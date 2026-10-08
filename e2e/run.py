@@ -161,11 +161,11 @@ def run_scenario(page: Page, fixture_name: str) -> None:
     for label, heading in (
         ('RH', 'RH'),
         ('Projects', 'Projets'),
-        ('Tasks', 'Tâches'),
+        ('Tâches', 'Tâches'),
         ('Snippets', 'Snippets'),
         ('Journal', 'Journal'),
         ('Export', 'Export des données'),
-        ('Planning', 'Planification'),
+        ('Planification', 'Planification'),
     ):
         page.get_by_role('link', name=label, exact=True).click()
         expect(page.locator('h1')).to_contain_text(heading)
@@ -231,10 +231,10 @@ def run_filled_crud(page: Page) -> None:
     persisted = read_workspace(page)
     assert any(item['title'] == 'E2E tâche' and item['status'] == 'done' for item in persisted['todos'])
 
-    todo.get_by_role('button', name='Supprimer', exact=True).click()
+    todo.get_by_role('button', name='Supprimer E2E tâche', exact=True).click()
     alert = page.get_by_role('alertdialog')
     expect(alert).to_be_visible()
-    alert.locator('.button.danger').click()
+    alert.get_by_role('button', name='Supprimer', exact=True).click()
     expect(page.locator('.todo-card', has_text='E2E tâche')).to_have_count(0)
     persisted = wait_for_workspace(
         page,
@@ -340,49 +340,57 @@ def run_domain_crud(page: Page) -> None:
     seed_fixture(page, 'workspace-full.json')
 
     page.goto(app_route('/projects'), wait_until='domcontentloaded')
-    click_with_prompts(
-        page,
-        page.get_by_role('button', name='+ Nouveau', exact=True),
-        ['E2E projet', 'e2e', '#64b0ff'],
-    )
+    page.get_by_role('button', name='+ Nouveau', exact=True).click()
+    project_dialog = page.get_by_role('dialog', name='Nouveau projet')
+    project_dialog.get_by_label('Nom du projet').fill('E2E projet')
+    project_dialog.get_by_role('button', name='Créer', exact=True).click()
     project = page.locator('.project-card', has_text='E2E projet')
     expect(project).to_be_visible()
-    project.get_by_role('button', name='Supprimer', exact=True).click()
+    project.get_by_role('button', name='Supprimer le projet', exact=True).click()
     alert = page.get_by_role('alertdialog')
     expect(alert).to_be_visible()
-    alert.locator('.button.danger').click()
+    alert.get_by_role('button', name='Supprimer', exact=True).click()
     expect(project).to_have_count(0)
 
     page.goto(app_route('/rh'), wait_until='domcontentloaded')
-    click_with_prompts(page, page.get_by_role('button', name='+ Dossier', exact=True), ['E2E RH'])
+    page.get_by_role('button', name='+ Dossier', exact=True).click()
+    rh_dialog = page.get_by_role('dialog', name='Nouveau dossier')
+    rh_dialog.get_by_label('Nom du dossier').fill('E2E RH')
+    rh_dialog.get_by_role('button', name='Créer', exact=True).click()
     folder = page.locator('[role="treeitem"]', has_text='E2E RH')
     expect(folder).to_be_visible()
-    folder.get_by_role('button', name='E2E RH', exact=True).click()
-    click_with_prompts(page, page.get_by_role('button', name='+ Document', exact=True), ['E2E document'])
+    folder.get_by_role('button', name=re.compile('Dossier : E2E RH')).click()
+    page.get_by_role('button', name='+ Document', exact=True).click()
+    document_dialog = page.get_by_role('dialog', name='Nouveau document')
+    document_dialog.get_by_label('Titre du document').fill('E2E document')
+    document_dialog.get_by_role('button', name='Créer', exact=True).click()
     document = page.locator('[role="treeitem"]', has_text='E2E document')
     expect(document).to_be_visible()
-    document.get_by_role('button', name='E2E document', exact=True).click()
+    document.get_by_role('button', name=re.compile('Document : E2E document')).click()
     expect(page.locator('.document-card')).to_contain_text('E2E document')
     page.locator('.document-card').get_by_role('button', name='Supprimer', exact=True).click()
-    alert = page.get_by_role('alertdialog')
+    alert = page.get_by_role('alertdialog', name='Supprimer E2E document ?')
     expect(alert).to_be_visible()
-    alert.locator('.button.danger').click()
+    alert.get_by_role('button', name='Confirmer', exact=True).click()
     expect(document).to_have_count(0)
 
     page.goto(app_route('/snippets'), wait_until='domcontentloaded')
-    click_with_prompts(page, page.get_by_role('button', name='+ Dossier', exact=True), ['E2E snippets'])
+    page.get_by_role('button', name='Dossier', exact=True).click()
+    snippet_folder_dialog = page.get_by_role('dialog', name='Nouveau dossier')
+    snippet_folder_dialog.get_by_label('Nom du dossier').fill('E2E snippets')
+    snippet_folder_dialog.get_by_role('button', name='Créer', exact=True).click()
     page.locator('.folder-row', has_text='E2E snippets').first.click()
-    click_with_prompts(
-        page,
-        page.get_by_role('button', name='+ Snippet', exact=True),
-        ['E2E snippet', 'console.log(1)', 'javascript'],
-    )
+    page.get_by_role('button', name='Nouveau', exact=True).click()
+    snippet_dialog = page.get_by_role('dialog', name='Nouveau snippet')
+    snippet_dialog.get_by_label('Titre du snippet').fill('E2E snippet')
+    snippet_dialog.get_by_label('Code').fill('console.log(1)')
+    snippet_dialog.get_by_role('button', name='Créer', exact=True).click()
     snippet = page.locator('.snippet-card', has_text='E2E snippet')
     expect(snippet).to_be_visible()
     snippet.get_by_role('button', name='Supprimer', exact=True).click()
-    alert = page.get_by_role('alertdialog')
+    alert = page.get_by_role('alertdialog', name='Supprimer E2E snippet ?')
     expect(alert).to_be_visible()
-    alert.locator('.button.danger').click()
+    alert.get_by_role('button', name='Confirmer', exact=True).click()
     expect(snippet).to_have_count(0)
 
 
@@ -465,7 +473,7 @@ def run_responsive_and_shortcuts(page: Page) -> None:
     expect(menu).to_be_visible()
     menu.click()
     expect(page.locator('#main-navigation')).to_have_class(re.compile(r'\bopen\b'))
-    page.locator('#main-navigation').get_by_role('link', name='Tasks', exact=True).click()
+    page.locator('#main-navigation').get_by_role('link', name='Tâches', exact=True).click()
     expect_heading(page, '#todos-title', 'Tâches')
     page.reload(wait_until='domcontentloaded')
     expect(page.locator('.todo-card')).to_have_count(4)
