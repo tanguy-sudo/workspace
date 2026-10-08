@@ -1,0 +1,66 @@
+<section class="dashboard-page" aria-labelledby="dashboard-title">
+      <header class="dashboard-hero">
+        <div class="hero-top">
+          <div>
+            <p class="eyebrow">{{ siteName() }}</p>
+            <h1 id="dashboard-title">{{ greeting() }} {{ userName() }},<br /><strong>{{ dateLabel() }}</strong></h1>
+          </div>
+          <div class="hero-stats">
+            @for (stat of heroStats(); track stat.label) {
+              <div class="hero-stat" [class.danger]="stat.tone === 'danger'" [class.accent]="stat.tone === 'accent'"><strong>{{ stat.count }}</strong><span>{{ stat.label }}</span></div>
+            }
+          </div>
+        </div>
+        <button class="hero-search" type="button" (click)="openSearch()"><span aria-hidden="true">⌕</span><span>Rechercher dans le workspace...</span><kbd>Ctrl+Espace</kbd></button>
+        <nav class="shortcut-grid" aria-label="Acces rapides">
+          @for (shortcut of shortcuts(); track shortcut.name) {
+             <a class="shortcut-card" [routerLink]="shortcut.path"><span class="shortcut-icon">{{ shortcut.icon }}</span><strong>{{ shortcut.name }}</strong><small>{{ shortcut.sub }}</small>@if (shortcut.badge !== null) { <span class="shortcut-badge" [class.danger]="shortcut.name === 'Taches' && reminderBuckets().overdue.length > 0">{{ shortcut.badge }}</span> }</a>
+          }
+        </nav>
+      </header>
+      @if (loading()) {
+        <p class="status-message">Chargement du dashboard...</p>
+      } @else if (!data()) {
+        <p class="status-message error-message" role="alert">Le dashboard ne peut pas etre charge.</p>
+      } @else {
+        <section class="dashboard-section" aria-labelledby="reminders-title">
+          <header class="section-header"><h2 id="reminders-title">Rappels <small>{{ activeReminderCount() ? '· ' + activeReminderCount() + ' actifs' : '' }}</small></h2><button class="primary-button" type="button" (click)="openReminder()">+ Nouveau rappel</button></header>
+          <div class="reminder-tabs" role="tablist" aria-label="Rappels">
+            @for (tab of reminderTabs; track tab.id) { <button type="button" role="tab" [id]="'reminder-tab-' + tab.id" [attr.aria-controls]="'reminder-panel-' + tab.id" [attr.aria-selected]="reminderTab() === tab.id" [class.active]="reminderTab() === tab.id" (click)="setReminderTab(tab.id)">{{ tab.label }} <span>{{ reminderCount(tab.id) }}</span></button> }
+          </div>
+          <div class="reminder-list" role="tabpanel" [id]="'reminder-panel-' + reminderTab()" [attr.aria-labelledby]="'reminder-tab-' + reminderTab()" aria-live="polite">
+            @for (todo of visibleReminders(); track todo.id) {
+              <article class="reminder-card" [class.overdue]="reminderTab() === 'overdue'" [class.today]="reminderTab() === 'today'" [class.pinned]="reminderTab() === 'pinned'" [class.upcoming]="reminderTab() === 'upcoming'" [attr.data-id]="todo.id">
+                <button class="check-button" type="button" [attr.aria-label]="'Terminer ' + todo.title" (click)="$event.stopPropagation(); completeReminder(todo)"></button>
+                <span class="priority-dot" [style.background]="priorityColor(todo.priorityId)" [attr.aria-label]="priorityLabel(todo.priorityId)" role="img"></span>
+                <button class="reminder-body" type="button" [attr.aria-label]="'Ouvrir ' + todo.title" (click)="openTodo(todo)"><strong>{{ todo.title }}</strong><span class="reminder-meta">@if (reminderWhen(todo); as when) { <span [class.late]="when.late">{{ when.text }}</span> } @if (priorityLabel(todo.priorityId); as priority) { <span>{{ priority }}</span> } @if (todo.context) { <span>@{{ todo.context }}</span> } @for (tag of (todo.tags || []).slice(0, 3); track tag) { <span>#{{ tag }}</span> }</span></button>
+                <button class="pin-button" type="button" [class.active]="todo.pinned === true" [attr.aria-label]="todo.pinned ? 'Désépingler ' + todo.title : 'Épingler ' + todo.title" [attr.aria-pressed]="todo.pinned === true" (click)="$event.stopPropagation(); togglePin(todo)">{{ todo.pinned ? '★' : '☆' }}</button>
+              </article>
+            } @if (!visibleReminders().length) { <p class="empty-message">{{ reminderEmptyMessage() }}</p> }
+          </div>
+        </section>
+
+        @if (taskStats().total) {
+          <section class="dashboard-section" aria-labelledby="task-stats-title">
+            <header class="section-header"><h2 id="task-stats-title">Apercu des taches</h2></header>
+            <div class="task-stats-grid"><div class="stat-card"><span>Terminees</span><strong>{{ taskStats().done }}</strong></div><div class="stat-card"><span>Finies cette semaine</span><strong class="accent-text">{{ taskStats().doneWeek }}</strong></div><div class="stat-card"><span>En retard</span><strong [class.danger-text]="taskStats().overdue">{{ taskStats().overdue }}</strong></div><div class="stat-card"><span>En cours</span><strong>{{ taskStats().active }}</strong></div><div class="stat-card progress-card"><div><span>Progression globale</span><strong>{{ taskStats().progress }}%</strong></div><div class="progress-bar"><span [style.width.%]="taskStats().progress"></span></div>@for (priority of taskStats().priorities; track priority.id) { <div class="priority-row"><span [style.color]="priority.color">{{ priority.label }}</span><i><b [style.width.%]="priority.percent" [style.background]="priority.color"></b></i><small>{{ priority.count }}</small></div> }</div></div>
+          </section>
+        }
+
+        <section class="dashboard-section" aria-labelledby="health-title"><header class="section-header"><h2 id="health-title">Points d'attention</h2></header><div class="health-grid">@for (card of healthCards(); track card.id) { <a class="health-card" [class.warn]="card.tone === 'warn'" [class.ok]="card.tone === 'ok'" [routerLink]="card.path" [queryParams]="card.queryParams"><strong>{{ card.count }}</strong><b>{{ card.label }}</b><small>{{ card.hint }}</small></a> }</div></section>
+
+        <section class="dashboard-section" aria-labelledby="review-title"><header class="section-header review-header"><div><h2 id="review-title">Revue hebdomadaire</h2><p>{{ reviewStatus() }}</p></div><div class="review-actions"><button class="secondary-button" type="button" (click)="createWeeklyReviewTodo()">Creer une tache de revue</button><button class="primary-button" type="button" [disabled]="reviewDone()" (click)="completeReview()">{{ reviewDone() ? 'Revue faite cette semaine' : 'Marquer faite' }}</button></div></header><div class="review-list">@for (item of reviewItems(); track item.title) { <a class="review-item" [class.ok]="item.ok" [routerLink]="item.path" [queryParams]="item.queryParams"><strong>{{ item.title }}</strong><small>{{ item.detail }}</small></a> }</div></section>
+
+        <section class="dashboard-section" aria-labelledby="recent-title"><header class="section-header"><h2 id="recent-title">Recemment visite</h2>@if (recentItems().length > 4) { <button class="secondary-button" type="button" (click)="recentExpanded.update(value => !value)">{{ recentExpanded() ? 'Voir moins' : 'Voir plus' }}</button> }</header><div class="recent-grid" aria-live="polite">
+          @for (item of visibleRecentItems(); track item.key) {
+            @if (item.kind === 'activity') { <article class="recent-card activity-card"><small>{{ activityActionLabel(item.action) }} · {{ activityTypeLabel(item.type) }}</small><strong>{{ item.label }}</strong><time>{{ timeAgo(item.ts) }}</time></article> }
+            @else { @if (recentTarget(item); as target) { <a class="recent-card" [routerLink]="recentPath(item)" [queryParams]="recentQuery(item)"><small>{{ item.type === 'project' ? 'Projet' : 'Dossier RH' }}</small><strong>{{ item.name }}</strong><time>{{ timeAgo(item.ts) }}</time></a> } @else { <button class="recent-card missing" type="button" (click)="missingRecent()"><small>{{ item.type === 'project' ? 'Projet' : 'Dossier RH' }}</small><strong>{{ item.name }}</strong><time>Element supprime</time></button> } }
+          }
+          @if (!recentItems().length) { <p class="empty-message">Aucune activite recente. Creez des taches, snippets ou documents pour les retrouver ici.</p> }
+        </div></section>
+      }
+    </section>
+
+    @if (reminderDialog()) {
+      <div class="dialog-backdrop" role="presentation" (click)="closeReminder()"><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="reminder-dialog-title" appFocusTrap tabindex="-1" (click)="$event.stopPropagation()"><h2 id="reminder-dialog-title">Nouveau rappel</h2><form (ngSubmit)="submitReminder()"><label class="field"><span>Titre du rappel *</span><input name="reminder-title" maxlength="120" required [(ngModel)]="reminderDraft.title" /></label><div class="field-grid"><label class="field"><span>Date et heure</span><app-date-picker name="reminder-when" mode="datetime" [(ngModel)]="reminderDraft.when" /></label><label class="field"><span>Priorite</span><select name="reminder-priority" [(ngModel)]="reminderDraft.priorityId">@for (priority of priorities(); track priority.id) { <option [value]="priority.id">{{ priority.label }}</option> }</select></label></div><label class="field"><span>Contexte</span><input name="reminder-context" maxlength="80" placeholder="bureau, client..." [(ngModel)]="reminderDraft.context" /></label><label class="check-field"><input name="reminder-pinned" type="checkbox" [(ngModel)]="reminderDraft.pinned" /> Epingler sur l'accueil</label><div class="dialog-actions"><button class="secondary-button" type="button" (click)="closeReminder()">Annuler</button><button class="primary-button" type="submit">Creer</button></div></form></section></div>
+    }

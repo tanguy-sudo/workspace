@@ -1,0 +1,30 @@
+<div class="toast-stack" aria-live="polite" aria-atomic="false">
+      @for (toast of feedback.toasts(); track toast.id) {
+        <div class="toast" [class]="'toast ' + toast.kind" role="status">
+          <span>{{ toast.message }}</span>
+          <button type="button" aria-label="Fermer le message" (click)="feedback.dismissToast(toast.id)">×</button>
+        </div>
+      }
+    </div>
+
+    @if (feedback.modal(); as modal) {
+      <div class="modal-backdrop" role="presentation" (click)="onBackdrop($event)">
+        <section
+          #dialog
+          class="dialog"
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="dialog-title"
+          aria-describedby="dialog-message"
+          appFocusTrap
+          tabindex="-1"
+        >
+          <h2 id="dialog-title">{{ modal.title }}</h2>
+          <p id="dialog-message">{{ modal.message }}</p>
+          <div class="dialog-actions">
+            <button type="button" class="secondary-button" (click)="feedback.resolveModal(false)">{{ modal.cancelLabel }}</button>
+            <button type="button" class="primary-button" [class.danger-button]="modal.destructive" (click)="feedback.resolveModal(true)">{{ modal.confirmLabel }}</button>
+          </div>
+        </section>
+      </div>
+    }

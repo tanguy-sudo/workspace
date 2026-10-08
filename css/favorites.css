@@ -1,0 +1,89 @@
+/* ── favorites.css ── panneau favoris flottant ── */
+
+.fav-fab {
+  position:fixed; bottom:28px; right:28px; z-index:150;
+  width:46px; height:46px; border-radius:14px;
+  background:var(--accent); color:var(--bg);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 20px rgba(240,160,48,.35);
+  transition:transform var(--t-fast), box-shadow var(--t-fast);
+  cursor:pointer; border:none;
+}
+.fav-fab:hover { transform:scale(1.08) translateY(-2px); box-shadow:0 8px 28px rgba(240,160,48,.45); }
+.fav-fab:active { transform:scale(.95); }
+.fav-fab svg { transition:transform var(--t-mid); }
+.fav-fab.open svg { transform:rotate(45deg); }
+
+.fav-backdrop {
+  position:fixed; inset:0; z-index:148;
+  background:rgba(0,0,0,.2); backdrop-filter:blur(2px);
+  opacity:0; pointer-events:none; transition:opacity var(--t-mid);
+}
+.fav-backdrop.open { opacity:1; pointer-events:all; }
+
+.fav-panel {
+  position:fixed; right:20px; bottom:86px; z-index:149;
+  width:310px; max-height:calc(100vh - 120px);
+  background:var(--bg-2); border:1px solid var(--border);
+  border-radius:var(--r-xl); box-shadow:var(--shadow-lg);
+  display:flex; flex-direction:column;
+  transform:scale(.95) translateY(10px); transform-origin:bottom right;
+  opacity:0; pointer-events:none;
+  transition:transform var(--t-mid), opacity var(--t-mid);
+  overflow:hidden;
+}
+.fav-panel.open { transform:scale(1) translateY(0); opacity:1; pointer-events:all; }
+
+.fav-panel-header { padding:var(--sp-4) var(--sp-4) var(--sp-3); border-bottom:1px solid var(--border); flex-shrink:0; }
+.fav-panel-title  { font-size:.82rem; font-weight:600; margin-bottom:var(--sp-2); }
+.fav-breadcrumb   {
+  display:flex; align-items:center; gap:4px; flex-wrap:wrap;
+  font-family:var(--font-mono); font-size:.66rem; color:var(--text-3); min-height:16px;
+}
+.fav-bc-item { cursor:pointer; padding:1px 4px; border-radius:3px; transition:all var(--t-fast); }
+.fav-bc-item:hover { color:var(--text); background:var(--bg-3); }
+.fav-bc-item.current { color:var(--text-2); cursor:default; }
+.fav-bc-item.current:hover { background:transparent; }
+.fav-bc-sep { color:var(--border-hi); }
+
+.fav-panel-body { flex:1; overflow-y:auto; padding:var(--sp-1) 0; }
+
+.fav-back {
+  display:flex; align-items:center; gap:var(--sp-2);
+  padding:var(--sp-2) var(--sp-4); color:var(--text-3);
+  font-size:.82rem; cursor:pointer; width:100%; background:none; border:none;
+  transition:color var(--t-fast), background var(--t-fast);
+  border-bottom:1px solid var(--border); margin-bottom:var(--sp-1);
+  font-family:var(--font-sans);
+}
+.fav-back:hover { color:var(--text); background:var(--bg-3); }
+
+.fav-entry {
+  display:flex; align-items:center; gap:var(--sp-3);
+  padding:var(--sp-2) var(--sp-4); cursor:pointer;
+  transition:background var(--t-fast); min-height:38px;
+  border:none; width:100%; background:none; text-align:left; font-family:var(--font-sans); color:var(--text);
+}
+.fav-entry:hover { background:var(--bg-3); }
+.fav-entry-icon {
+  width:26px; height:26px; border-radius:var(--r-sm);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.fav-entry.fav-folder .fav-entry-icon { background:var(--accent-dim); color:var(--accent); }
+.fav-entry.fav-link   .fav-entry-icon { background:var(--link-dim);   color:var(--link-color); }
+.fav-entry-name { flex:1; font-size:.84rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fav-entry.fav-folder .fav-entry-name { font-weight:500; }
+.fav-entry.fav-link .fav-entry-name { color:var(--link-color); }
+.fav-entry-arrow { color:var(--text-3); flex-shrink:0; }
+.fav-entry-actions { display:none; gap:2px; }
+.fav-entry:hover .fav-entry-actions { display:flex; }
+.fav-entry:hover .fav-entry-arrow   { display:none; }
+
+.fav-empty { text-align:center; padding:var(--sp-6) var(--sp-4); color:var(--text-3); font-size:.82rem; }
+
+.fav-panel-footer {
+  padding:var(--sp-2) var(--sp-3) var(--sp-3);
+  border-top:1px solid var(--border); flex-shrink:0;
+  display:flex; gap:var(--sp-2);
+}
+.fav-panel-footer .btn { flex:1; justify-content:center; font-size:.78rem; }

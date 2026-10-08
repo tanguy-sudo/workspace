@@ -1,0 +1,176 @@
+/* ── global-search.css ── */
+
+.gs-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 80px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-mid);
+}
+.gs-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.gs-box {
+  width: min(600px, calc(100vw - 32px));
+  background: var(--bg-2);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-12px) scale(0.98);
+  transition: transform var(--t-mid);
+}
+.gs-overlay.open .gs-box {
+  transform: translateY(0) scale(1);
+}
+
+.gs-input-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  border-bottom: 1px solid var(--border);
+}
+.gs-input-row svg {
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+.gs-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+.gs-input::placeholder {
+  color: var(--text-3);
+}
+.gs-shortcut {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-3);
+  background: var(--bg-3);
+  padding: 2px 7px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.gs-results {
+  max-height: 420px;
+  overflow-y: auto;
+  padding: var(--sp-2) 0;
+}
+
+.gs-section-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+  padding: var(--sp-2) var(--sp-5) var(--sp-1);
+}
+
+.gs-result {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-5);
+  cursor: pointer;
+  transition: background var(--t-fast);
+  border: none;
+  width: 100%;
+  background: none;
+  text-align: left;
+  font-family: var(--font-sans);
+}
+.gs-result:hover,
+.gs-result.selected {
+  background: var(--bg-3);
+}
+.gs-result .gs-shortcut {
+  opacity: 0;
+  transition: opacity var(--t-fast);
+}
+.gs-result.selected .gs-shortcut,
+.gs-result:hover .gs-shortcut {
+  opacity: 1;
+}
+
+.gs-result-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.gs-result-body {
+  flex: 1;
+  min-width: 0;
+}
+.gs-result-title {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gs-result-sub {
+  font-size: 0.75rem;
+  color: var(--text-3);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gs-result-title mark {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+.gs-empty {
+  text-align: center;
+  padding: var(--sp-6);
+  color: var(--text-3);
+  font-size: 0.85rem;
+}
+
+.gs-footer {
+  padding: var(--sp-3) var(--sp-5);
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: var(--sp-4);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-3);
+}
+.gs-footer kbd {
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+/* ── Filtres avancés ── */
+.gs-chips { display:flex; flex-wrap:wrap; gap:6px; padding:8px var(--sp-5) 4px; }
+.gs-chip { font-size:.72rem; padding:2px 8px; border-radius:999px; border:1px solid var(--bd); background:var(--bg-2); color:var(--text-2); font-family:var(--font-mono); }
+.gs-help { padding:8px var(--sp-5) var(--sp-3); border-top:1px solid var(--bd); margin-top:var(--sp-2); }
+.gs-help-row { display:flex; align-items:center; gap:10px; padding:3px 0; font-size:.78rem; color:var(--text-2); }
+.gs-help-row code { background:var(--bg-3); padding:1px 6px; border-radius:4px; font-family:var(--font-mono); color:var(--accent); min-width:140px; display:inline-block; }
+.gs-result mark { background:color-mix(in srgb,var(--accent) 35%,transparent); color:inherit; border-radius:2px; padding:0 1px; }
+

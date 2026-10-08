@@ -1,0 +1,87 @@
+/* ── pages/settings.css ── */
+
+.settings-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-5);
+  margin-bottom: var(--sp-7);
+}
+
+.settings-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-xl);
+  padding: var(--sp-5);
+  box-shadow: var(--glass-shadow);
+}
+
+.settings-card-title {
+  font-size: 0.95rem;
+  margin-bottom: var(--sp-4);
+  font-weight: 600;
+}
+
+.settings-card .field:last-of-type {
+  margin-bottom: var(--sp-3);
+}
+
+.settings-note {
+  margin: 0;
+  color: var(--text-3);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.settings-value {
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg-3);
+  color: var(--text-2);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.settings-actions {
+  display: flex;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+
+.settings-actions-wrap {
+  flex-wrap: wrap;
+}
+
+.settings-summary {
+  grid-column: 1 / -1;
+}
+
+.settings-summary ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.settings-summary li {
+  font-size: 0.88rem;
+  color: var(--text-2);
+  padding: var(--sp-2) 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.settings-summary li:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 840px) {
+  .settings-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-summary {
+    grid-column: auto;
+  }
+}

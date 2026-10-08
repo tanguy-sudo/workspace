@@ -1,0 +1,99 @@
+<section class="planning-page" aria-labelledby="planning-title">
+      <header class="planning-header">
+        <div>
+          <p class="eyebrow">WORKSPACE / ANGULAR</p>
+          <h1 id="planning-title">Planification</h1>
+          <p class="planning-meta">Optimise ton temps selon tes tâches</p>
+        </div>
+        <span id="session-counter" class="plan-session-counter" [hidden]="!sessionDoneIds().size">✓ {{ sessionDoneIds().size }} terminée{{ sessionDoneIds().size > 1 ? 's' : '' }} cette session</span>
+      </header>
+
+      <section class="planning-form-card" aria-labelledby="planning-form-title">
+        <h2 id="planning-form-title">Quel est ton créneau disponible ?</h2>
+        <div class="planning-form-row">
+          <label class="field">
+            <span>Temps disponible (min)</span>
+            <input id="p-time" type="text" inputmode="decimal" placeholder="Ex : 90 ou 60*5" [(ngModel)]="timeInput" />
+            <small id="p-time-hint" [class.valid-hint]="timeHintState() === 'valid'" [class.invalid-hint]="timeHintState() === 'invalid'">{{ timeHint() }}</small>
+          </label>
+          <label class="field">
+            <span>Contexte <em>(optionnel)</em></span>
+            <select id="p-context" [(ngModel)]="context">
+              <option value="">Peu importe</option>
+              @for (value of contexts(); track value) { <option [value]="value">{{ value }}</option> }
+            </select>
+          </label>
+          <label class="field" [hidden]="!projects().length">
+            <span>Projet <em>(optionnel)</em></span>
+            <select id="p-project" [(ngModel)]="projectId">
+              <option value="">Tous les projets</option>
+              @for (project of projects(); track project.id) { <option [value]="project.id">{{ project.name }}</option> }
+            </select>
+          </label>
+          <label class="field">
+            <span>Échéance</span>
+            <select id="p-date" [(ngModel)]="dateFilter">
+              <option value="all">Toutes les tâches</option>
+              <option value="today">Aujourd'hui</option>
+              <option value="week">Cette semaine</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="planning-mode-row">
+          <span class="planning-mode-label">Mode</span>
+          <div class="planning-mode-options">
+            @for (option of modes; track option.id) {
+              <label class="plan-mode-btn">
+                <input type="radio" name="p-mode" [value]="option.id" [(ngModel)]="mode" />
+                <span class="plan-mode-inner"><strong>{{ option.label }}</strong><small>{{ option.description }}</small></span>
+              </label>
+            }
+          </div>
+          <div class="planning-form-actions">
+            <button id="btn-plan" class="primary-button" type="button" (click)="runPlan()">Générer</button>
+            <button id="btn-reset" class="secondary-button" type="button" (click)="resetPlan()">Réinitialiser</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="plan-result" [hidden]="!resultVisible()" aria-live="polite">
+          <div id="plan-summary" class="plan-summary">
+            @if (!plan().length) {
+              <span>Aucune tâche disponible pour ce créneau.</span>
+            } @else {
+              <span><strong>{{ plan().length }}</strong> tâche{{ plan().length > 1 ? 's' : '' }} · <strong>{{ formatTime(totalPlanMinutes()) || 'temps variable' }}</strong> estimé · mode <strong>{{ modeLabel() }}</strong>@if (displayedContext(); as planContext) { · contexte <strong>{{ planContext }}</strong> } @if (restoredLabel(); as label) { <span class="plan-restored-badge" title="Plan restauré automatiquement">↩ restauré {{ label }}</span> }</span>
+            }
+          </div>
+
+          <div id="plan-time-bar-wrap" class="plan-time-bar-wrap">
+            <div class="plan-timebar-labels">
+              <span>{{ formatTime(timeBar().used) }} planifiés</span>
+              <span class="plan-timebar-remaining">{{ timeBar().remaining > 0 ? formatTime(timeBar().remaining) + ' restant sur ' + formatTime(timeBar().available) : 'Créneau optimisé à 100%' }}</span>
+            </div>
+            <div class="plan-timebar" role="progressbar" [attr.aria-valuenow]="timeBar().percent" aria-valuemin="0" aria-valuemax="100">
+              <div class="plan-timebar-fill" [class.warning-fill]="timeBar().percent > 70 && timeBar().percent <= 95" [class.success-fill]="timeBar().percent > 95" [style.width.%]="timeBar().percent"></div>
+            </div>
+          </div>
+
+          <div id="plan-list" class="plan-task-list">
+            @for (todo of plan(); track todo.id; let index = $index) {
+              <article class="plan-task-card" [class.plan-task-done]="isSessionDone(todo.id)" [attr.data-todo-id]="todo.id" [attr.data-id]="todo.id">
+                <div class="plan-task-number">{{ index + 1 }}</div>
+                <div class="plan-task-body">
+                  <button class="plan-task-title" type="button" (click)="openTask(todo)" [attr.aria-label]="'Ouvrir ' + todo.title">{{ todo.title }}</button>
+                  <div class="plan-task-meta">
+                    @if (priorityFor(todo.priorityId); as priority) { <span class="priority-chip" [style.color]="safePriorityColor(priority.color)" [style.border-color]="safePriorityColor(priority.color)">{{ priority.label }}</span> }
+                    @if (todoMinutes(todo)) { <span class="meta-chip">{{ formatTime(todoMinutes(todo)) }}</span> }
+                    @if (todo.context) { <span class="meta-chip context-chip">{{ todo.context }}</span> }
+                    @if (todo.dueDate) { <span class="meta-chip due-chip">Échéance: {{ todo.dueDate }}</span> }
+                  </div>
+                  @if (!isSessionDone(todo.id)) {
+                    <button class="success-button" type="button" (click)="completeTask(todo)">✓ Marquer terminée</button>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+      </section>
+    </section>

@@ -1,0 +1,279 @@
+/* ── markdown-editor.css ── */
+
+.md-editor {
+  border: 1px solid var(--bd);
+  border-radius: var(--rad-md);
+  background: var(--bg-2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.md-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  background: var(--bg-3);
+  border-bottom: 1px solid var(--bd);
+  flex-wrap: wrap;
+}
+.md-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid transparent;
+  border-radius: var(--rad-sm);
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-family: var(--font-sans);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition:
+    background var(--t-fast),
+    color var(--t-fast);
+}
+.md-btn:hover {
+  background: var(--bg-2);
+  color: var(--text);
+  border-color: var(--bd);
+}
+.md-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--bd);
+  margin: 0 4px;
+}
+.md-spacer {
+  flex: 1;
+}
+
+.md-mode {
+  display: inline-flex;
+  background: var(--bg-2);
+  border: 1px solid var(--bd);
+  border-radius: var(--rad-sm);
+  padding: 2px;
+  gap: 2px;
+}
+.md-mode-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  padding: 3px 10px;
+  font-size: 0.72rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+.md-mode-btn.active {
+  background: var(--accent);
+  color: var(--bg-1);
+}
+
+.md-body {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+.md-editor[data-mode="split"] .md-body {
+  grid-template-columns: 1fr 1fr;
+}
+.md-editor[data-mode="preview"] .md-input,
+.md-editor[data-mode="edit"] .md-preview {
+  display: none;
+}
+.md-editor[data-mode="split"] .md-preview {
+  border-left: 1px solid var(--bd);
+}
+
+.md-input {
+  border: none;
+  outline: none;
+  background: var(--bg-1);
+  color: var(--text);
+  padding: var(--sp-3) var(--sp-4);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  resize: none;
+  width: 100%;
+  border-radius: 0;
+}
+.md-input:focus {
+  border: none;
+}
+
+.md-preview {
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--bg-1);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  overflow: auto;
+  max-height: 600px;
+}
+
+/* ── Rendu markdown (preview + notes affichées) ── */
+.md-rendered h1,
+.md-rendered h2,
+.md-rendered h3,
+.md-rendered h4,
+.md-rendered h5,
+.md-rendered h6 {
+  margin: 0.8em 0 0.4em;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.md-rendered h1 {
+  font-size: 1.5em;
+  border-bottom: 1px solid var(--bd);
+  padding-bottom: 4px;
+}
+.md-rendered h2 {
+  font-size: 1.25em;
+}
+.md-rendered h3 {
+  font-size: 1.1em;
+}
+.md-rendered h4 {
+  font-size: 1em;
+  color: var(--text-2);
+}
+
+.md-rendered p {
+  margin: 0.5em 0;
+}
+.md-rendered ul,
+.md-rendered ol {
+  margin: 0.4em 0 0.4em 1.4em;
+  padding: 0;
+}
+.md-rendered li {
+  margin: 2px 0;
+}
+.md-rendered li.task-item {
+  list-style: none;
+  margin-left: -1.2em;
+}
+.md-rendered li.task-item input {
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.md-rendered code {
+  background: var(--bg-3);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--code-color, var(--accent));
+}
+.md-rendered pre {
+  background: var(--bg-3);
+  border: 1px solid var(--bd);
+  border-radius: var(--rad-sm);
+  padding: 10px 12px;
+  overflow: auto;
+  margin: 0.6em 0;
+}
+.md-rendered pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.82em;
+  color: var(--text);
+}
+
+.md-rendered blockquote {
+  margin: 0.6em 0;
+  padding: 4px 12px;
+  border-left: 3px solid var(--accent);
+  background: var(--bg-2);
+  color: var(--text-2);
+  border-radius: 0 var(--rad-sm) var(--rad-sm) 0;
+}
+
+.md-rendered a {
+  color: var(--link-color, var(--accent));
+  text-decoration: none;
+}
+.md-rendered a:hover {
+  text-decoration: underline;
+}
+
+.md-rendered hr {
+  border: none;
+  border-top: 1px solid var(--bd, var(--border-hi));
+  margin: 0.8em 0;
+}
+
+.md-rendered img {
+  max-width: 100%;
+  border-radius: var(--rad-sm);
+  margin: 0.4em 0;
+}
+
+.md-rendered .md-table-wrap {
+  margin: 0.8em 0;
+  overflow-x: auto;
+  border: 1px solid var(--bd);
+  border-radius: var(--rad-sm);
+  background: color-mix(in srgb, var(--bg-2) 86%, transparent);
+  scrollbar-width: thin;
+}
+
+.md-rendered table {
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 0;
+  width: 100%;
+  min-width: 620px;
+  font-size: 0.88em;
+}
+.md-rendered th,
+.md-rendered td {
+  border-right: 1px solid var(--bd);
+  border-bottom: 1px solid var(--bd);
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.md-rendered th {
+  background: color-mix(in srgb, var(--bg-3) 90%, var(--accent) 10%);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.md-rendered th:last-child,
+.md-rendered td:last-child {
+  border-right: none;
+}
+.md-rendered tbody tr:last-child td {
+  border-bottom: none;
+}
+.md-rendered tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--bg-3) 45%, transparent);
+}
+.md-rendered tbody tr:hover {
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-2) 88%);
+}
+.md-rendered td:first-child,
+.md-rendered th:first-child {
+  min-width: 260px;
+}
+.md-rendered td a {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 900px) {
+  .md-rendered table {
+    min-width: 520px;
+  }
+}
+
+.md-rendered del {
+  color: var(--text-2);
+}

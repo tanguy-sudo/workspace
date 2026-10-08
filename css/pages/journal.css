@@ -1,0 +1,303 @@
+/* ── pages/journal.css ── */
+
+.journal-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: var(--sp-4);
+  margin-top: var(--sp-4);
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .journal-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Sidebar */
+.journal-sidebar {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  position: sticky;
+  top: var(--sp-4);
+  max-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+}
+.journal-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--sp-3) calc(var(--sp-4) + 36px) var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-3);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+}
+.journal-sidebar-header span:last-child {
+  background: var(--bg-2);
+  padding: 1px 8px;
+  border-radius: 999px;
+  color: var(--text-2);
+}
+.journal-list {
+  overflow-y: auto;
+  flex: 1;
+}
+.journal-side-empty {
+  padding: var(--sp-5);
+  text-align: center;
+  color: var(--text-3);
+  font-size: 0.82rem;
+}
+
+/* Wrapper relatif pour positionner le bouton delete */
+.journal-entry-wrap {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--border);
+}
+.journal-entry-wrap .journal-entry {
+  flex: 1;
+  border-bottom: none; /* géré par le wrapper */
+}
+/* Bouton supprimer — apparaît au survol du wrapper */
+.journal-entry-del {
+  position: absolute;
+  top: 50%;
+  right: var(--sp-2);
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-sm);
+  border: 1px solid transparent;
+  background: none;
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--t-fast), color var(--t-fast),
+    background var(--t-fast), border-color var(--t-fast);
+  flex-shrink: 0;
+}
+.journal-entry-wrap:hover .journal-entry-del {
+  opacity: 1;
+}
+.journal-entry-del:hover {
+  color: var(--danger);
+  background: var(--danger-dim);
+  border-color: color-mix(in srgb, var(--danger) 40%, transparent);
+}
+
+.journal-entry {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  border-bottom: none;
+  padding: var(--sp-3) var(--sp-4);
+  cursor: pointer;
+  transition: background var(--t-fast);
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+.journal-entry:hover {
+  background: var(--bg-3);
+}
+.journal-entry.active {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-left: 3px solid var(--accent);
+  padding-left: calc(var(--sp-4) - 3px);
+}
+.journal-entry-date {
+  flex-shrink: 0;
+  width: 42px;
+  text-align: center;
+  padding: 4px 0;
+  background: var(--bg-3);
+  border-radius: var(--r-sm);
+  font-family: var(--font-mono);
+}
+.journal-entry.active .journal-entry-date {
+  background: var(--accent);
+  color: var(--bg-1);
+}
+.journal-entry-day {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1;
+}
+.journal-entry-mon {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+.journal-entry.active .journal-entry-mon {
+  color: var(--bg-1);
+  opacity: 0.8;
+}
+.journal-entry-body {
+  flex: 1;
+  min-width: 0;
+}
+.journal-entry-title {
+  font-size: 0.88rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+.journal-entry-preview {
+  font-size: 0.74rem;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.journal-entry-mood {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+/* Main */
+.journal-main {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5) var(--sp-6);
+  min-height: 60vh;
+}
+.journal-empty {
+  text-align: center;
+  padding: var(--sp-7) var(--sp-4);
+  color: var(--text-2);
+}
+.journal-empty-icon {
+  font-size: 3rem;
+  margin-bottom: var(--sp-3);
+}
+.journal-empty h2 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: var(--sp-2);
+  color: var(--text);
+}
+.journal-empty p {
+  font-size: 0.88rem;
+  margin-bottom: var(--sp-5);
+  line-height: 1.6;
+}
+
+.journal-entry-header {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+  margin-bottom: var(--sp-4);
+  padding-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--border);
+}
+.journal-entry-title-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  font-family: var(--font-sans);
+  margin-bottom: 6px;
+}
+.journal-entry-title-input:focus {
+  outline: none;
+  border: none;
+}
+.journal-entry-info {
+  display: flex;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-3);
+  flex-wrap: wrap;
+  align-items: center;
+}
+.journal-entry-info .saved {
+  color: var(--success);
+  transition:
+    visibility 0.2s,
+    opacity 0.2s;
+}
+
+.journal-mood-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: var(--sp-3);
+}
+.journal-mood-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text-2);
+  font-family: var(--font-sans);
+  transition: all var(--t-fast);
+}
+.journal-mood-btn:hover {
+  color: var(--text);
+  border-color: var(--border-hi);
+}
+.journal-mood-btn.active {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.journal-mood-btn span:first-child {
+  font-size: 1rem;
+}
+
+.journal-tags-input {
+  width: 100%;
+  margin-bottom: var(--sp-4);
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  font-size: 0.82rem;
+  font-family: var(--font-sans);
+  padding: 8px 12px;
+}
+
+.journal-actions {
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+#journal-search {
+  width: 100%;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  border-radius: var(--r-md);
+}

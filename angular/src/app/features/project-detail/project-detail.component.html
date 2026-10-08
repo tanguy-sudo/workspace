@@ -1,0 +1,210 @@
+<section class="project-detail-page" aria-labelledby="project-name">
+      @if (loading()) {
+        <p class="status-message">Chargement du projet...</p>
+      } @else if (!project()) {
+        <div class="status-message error-message" role="alert">
+          <h1 id="project-name">Project</h1>
+          <p>Ce projet est introuvable ou ses données sont indisponibles.</p>
+          <button class="secondary-button" type="button" (click)="backToProjects()">Retour aux projets</button>
+        </div>
+      } @else {
+        <header class="project-header" [style.--project-color]="projectColor(project()?.color)">
+          <nav class="breadcrumbs" aria-label="Chemin du projet">
+            @for (crumb of breadcrumbs(); track crumb.id; let index = $index) {
+              <button type="button" (click)="navigateToBreadcrumb(index)">{{ crumb.name }}</button>
+              @if (index < breadcrumbs().length - 1) { <span aria-hidden="true">/</span> }
+            }
+          </nav>
+          <div class="header-main">
+            <div>
+              <p class="eyebrow">WORKSPACE / ANGULAR</p>
+              <h1 id="project-name">{{ project()?.name }}</h1>
+              <p class="project-meta">{{ itemCount() }} item{{ itemCount() > 1 ? 's' : '' }} · {{ currentFolderName() }}</p>
+            </div>
+            <div class="header-actions">
+              <button class="secondary-button" type="button" [class.active-button]="selectionMode()" (click)="toggleSelectionMode()">{{ selectionMode() ? 'Annuler' : 'Sélectionner' }}</button>
+              <button class="secondary-button" type="button" (click)="openNewFolder()">+ Dossier</button>
+              <button class="primary-button" type="button" (click)="openNewItem()">+ Item</button>
+              <button class="secondary-button" type="button" (click)="openProjectEditor()">Modifier</button>
+              <button class="secondary-button" type="button" (click)="backToProjects()">Retour</button>
+            </div>
+          </div>
+          <div class="filter-row" role="toolbar" aria-label="Filtrer les éléments">
+            @for (filter of filters; track filter.id) {
+              <button type="button" [class.active-filter]="activeFilter() === filter.id" (click)="setFilter(filter.id)">{{ filter.label }}</button>
+            }
+          </div>
+        </header>
+
+        @if (selectionMode()) {
+          <div class="selection-bar" role="status">
+            <span>{{ selectedIds().size }} sélectionné{{ selectedIds().size > 1 ? 's' : '' }}</span>
+            <button class="danger-button" type="button" [disabled]="!selectedIds().size" (click)="deleteSelected()">Supprimer</button>
+          </div>
+        }
+
+        <div class="project-content">
+          @if (folderStack().length > 1) {
+            <button class="parent-drop" type="button" (click)="goParent()" (dragover)="allowParentDrop($event)" (drop)="dropIntoParent($event)">← Remonter dans {{ parentFolderName() }}</button>
+          }
+          @if (!visibleNodes().length) {
+            <div class="empty-state"><h2>{{ activeFilter() === 'all' ? 'Dossier vide' : 'Aucun item de ce type' }}</h2><p>Ajoutez un dossier ou un item pour commencer.</p></div>
+          } @else {
+            <div class="nodes-list" aria-live="polite">
+              @for (node of visibleNodes(); track node.id) {
+                @if (node.nodeType === 'folder') {
+                  <article
+                    class="folder-card"
+                    [class.pinned]="node.pinned === true"
+                    [class.selected]="selectedIds().has(node.id)"
+                    [class.focused]="focusHighlight() === node.id"
+                    [class.drop-before]="isDrop(node.id, 'before')"
+                    [class.drop-inside]="isDrop(node.id, 'inside')"
+                    [class.drop-after]="isDrop(node.id, 'after')"
+                    [attr.data-project-node-id]="node.id"
+                    draggable="true"
+                    tabindex="0"
+                    (click)="activateNode(node)"
+                    (keydown.enter)="activateFromKeyboard($event, node)"
+                    (keydown.space)="activateFromKeyboard($event, node)"
+                    (dragstart)="dragStart($event, node)"
+                    (dragover)="dragOver($event, node)"
+                    (dragleave)="dragLeave(node.id)"
+                    (drop)="dropNode($event, node)"
+                    (dragend)="dragEnd()"
+                  >
+                    @if (selectionMode()) { <input class="selection-checkbox" type="checkbox" [checked]="selectedIds().has(node.id)" (click)="$event.stopPropagation()" (change)="toggleSelection(node.id)" [attr.aria-label]="'Sélectionner ' + node.name" /> }
+                     <span class="node-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 6.5a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg></span>
+                    <div class="node-main"><h2>{{ node.name }}</h2><span>{{ node.children?.length ?? 0 }} élément{{ (node.children?.length ?? 0) > 1 ? 's' : '' }}</span></div>
+                    <div class="node-actions">
+                       <button type="button" [attr.aria-label]="node.pinned === true ? 'Désépingler ' + node.name : 'Épingler ' + node.name" [attr.aria-pressed]="node.pinned === true" (click)="$event.stopPropagation(); togglePin(node)">{{ node.pinned === true ? '★' : '☆' }}</button>
+                      <button type="button" (click)="$event.stopPropagation(); openRenameFolder(node)">Renommer</button>
+                      <button type="button" (click)="$event.stopPropagation(); openMoveDialog(node)">Déplacer</button>
+                      <button class="danger-icon" type="button" (click)="$event.stopPropagation(); removeNode(node)">Supprimer</button>
+                    </div>
+                    <span class="node-arrow" aria-hidden="true">→</span>
+                  </article>
+                } @else {
+                  <article
+                    class="item-card"
+                    [class.collapsed]="!isExpanded(node.id)"
+                    [class.pinned]="node.pinned === true"
+                    [class.selected]="selectedIds().has(node.id)"
+                    [class.focused]="focusHighlight() === node.id"
+                    [class.drop-before]="isDrop(node.id, 'before')"
+                    [class.drop-after]="isDrop(node.id, 'after')"
+                    [attr.data-project-node-id]="node.id"
+                    draggable="true"
+                    (dragstart)="dragStart($event, node)"
+                    (dragover)="dragOver($event, node)"
+                    (dragleave)="dragLeave(node.id)"
+                    (drop)="dropNode($event, node)"
+                    (dragend)="dragEnd()"
+                  >
+                    @if (selectionMode()) { <input class="selection-checkbox" type="checkbox" [checked]="selectedIds().has(node.id)" (click)="$event.stopPropagation()" (change)="toggleSelection(node.id)" [attr.aria-label]="'Sélectionner ' + node.title" /> }
+                    <span class="type-badge" [class]="'type-badge ' + node.type">{{ node.type }}</span>
+                    <div class="item-main">
+                      <div class="item-summary" [attr.role]="node.type === 'link' ? null : 'button'" [attr.tabindex]="node.type === 'link' ? null : '0'" [attr.aria-expanded]="node.type === 'link' ? null : isExpanded(node.id)" [attr.aria-label]="node.type === 'link' ? null : 'Développer ' + node.title" (click)="activateItem(node, $event)" (keydown.enter)="activateItemFromKeyboard($event, node)" (keydown.space)="activateItemFromKeyboard($event, node)">
+                        @if (node.type === 'link' && safeItemUrl(node.url); as url) { <a [href]="url" target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()">{{ node.title }}</a> } @else { <h2>{{ node.title }}</h2> }
+                        <div class="item-tags">@for (tag of node.tags ?? []; track tag) { <span>#{{ tag }}</span> }</div>
+                      </div>
+                      @if (isExpanded(node.id)) {
+                        <div class="item-body">
+                          @if (node.category) { <span class="category-pill">{{ node.category }}</span> }
+                          @if (safeItemUrl(node.url); as url) { <a class="item-url" [href]="url" target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()">{{ url }}</a> }
+                          @if (node.note) { <app-safe-markdown [markdown]="noteContent(node)" (wikiLink)="openWikiLink($event)" /> @if (isNoteLong(node)) { <button class="note-toggle" type="button" (click)="$event.stopPropagation(); toggleNote(node.id)">{{ expandedNotes().has(node.id) ? 'Voir moins' : 'Voir plus' }}</button> } }
+                          @if (node.type === 'code' && node.code) { <pre><code>{{ node.code }}</code></pre> }
+                          @if (node.type === 'password') {
+                            @if (secretFor(node); as secret) {
+                              <div class="secret-block"><div><label [for]="'login-' + node.id">Login</label><input [id]="'login-' + node.id" readonly [value]="secret.login" /><button type="button" (click)="copyText(secret.login, 'Login copié')">Copier</button></div><div><label [for]="'password-' + node.id">Mot de passe</label><input [id]="'password-' + node.id" [type]="revealedSecrets().has(node.id) ? 'text' : 'password'" readonly [value]="secret.password" /><button type="button" (click)="toggleSecret(node.id)">{{ revealedSecrets().has(node.id) ? 'Masquer' : 'Afficher' }}</button><button type="button" (click)="copyText(secret.password, 'Mot de passe copié')">Copier</button></div></div>
+                             } @else if (isSecretLocked(node)) {
+                               <div class="locked-secret"><span>Contenu chiffré</span><button class="secondary-button" type="button" (click)="unlockAndLoad(node)">Déverrouiller</button></div>
+                             }
+                          }
+                          @if (node.file) { <button class="attachment" type="button" (click)="openAttachment(node.file)">{{ node.file.name }} · {{ formatFileSize(node.file.size) }} · {{ attachmentAction(node.file) }}</button> }
+                          <div class="inline-actions"><button type="button" (click)="openFullscreen(node)">Plein écran</button></div>
+                        </div>
+                      }
+                    </div>
+                    <div class="node-actions">
+                       <button class="collapse-button" type="button" (click)="$event.stopPropagation(); toggleExpanded(node.id)" [attr.aria-label]="isExpanded(node.id) ? 'Plier ' + node.title : 'Déplier ' + node.title" [attr.aria-expanded]="isExpanded(node.id)">{{ isExpanded(node.id) ? '⌄' : '›' }}</button>
+                       <button type="button" [attr.aria-label]="node.pinned === true ? 'Désépingler ' + node.title : 'Épingler ' + node.title" [attr.aria-pressed]="node.pinned === true" (click)="$event.stopPropagation(); togglePin(node)">{{ node.pinned === true ? '★' : '☆' }}</button>
+                      <button type="button" (click)="$event.stopPropagation(); openMoveDialog(node)">Déplacer</button>
+                      <button type="button" (click)="$event.stopPropagation(); openItemEditor(node)">Modifier</button>
+                      <button class="danger-icon" type="button" (click)="$event.stopPropagation(); removeNode(node)">Supprimer</button>
+                    </div>
+                  </article>
+                }
+              }
+            </div>
+          }
+        </div>
+
+        @if (linkedTodos().length) {
+          <section class="linked-todos" aria-labelledby="linked-todos-title">
+            <h2 id="linked-todos-title">Tâches liées ({{ linkedTodos().length }})</h2>
+            @for (todo of linkedTodos(); track todo.id) { <button type="button" (click)="openTodo(todo)"><span>{{ priorityLabel(todo.priorityId) }}</span><strong>{{ todo.title }}</strong>@if (todo.dueDate) { <small>{{ todo.dueDate }}</small> }</button> }
+          </section>
+        }
+      }
+    </section>
+
+    @if (dialog(); as activeDialog) {
+      <div class="dialog-backdrop" role="presentation" (click)="closeDialog()">
+        <section class="dialog" role="dialog" aria-modal="true" [attr.aria-labelledby]="activeDialog.kind + '-dialog-title'" appFocusTrap tabindex="-1" (click)="$event.stopPropagation()">
+          <h2 [id]="activeDialog.kind + '-dialog-title'">{{ activeDialog.title }}</h2>
+          @if (activeDialog.kind === 'folder') {
+            <form (ngSubmit)="submitFolder()">
+              <label class="field"><span>Nom du dossier</span><input name="folder-name" maxlength="120" required [(ngModel)]="folderName" /></label>
+              <div class="dialog-actions"><button class="secondary-button" type="button" (click)="closeDialog()">Annuler</button><button class="primary-button" type="submit">Enregistrer</button></div>
+            </form>
+          } @else if (activeDialog.kind === 'project') {
+            <form (ngSubmit)="submitProject()">
+              <label class="field"><span>Nom du projet</span><input name="project-name" maxlength="60" required [(ngModel)]="projectDraft.name" /></label>
+              <label class="field"><span>Couleur</span><input name="project-color" type="color" [(ngModel)]="projectDraft.color" /></label>
+              <label class="field"><span>Catégories séparées par des virgules</span><input name="project-categories" maxlength="300" [(ngModel)]="projectDraft.categories" /></label>
+              <div class="dialog-actions"><button class="secondary-button" type="button" (click)="closeDialog()">Annuler</button><button class="primary-button" type="submit">Enregistrer</button></div>
+            </form>
+          } @else if (activeDialog.kind === 'move') {
+            <form (ngSubmit)="submitMove()">
+              <label class="field"><span>Déplacer vers</span><select name="move-target" [(ngModel)]="moveTargetId">@for (target of moveTargets(); track target.id) { <option [value]="target.id">{{ target.label }}</option> }</select></label>
+              <div class="dialog-actions"><button class="secondary-button" type="button" (click)="closeDialog()">Annuler</button><button class="primary-button" type="submit">Déplacer</button></div>
+            </form>
+          } @else {
+            <form (ngSubmit)="submitItem()">
+              <div class="type-picker" role="radiogroup" aria-label="Type d'item">@for (type of itemTypes; track type) { <button type="button" role="radio" [attr.aria-label]="itemTypeLabel(type)" [attr.aria-checked]="itemDraft.type === type" [class.active-type]="itemDraft.type === type" (click)="itemDraft.type = type"><span class="type-option-icon" aria-hidden="true">@switch (type) { @case ('link') { <svg viewBox="0 0 16 16"><path d="M6.5 9.5a4 4 0 0 0 5.66-5.66L10.5 2.2A4 4 0 0 0 4.84 7.86M9.5 6.5a4 4 0 0 0-5.66 5.66L5.5 13.8A4 4 0 0 0 11.16 8.14" /></svg> } @case ('memo') { <svg viewBox="0 0 16 16"><rect x="2.5" y="1.5" width="11" height="13" rx="1.5" /><path d="M5 5.5h6M5 8h6M5 10.5h4" /></svg> } @case ('info') { <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" /><path d="M8 7.5v4M8 5.5v.5" /></svg> } @case ('code') { <svg viewBox="0 0 16 16"><path d="M5 4 2 8l3 4M11 4l3 4-3 4M9 2 7 14" /></svg> } @case ('password') { <svg viewBox="0 0 16 16"><rect x="3" y="7" width="10" height="7" rx="1.5" /><path d="M5.5 7V5.5a2.5 2.5 0 0 1 5 0V7" /><circle cx="8" cy="10.5" r=".9" /></svg> } }</span>{{ itemTypeLabel(type) }}</button> }</div>
+              <label class="field"><span>Titre</span><input name="item-title" maxlength="120" required [(ngModel)]="itemDraft.title" /></label>
+              <label class="field"><span>Catégorie</span><select name="item-category" [(ngModel)]="itemDraft.category"><option value="">Aucune</option>@for (category of projectCategories(); track category) { <option [value]="category">{{ category }}</option> }</select></label>
+              @if (itemDraft.type === 'link' || itemDraft.type === 'password') { <label class="field"><span>URL</span><input name="item-url" type="url" [(ngModel)]="itemDraft.url" /></label> }
+              @if (itemDraft.type === 'password') { <label class="field"><span>Login</span><input name="item-login" autocomplete="username" [(ngModel)]="itemDraft.login" /></label><label class="field"><span>Mot de passe</span><input name="item-password" type="password" autocomplete="current-password" [(ngModel)]="itemDraft.password" /></label> }
+               @if (itemDraft.type === 'code') { <label class="field"><span>Langage</span><input name="item-language" [(ngModel)]="itemDraft.language" /></label><label class="field"><span>Code</span><textarea name="item-code" rows="10" [(ngModel)]="itemDraft.code"></textarea></label> } @else { <label class="field"><span>Note Markdown</span><app-markdown-editor name="item-note" [(ngModel)]="itemDraft.note" [minHeight]="180" (wikiLink)="openWikiLink($event)" /></label> }
+              <label class="field"><span>Tags séparés par des virgules</span><input name="item-tags" [(ngModel)]="itemDraft.tags" /></label>
+              <label class="field"><span>Pièce jointe</span><input name="item-file" type="file" (change)="selectFile($event)" />@if (itemDraft.file) { <small>{{ itemDraft.file.name }} · {{ formatFileSize(itemDraft.file.size) }}</small> }</label>
+              <div class="dialog-actions"><button class="secondary-button" type="button" (click)="closeDialog()">Annuler</button><button class="primary-button" type="submit">{{ activeDialog.nodeId ? 'Enregistrer' : 'Ajouter' }}</button></div>
+            </form>
+          }
+        </section>
+      </div>
+    }
+
+    @if (vaultDialog(); as vaultDialog) {
+      <div class="dialog-backdrop" role="presentation" (click)="cancelVaultUnlock()">
+        <section class="dialog small-dialog" role="dialog" aria-modal="true" aria-labelledby="vault-dialog-title" appFocusTrap tabindex="-1" (click)="$event.stopPropagation()">
+          <h2 id="vault-dialog-title">{{ vaultDialog.title }}</h2>
+          <p class="dialog-note">{{ vaultDialog.reason }}</p>
+          <form (ngSubmit)="submitVaultUnlock()"><label class="field"><span>Mot de passe maître</span><input name="vault-password" type="password" autocomplete="current-password" required [value]="vaultPassword()" (input)="setVaultPassword($event)" /></label><div class="dialog-actions"><button class="secondary-button" type="button" (click)="cancelVaultUnlock()">Annuler</button><button class="primary-button" type="submit">Déverrouiller</button></div></form>
+        </section>
+      </div>
+    }
+
+    @if (attachmentPreview(); as preview) {
+       <div class="viewer-backdrop" role="presentation" (click)="closeAttachmentPreview()">
+         <section class="viewer" role="dialog" aria-modal="true" [attr.aria-label]="preview.file.name" appResizableDialog appFocusTrap tabindex="-1" (click)="$event.stopPropagation()"><header><strong>{{ preview.file.name }}</strong><button type="button" (click)="closeAttachmentPreview()">Fermer</button></header>@if (preview.kind === 'image') { <img [src]="preview.imageUrl" [alt]="preview.file.name" /> } @else { <iframe sandbox [src]="preview.frameUrl" [title]="preview.file.name"></iframe> }</section>
+      </div>
+    }
+
+    @if (fullscreenItem(); as item) {
+       <div class="viewer-backdrop" role="presentation" (click)="closeFullscreen()">
+          <section class="fullscreen-viewer" role="dialog" aria-modal="true" [attr.aria-label]="item.title" appResizableDialog appFocusTrap tabindex="-1" (click)="$event.stopPropagation()"><header><div><strong>{{ item.title }}</strong><span>{{ item.type }}</span></div><div><button type="button" (click)="copyItem(item)">Copier</button><button type="button" (click)="closeFullscreen()">Fermer</button></div></header><div class="fullscreen-content">@if (item.type === 'code') { <pre><code>{{ item.code }}</code></pre> } @else { @if (safeItemUrl(item.url); as url) { <a class="item-url" [href]="url" target="_blank" rel="noopener noreferrer">{{ url }}</a> } @if (item.note) { <app-safe-markdown [markdown]="item.note" (wikiLink)="openWikiLink($event)" /> } @if (item.type === 'password' && secretFor(item); as secret) { <div class="secret-block"><div><label [for]="'fullscreen-login-' + item.id">Login</label><input [id]="'fullscreen-login-' + item.id" readonly [value]="secret.login" /></div><div><label [for]="'fullscreen-password-' + item.id">Mot de passe</label><input [id]="'fullscreen-password-' + item.id" [type]="revealedSecrets().has(item.id) ? 'text' : 'password'" readonly [value]="secret.password" /><button type="button" (click)="toggleSecret(item.id)">{{ revealedSecrets().has(item.id) ? 'Masquer' : 'Afficher' }}</button></div></div> } @if (item.file) { <button class="attachment" type="button" (click)="openAttachment(item.file)">{{ item.file.name }}</button> } }</div></section>
+      </div>
+    }

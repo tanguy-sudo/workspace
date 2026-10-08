@@ -1,0 +1,72 @@
+<div class="dt-wrap">
+  <input class="dt-native-value" type="hidden" [name]="name" [value]="value" aria-hidden="true" tabindex="-1" />
+  <button
+    #trigger
+    class="dt-trigger"
+    type="button"
+    [class.has-value]="!!displayValue"
+    [disabled]="disabled"
+    [attr.aria-label]="ariaLabel || (mode === 'datetime' ? 'Choisir une date et une heure' : 'Choisir une date')"
+    [attr.aria-expanded]="open"
+    [attr.aria-controls]="open ? popupId : null"
+    aria-haspopup="dialog"
+    (click)="toggle($event)"
+  >
+    <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span class="dt-display">{{ displayValue || effectivePlaceholder }}</span>
+  </button>
+
+  @if (open) {
+    <div
+      #popup
+      class="dt-popup"
+      [class.positioned]="positioned"
+      [class.above]="popupAbove"
+      [class.align-end]="popupAlignEnd"
+      [id]="popupId"
+      role="dialog"
+      aria-label="Sélecteur de date"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dt-cal-nav">
+        <button class="dt-nav-btn" type="button" aria-label="Mois précédent" (click)="previousMonth()">&#8249;</button>
+        <span class="dt-month-label">{{ monthLabel }}</span>
+        <button class="dt-nav-btn" type="button" aria-label="Mois suivant" (click)="nextMonth()">&#8250;</button>
+      </div>
+      <div class="dt-weekdays">@for (weekday of weekdays; track weekday) { <span>{{ weekday }}</span> }</div>
+      <div class="dt-days">
+        @for (day of calendarDays; track day.timestamp) {
+          <button
+            class="dt-day"
+            [class.other-month]="day.otherMonth"
+            [class.selected]="isSelected(day.date)"
+            [class.today]="isToday(day.date)"
+            [disabled]="day.otherMonth"
+            [attr.aria-label]="dayLabel(day.date)"
+            [attr.aria-current]="isToday(day.date) ? 'date' : null"
+            type="button"
+            (click)="selectDay(day.date)"
+          >{{ day.date.getDate() }}</button>
+        }
+      </div>
+
+      @if (mode === 'datetime') {
+        <div class="dt-time-sep"></div>
+        <div class="dt-time-section">
+          <div class="dt-time-label">Heure</div>
+          <div class="dt-time-row">
+            <input class="dt-hour" type="number" min="0" max="23" [value]="draft ? formatTime(draft.getHours()) : '09'" aria-label="Heures" (input)="updateHour($event)" />
+            <span class="dt-time-colon">:</span>
+            <input class="dt-min" type="number" min="0" max="59" step="15" [value]="draft ? formatTime(draft.getMinutes()) : '00'" aria-label="Minutes" (input)="updateMinute($event)" />
+          </div>
+        </div>
+      }
+
+      <div class="dt-footer">
+        <button class="dt-btn dt-btn-clear" type="button" (click)="clear()">Effacer</button>
+        <button class="dt-btn dt-btn-today" type="button" (click)="setToday()">Aujourd'hui</button>
+        <button class="dt-btn dt-btn-ok" type="button" (click)="confirm()">OK</button>
+      </div>
+    </div>
+  }
+</div>

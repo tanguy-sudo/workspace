@@ -1,0 +1,2 @@
+:host { display: block; }
+    .sandbox-preview { display: block; width: 100%; min-height: 20rem; border: 1px solid var(--border); border-radius: .5rem; background: white; }

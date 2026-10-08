@@ -1,0 +1,41 @@
+@if (state.isOpen()) {
+      <div class="search-overlay" role="presentation" (click)="onOverlay($event)">
+        <section class="search-dialog" role="dialog" aria-modal="true" aria-labelledby="search-title" appResizableDialog appFocusTrap tabindex="-1">
+          <h2 id="search-title" class="sr-only">Recherche globale</h2>
+          <label class="search-input-row">
+            <span aria-hidden="true">⌕</span>
+            <input
+              [value]="query()"
+              (input)="setQuery($event)"
+              (keydown)="onKeydown($event)"
+              placeholder="Rechercher, #tag, status:done, type:snippet"
+              autocomplete="off"
+              aria-label="Rechercher dans le workspace"
+            />
+            <kbd>Ctrl K</kbd>
+          </label>
+          <div class="search-results" role="listbox" aria-label="Resultats de recherche">
+            @if (!items().length) {
+              <p class="search-empty">Aucun resultat</p>
+            }
+            @for (item of items(); track item.title + item.subtitle + $index; let index = $index) {
+              <button
+                class="search-result"
+                [class.selected]="index === selected()"
+                type="button"
+                role="option"
+                [attr.aria-selected]="index === selected()"
+                (click)="activate(item)"
+              >
+                <span class="search-icon" aria-hidden="true">{{ icon(item) }}</span>
+                <span class="search-result-copy">
+                  <strong>{{ item.title }}</strong>
+                  <small>{{ item.subtitle }}</small>
+                </span>
+              </button>
+            }
+          </div>
+          <footer><span><kbd>↑↓</kbd> naviguer</span><span><kbd>Enter</kbd> ouvrir</span><span><kbd>Esc</kbd> fermer</span></footer>
+        </section>
+      </div>
+    }

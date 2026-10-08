@@ -1,0 +1,23 @@
+/* Arbre partagé (snippets, RH). Primitives partagées : styles.scss. */
+:host { display: block; }
+
+.tree, .tree-group { display: grid; width: 100%; min-width: 0; gap: 2px; }
+.treeitem-wrap { position: relative; width: 100%; min-width: 0; }
+.treeitem { display: flex; width: 100%; align-items: center; min-width: 0; min-height: 2.25rem; padding: 0 var(--sp-1); border: 1px solid transparent; border-radius: var(--r-md); transition: border-color var(--t-fast), background var(--t-fast); }
+.treeitem:hover { background: var(--bg-3); }
+.treeitem.selected { border-color: var(--accent); background: var(--accent-dim); }
+.treeitem:focus-visible { outline: none; border-color: var(--accent); background: var(--accent-dim); box-shadow: 0 0 0 3px var(--accent-dim); }
+.treeitem-selection { width: 16px; height: 16px; margin-left: var(--sp-2); flex: 0 0 auto; }
+.treeitem-label { display: flex; width: 0; min-width: 0; min-height: 0; overflow: hidden; flex: 1 1 0; align-items: center; gap: var(--sp-2); padding: 6px var(--sp-2); border: 0; border-radius: var(--r-sm); background: transparent; color: var(--text); font-size: .88rem; text-align: left; cursor: pointer; }
+.treeitem-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.treeitem-pin { width: 2rem; flex: 0 0 2rem; padding: 3px 6px; border: 0; border-radius: var(--r-sm); background: transparent; color: var(--text-3); font-size: .9rem; line-height: 1; cursor: pointer; }
+.treeitem-pin:hover, .treeitem-pin.pinned { background: var(--accent-dim); color: var(--accent); }
+.treeitem-kind { flex: 0 0 auto; padding: 2px 5px; border: 1px solid var(--border); border-radius: var(--r-sm); color: var(--text-3); font: .62rem var(--font-mono); letter-spacing: .04em; }
+.treeitem-kind--folder { border-color: color-mix(in srgb, var(--success) 45%, transparent); background: var(--success-dim); color: var(--success); }
+.treeitem-kind--document { border-color: color-mix(in srgb, var(--accent) 45%, transparent); background: var(--accent-dim); color: var(--accent); }
+.tree-group { width: auto; margin-left: var(--sp-4); padding-left: var(--sp-3); border-left: 1px solid var(--border); }
+
+.drop-before::before, .drop-after::after { position: absolute; right: 0; left: 0; height: 3px; border-radius: 3px; background: var(--accent); content: ''; }
+.drop-before::before { top: -.1rem; }
+.drop-after::after { bottom: -.1rem; }
+.drop-inside > .treeitem { border-color: var(--accent); background: var(--accent-dim); }

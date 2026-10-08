@@ -1,0 +1,314 @@
+/* ── pages/export.css ── */
+
+/* Widget stockage */
+.export-storage-section {
+  margin-bottom: var(--sp-4);
+}
+.export-storage-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-3);
+}
+.export-storage-size {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--success);
+  transition: color var(--t-fast);
+}
+.export-storage-bar-wrap {
+  background: var(--bg-3);
+  border-radius: 6px;
+  height: 8px;
+  overflow: hidden;
+  margin-bottom: var(--sp-4);
+}
+.export-storage-bar {
+  height: 100%;
+  border-radius: 6px;
+  background: var(--success);
+  width: 0%;
+  transition:
+    width 0.6s var(--ease),
+    background var(--t-fast);
+}
+.export-storage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-2);
+}
+.export-storage-count {
+  text-align: center;
+  background: var(--bg-3);
+  border-radius: var(--r-md);
+  padding: var(--sp-3) var(--sp-2);
+}
+.export-storage-count-num {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.export-storage-count-lbl {
+  font-size: 0.7rem;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+}
+.export-storage-warning {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  margin-top: var(--sp-2);
+}
+
+.export-intro {
+  display: flex;
+  gap: var(--sp-4);
+  align-items: center;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--r-md);
+  padding: var(--sp-3) var(--sp-4);
+  margin-bottom: var(--sp-5);
+  font-size: 0.88rem;
+  color: var(--text-2);
+}
+.export-intro-icon {
+  font-size: 1.6rem;
+}
+.export-intro strong {
+  color: var(--text);
+}
+
+.export-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-6);
+}
+
+.export-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  transition: border-color var(--t-fast);
+}
+.export-card:hover {
+  border-color: var(--border-hi);
+}
+.export-card-head {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: center;
+}
+.export-card-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-3);
+  border-radius: var(--r-md);
+  font-size: 1.1rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.export-card-titles h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+  color: var(--text);
+}
+.export-card-count {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+.export-card-desc {
+  font-size: 0.82rem;
+  color: var(--text-2);
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
+}
+.export-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: var(--sp-2);
+  border-top: 1px solid var(--border);
+}
+.export-fmt-btn {
+  font-size: 0.78rem;
+  padding: 6px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.export-fmt-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: var(--r-sm);
+  background: var(--bg-3);
+  color: var(--text-2);
+}
+.export-fmt-badge.json {
+  background: rgba(100, 176, 255, 0.18);
+  color: #64b0ff;
+}
+.export-fmt-badge.md {
+  background: rgba(120, 200, 130, 0.18);
+  color: #6ec779;
+}
+.export-fmt-badge.zip {
+  background: rgba(240, 160, 48, 0.18);
+  color: #f0a030;
+}
+.export-fmt-badge.csv {
+  background: rgba(180, 130, 220, 0.18);
+  color: #b482dc;
+}
+
+.export-section {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5);
+  margin-bottom: var(--sp-4);
+}
+.export-section-title {
+  font-size: 1.05rem;
+  font-weight: 500;
+  margin: 0 0 var(--sp-2);
+  color: var(--text);
+}
+.export-section-desc {
+  font-size: 0.85rem;
+  color: var(--text-2);
+  margin: 0 0 var(--sp-4);
+  line-height: 1.6;
+}
+.export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+.export-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.export-import {
+  border-left: 3px solid var(--warning, #f0a030);
+}
+
+.export-import-modes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+}
+@media (max-width: 600px) {
+  .export-import-modes {
+    grid-template-columns: 1fr;
+  }
+}
+.export-import-mode {
+  display: flex;
+  gap: var(--sp-3);
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--sp-3);
+  font-size: 0.82rem;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+.export-import-mode strong {
+  color: var(--text);
+  display: block;
+  margin-bottom: 4px;
+}
+.export-import-mode p {
+  margin: 0;
+}
+.export-import-mode-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+/* Modal de choix d'import */
+.import-file-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--sp-2) var(--sp-3);
+  font-size: 0.82rem;
+  margin-bottom: var(--sp-4);
+  flex-wrap: wrap;
+}
+.import-file-date {
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+.import-choice-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.import-choice-label {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+  padding: var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition:
+    border-color var(--t-fast),
+    background var(--t-fast);
+}
+.import-choice-label:has(input:checked) {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.import-choice-label input[type="radio"] {
+  margin-top: 3px;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+}
+.import-choice-body {
+  font-size: 0.83rem;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+.import-choice-body strong {
+  color: var(--text);
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+.import-choice-body p {
+  margin: 0;
+}

@@ -1,0 +1,40 @@
+/* Panneau favoris. Primitives partagées : styles.scss. */
+:host { display: contents; }
+
+.favorites-fab { position: fixed; right: var(--sp-5); bottom: var(--sp-5); z-index: 40; width: 2.8rem; height: 2.8rem; border: 1px solid var(--border-hi); border-radius: 50%; background: var(--bg-2); color: var(--accent); font-size: 1.1rem; box-shadow: var(--shadow-lg); cursor: pointer; transition: border-color var(--t-fast), transform var(--t-fast); }
+.favorites-fab:hover { border-color: var(--accent); transform: translateY(-2px); }
+.favorites-backdrop { position: fixed; inset: 0; z-index: 39; background: rgb(0 0 0 / 45%); backdrop-filter: blur(8px); }
+.favorites-panel { position: absolute; right: var(--sp-5); bottom: 4.8rem; display: grid; width: 24rem; height: 34rem; max-width: calc(100vw - 2rem); max-height: calc(100vh - 6rem); grid-template-rows: auto 1fr auto; overflow: hidden; border: 1px solid var(--border-hi); border-radius: var(--r-xl); background: var(--bg-2); box-shadow: var(--shadow-lg); animation: modal-pop-in 220ms var(--ease-out) both; }
+
+@media (max-width: 700px) {
+  .favorites-panel { right: 1rem; bottom: 4.5rem; width: calc(100vw - 2rem); height: min(34rem, calc(100vh - 6rem)); }
+}
+
+header, footer { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border); }
+header h2 { margin: 0 0 var(--sp-1); font-size: 1rem; font-weight: 500; }
+nav { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-1); color: var(--text-3); font: .75rem var(--font-mono); }
+
+/* Boutons fantômes : fermeture, fil d'Ariane, actions de ligne. */
+header > button, nav button, .favorite-row > button:not(.favorite-main) { min-height: 0; border: 0; background: transparent; color: var(--text-2); cursor: pointer; transition: background var(--t-fast), color var(--t-fast), opacity var(--t-fast); }
+header > button, .favorite-row > button:not(.favorite-main) { padding: 4px 8px; border-radius: var(--r-sm); font-size: 1.05rem; line-height: 1; }
+nav button { padding: 3px 10px; border-radius: 999px; background: var(--bg-3); font: inherit; }
+header > button:hover, nav button:hover, .favorite-row > button:not(.favorite-main):hover { background: var(--bg-4); color: var(--text); }
+.favorite-row > button:not(.favorite-main) { color: var(--text-3); opacity: 0; }
+.favorite-row:hover > button:not(.favorite-main), .favorite-row:focus-within > button:not(.favorite-main) { opacity: 1; }
+.favorite-row > button:last-child:hover { background: var(--danger-dim); color: var(--danger); }
+
+.favorites-body { overflow: auto; padding: var(--sp-2); }
+.favorite-row { display: flex; align-items: center; gap: 2px; padding: 2px; border-radius: var(--r-md); transition: background var(--t-fast); }
+.favorite-row:hover { background: var(--bg-3); }
+.favorite-main { display: flex; min-width: 0; flex: 1; align-items: center; gap: var(--sp-3); padding: 8px var(--sp-2); border: 0; background: transparent; color: var(--text); font-size: .88rem; text-align: left; cursor: pointer; }
+.favorite-icon { display: grid; width: 26px; height: 26px; flex-shrink: 0; place-items: center; border-radius: var(--r-sm); }
+.favorite-icon svg { width: 14px; height: 14px; stroke-width: 1.5; }
+.folder-icon { background: var(--accent-dim); color: var(--accent); }
+.link-icon { background: var(--link-dim); color: var(--link-color); }
+.favorite-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.favorite-main:has(.link-icon) .favorite-name { color: var(--link-color); }
+.favorites-empty { margin: 0; padding: var(--sp-5); color: var(--text-2); font-size: .85rem; text-align: center; }
+
+footer { justify-content: flex-start; border-top: 1px solid var(--border); border-bottom: 0; }
+footer button { min-height: 0; padding: 6px var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg-3); color: var(--text-2); font-size: .8rem; cursor: pointer; transition: border-color var(--t-fast), color var(--t-fast); }
+footer button:hover { border-color: var(--accent); color: var(--accent); }

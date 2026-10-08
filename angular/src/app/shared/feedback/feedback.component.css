@@ -1,0 +1,17 @@
+/* Toasts + modale de confirmation. Primitives partagées : styles.scss. */
+:host { display: contents; }
+
+.toast-stack { position: fixed; right: var(--sp-4); bottom: var(--sp-4); z-index: 100; display: grid; gap: var(--sp-2); width: min(24rem, calc(100vw - 2rem)); }
+.toast { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); border: 1px solid var(--border-hi); border-radius: var(--r-lg); background: var(--bg-2); color: var(--text); font-size: .85rem; box-shadow: var(--shadow-lg); animation: slideInRight .25s var(--ease-out) both; }
+.toast.success { border-color: var(--success); color: var(--success); }
+.toast.error { border-color: var(--danger); color: var(--danger); }
+.toast button { min-height: 0; padding: 2px 6px; border: 0; border-radius: var(--r-sm); background: transparent; color: var(--text-2); font-size: 1.1rem; line-height: 1; cursor: pointer; transition: background var(--t-fast), color var(--t-fast); }
+.toast button:hover { background: var(--bg-3); color: var(--text); }
+
+.modal-backdrop { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: var(--sp-6) var(--sp-4); background: rgb(0 0 0 / 55%); }
+.dialog { width: min(23.75rem, calc(100vw - 2rem)); }
+.dialog h2 { margin: 0; font-size: 1.1rem; font-weight: 500; }
+.dialog p { margin: var(--sp-3) 0 var(--sp-5); color: var(--text-2); font-size: .88rem; line-height: 1.6; }
+
+.danger-button { border-color: var(--danger); background: var(--danger); color: var(--bg); }
+.danger-button:hover:not(:disabled) { border-color: var(--danger); background: color-mix(in srgb, var(--danger) 85%, #000); }

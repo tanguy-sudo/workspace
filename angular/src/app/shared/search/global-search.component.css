@@ -1,0 +1,24 @@
+/* Aligné sur css/global-search.css. Primitives partagées : styles.scss. */
+:host { display: contents; }
+
+.search-overlay { position: fixed; inset: 0; z-index: 300; display: grid; place-items: start center; padding: 80px var(--sp-4) var(--sp-4); background: rgb(0 0 0 / 70%); backdrop-filter: blur(8px); }
+.search-dialog { position: relative; width: min(37.5rem, calc(100vw - 2rem)); overflow: hidden; border: 1px solid var(--border-hi); border-radius: var(--r-xl); background: var(--bg-2); box-shadow: var(--shadow-lg); animation: modal-pop-in 220ms var(--ease-out) both; }
+
+.search-input-row { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-4) var(--sp-5); border-bottom: 1px solid var(--border); }
+.search-input-row > span { flex-shrink: 0; color: var(--text-3); font-size: 1.1rem; }
+.search-input-row input { min-width: 0; flex: 1; padding: 0; border: 0; background: none; box-shadow: none; color: var(--text); font-size: 1rem; }
+.search-input-row input::placeholder { color: var(--text-3); }
+kbd { flex-shrink: 0; padding: 2px 7px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-3); color: var(--text-3); font: .7rem var(--font-mono); }
+
+.search-results { max-height: min(60vh, 26rem); overflow-y: auto; padding: var(--sp-2) 0; }
+.search-result { display: flex; width: 100%; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-5); border: 0; border-left: 3px solid transparent; border-radius: 0; background: none; color: var(--text); text-align: left; cursor: pointer; transition: background var(--t-fast); }
+.search-result:hover { background: var(--bg-3); }
+.search-result.selected { border-left-color: var(--accent); background: var(--bg-3); }
+.search-icon { display: grid; width: 30px; height: 30px; flex-shrink: 0; place-items: center; border-radius: var(--r-sm); background: var(--accent-dim); color: var(--accent); font-size: .8rem; }
+.search-result-copy { display: grid; min-width: 0; flex: 1; gap: 2px; }
+.search-result-copy strong, .search-result-copy small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.search-result-copy strong { font-size: .88rem; font-weight: 500; }
+.search-result-copy small { color: var(--text-2); font-size: .75rem; }
+
+.search-empty { margin: 0; padding: var(--sp-6); color: var(--text-2); font-size: .85rem; text-align: center; }
+footer { display: flex; flex-wrap: wrap; gap: var(--sp-4); padding: var(--sp-3) var(--sp-5); border-top: 1px solid var(--border); color: var(--text-2); font: .68rem var(--font-mono); }

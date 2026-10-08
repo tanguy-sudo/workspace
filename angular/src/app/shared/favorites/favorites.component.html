@@ -1,0 +1,36 @@
+<button class="favorites-fab" type="button" aria-label="Ouvrir les favoris" [attr.aria-expanded]="open()" (click)="toggle()">★</button>
+    @if (open()) {
+      <div class="favorites-backdrop" role="presentation" (click)="onBackdrop($event)">
+       <aside class="favorites-panel" role="dialog" aria-modal="true" aria-labelledby="favorites-title" appFocusTrap tabindex="-1">
+          <header>
+            <div><h2 id="favorites-title">Favoris</h2><nav aria-label="Chemin des favoris">
+              @for (crumb of breadcrumbs(); track crumb.id; let index = $index) {
+                <button type="button" (click)="jump(index)">{{ crumb.name }}</button>@if (index < breadcrumbs().length - 1) { <span>/</span> }
+              }
+            </nav></div>
+            <button type="button" aria-label="Fermer les favoris" (click)="close()">×</button>
+          </header>
+          <div class="favorites-body">
+            @if (current()?.children?.length) {
+              @for (node of current()?.children; track node.id) {
+                <div class="favorite-row">
+                  <button class="favorite-main" type="button" (click)="activate(node)">
+                    @if (node.nodeType === 'folder') {
+                      <span class="favorite-icon folder-icon" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 4a1 1 0 0 1 1-1h3.17a1 1 0 0 1 .71.29L7.5 4.41a1 1 0 0 0 .71.3h5.29a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1V4Z" /></svg></span>
+                    } @else {
+                      <span class="favorite-icon link-icon" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 9.5a4 4 0 0 0 5.66-5.66L10.5 2.2A4 4 0 0 0 4.84 7.86" /><path d="M9.5 6.5a4 4 0 0 0-5.66 5.66L5.5 13.8A4 4 0 0 0 11.16 8.14" /></svg></span>
+                    }
+                    <span class="favorite-name">{{ node.name }}</span>
+                  </button>
+                  <button type="button" [attr.aria-label]="'Renommer ' + node.name" (click)="rename(node)">✎</button>
+                  <button type="button" [attr.aria-label]="'Supprimer ' + node.name" (click)="remove(node)">×</button>
+                </div>
+              }
+            } @else {
+              <p class="favorites-empty">Dossier vide</p>
+            }
+          </div>
+          <footer><button type="button" (click)="addFolder()">+ Dossier</button><button type="button" (click)="addLink()">+ Lien</button></footer>
+        </aside>
+      </div>
+    }

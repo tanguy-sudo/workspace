@@ -1,0 +1,37 @@
+{
+  "_meta": {
+    "app": "Workspace",
+    "version": 6,
+    "exportedAt": "2026-01-21T10:30:00.000Z",
+    "fixture": "invalid-cycle"
+  },
+  "data": {
+    "projects": [
+      {
+        "id": "cycle-project",
+        "name": "Cycle project",
+        "color": "#4EA7FC",
+        "parentId": null,
+        "categories": [],
+        "children": [
+          {
+            "id": "cycle-folder",
+            "nodeType": "folder",
+            "name": "Cycle folder",
+            "children": [
+              {
+                "id": "cycle-folder",
+                "nodeType": "folder",
+                "name": "Repeated ancestor id",
+                "children": [],
+                "createdAt": 1767225600000
+              }
+            ],
+            "createdAt": 1767225600000
+          }
+        ],
+        "createdAt": 1767225600000
+      }
+    ]
+  }
+}

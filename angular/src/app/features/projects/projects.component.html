@@ -1,0 +1,109 @@
+<section class="projects-page" aria-labelledby="projects-title">
+      <header class="projects-header">
+        <div>
+          <p class="eyebrow">WORKSPACE / ANGULAR</p>
+          <h1 id="projects-title">Projets</h1>
+          <p class="projects-meta">{{ scopeProjects().length }} projet{{ scopeProjects().length > 1 ? 's' : '' }} dans cet espace</p>
+        </div>
+        <div class="header-actions">
+          <button class="secondary-button" type="button" [class.active-button]="selectionMode()" (click)="toggleSelectionMode()">{{ selectionMode() ? 'Annuler' : 'Sélectionner' }}</button>
+          <button class="secondary-button" type="button" (click)="toggleViewMode()" [attr.aria-label]="viewMode() === 'grid' ? 'Passer en liste' : 'Passer en grille'">{{ viewMode() === 'grid' ? 'Liste' : 'Grille' }}</button>
+          <label class="search-box">
+            <span class="sr-only">Rechercher un projet</span>
+            <input type="search" [value]="search()" (input)="setSearch($event)" placeholder="Rechercher..." />
+          </label>
+           <button class="primary-button" type="button" (click)="openCreateProject()">+ Nouveau</button>
+        </div>
+      </header>
+
+      <div class="scope-bar">
+        <span class="scope-label">{{ scopeLabel() }}</span>
+        <nav class="breadcrumbs" aria-label="Chemin des projets">
+          <button type="button" (click)="navigateScope(null)">Tous les projets</button>
+          @for (crumb of breadcrumbs(); track crumb.id) {
+            <span aria-hidden="true">/</span>
+            <button type="button" (click)="navigateScope(crumb.id)">{{ crumb.name }}</button>
+          }
+        </nav>
+      </div>
+
+      @if (status() === 'idle' || loading()) {
+        <p class="status-message">Chargement des projets...</p>
+      } @else if (!data()) {
+        <p class="status-message error-message" role="alert">Les projets ne peuvent pas être chargés.</p>
+      } @else {
+      @if (selectionMode()) {
+        <div class="selection-bar" role="status">
+          <span>{{ selectedIds().size }} sélectionné{{ selectedIds().size > 1 ? 's' : '' }}</span>
+          <button class="danger-button" type="button" [disabled]="!selectedIds().size" (click)="deleteSelected()">Supprimer</button>
+        </div>
+      }
+
+      @if (favoriteProjects().length) {
+        <section class="favorite-section" aria-labelledby="favorite-projects-title">
+          <h2 id="favorite-projects-title">Projets favoris</h2>
+          <div class="projects-grid" [class.view-list]="viewMode() === 'list'">
+            @for (project of favoriteProjects(); track project.id) { <ng-container [ngTemplateOutlet]="projectCard" [ngTemplateOutletContext]="{ project }" /> }
+          </div>
+        </section>
+      }
+
+      <div class="projects-grid" [class.view-list]="viewMode() === 'list'" aria-live="polite">
+        @for (project of filteredProjects(); track project.id) { <ng-container [ngTemplateOutlet]="projectCard" [ngTemplateOutletContext]="{ project }" /> }
+        @if (!filteredProjects().length) { <div class="empty-state"><h2>{{ parentId() ? 'Aucun sous-projet' : 'Aucun projet' }}</h2><p>Créez un projet pour commencer.</p></div> }
+         <button class="project-card new-card" type="button" (click)="openCreateProject()"><span class="new-card-plus">+</span><span>Nouveau projet</span></button>
+      </div>
+      }
+    </section>
+
+    <ng-template #projectCard let-project="project">
+      @let counts = projectCounts(project);
+      <article
+        class="project-card"
+        [class.selected]="selectedIds().has(project.id)"
+        [class.select-mode]="selectionMode()"
+        [style.--project-color]="projectColor(project)"
+        role="group"
+        tabindex="0"
+        (click)="openProject(project)"
+        (keydown.enter)="openProjectFromKeyboard($event, project)"
+        (keydown.space)="openProjectFromKeyboard($event, project)"
+      >
+        @if (selectionMode()) { <input class="selection-checkbox" type="checkbox" [checked]="selectedIds().has(project.id)" (click)="$event.stopPropagation()" (change)="toggleSelection(project.id)" [attr.aria-label]="'Sélectionner ' + project.name" /> }
+        <header class="project-card-header">
+           <span class="project-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 6.5a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg></span>
+          <h2>{{ project.name }}</h2>
+        </header>
+        @if (project.categories?.length) { <div class="categories">@for (category of project.categories; track category) { <span>{{ category }}</span> }</div> }
+        <div class="project-stats">
+           @if (counts.folder) { <span title="Dossiers">{{ counts.folder }} dossier{{ counts.folder > 1 ? 's' : '' }}</span> }
+           @if (counts.link) { <span title="Liens">{{ counts.link }} lien{{ counts.link > 1 ? 's' : '' }}</span> }
+           @if (counts.memo) { <span title="Mémos">{{ counts.memo }} mémo{{ counts.memo > 1 ? 's' : '' }}</span> }
+           @if (counts.code) { <span title="Snippets">{{ counts.code }} snippet{{ counts.code > 1 ? 's' : '' }}</span> }
+           @if (counts.info) { <span title="Infos">{{ counts.info }} info{{ counts.info > 1 ? 's' : '' }}</span> }
+           @if (counts.password) { <span title="Mots de passe">{{ counts.password }} mot{{ counts.password > 1 ? 's' : '' }} de passe</span> }
+          @if (!counts.folder && !counts.link && !counts.memo && !counts.code && !counts.info && !counts.password) { <span>Aucun contenu</span> }
+        </div>
+        <div class="project-actions">
+          <button type="button" [attr.aria-pressed]="project['lockToChildren'] === true" [attr.title]="project['lockToChildren'] === true ? 'Ouvrir les sous-projets au clic' : 'Ouvrir le détail au clic'" (click)="$event.stopPropagation(); toggleLock(project)">{{ project['lockToChildren'] === true ? 'Sous-projets' : 'Détail' }}</button>
+          <button type="button" [attr.aria-label]="project['favorite'] === true ? 'Retirer ' + project.name + ' des favoris' : 'Ajouter ' + project.name + ' aux favoris'" [attr.aria-pressed]="project['favorite'] === true" (click)="$event.stopPropagation(); toggleFavorite(project)">{{ project['favorite'] === true ? '★' : '☆' }}</button>
+          <button class="danger-icon" type="button" aria-label="Supprimer le projet" title="Supprimer le projet" (click)="$event.stopPropagation(); removeProject(project)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-9 0 1 13h10l1-13M10 11v5m4-5v5" /></svg></button>
+        </div>
+        <button class="children-button" type="button" (click)="$event.stopPropagation(); navigateScope(project.id)">Sous-projets ({{ childCount(project.id) }})</button>
+      </article>
+     </ng-template>
+
+     @if (createDialog()) {
+       <div class="dialog-backdrop" role="presentation" (click)="closeCreateProject()">
+         <section class="dialog project-create-dialog" role="dialog" aria-modal="true" aria-labelledby="create-project-dialog-title" appFocusTrap tabindex="-1" (click)="$event.stopPropagation()">
+           <h2 id="create-project-dialog-title">Nouveau projet</h2>
+           <p class="dialog-note">Créez un projet pour organiser vos tâches et vos ressources.</p>
+           <form (ngSubmit)="submitCreateProject()">
+             <label class="field"><span>Nom du projet</span><input name="project-name" maxlength="120" required autofocus [value]="projectDraft.name" (input)="setProjectDraft('name', $event)" /></label>
+             <label class="field"><span>Catégorie</span><input name="project-category" maxlength="60" required [value]="projectDraft.category" (input)="setProjectDraft('category', $event)" /></label>
+             <label class="field"><span>Couleur</span><input name="project-color" type="color" [value]="projectDraft.color" (input)="setProjectDraft('color', $event)" /></label>
+             <div class="dialog-actions"><button class="secondary-button" type="button" (click)="closeCreateProject()">Annuler</button><button class="primary-button" type="submit" [disabled]="!projectDraft.name.trim() || !projectDraft.category.trim()">Créer</button></div>
+           </form>
+         </section>
+       </div>
+     }

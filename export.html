@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      try {
+        document.documentElement.setAttribute(
+          "data-theme",
+          localStorage.getItem("workspace-theme") || "dark",
+        );
+      } catch (_) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    </script>
+        <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="assets/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Export — Workspace</title>
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/favorites.css" />
+    <link rel="stylesheet" href="css/global-search.css" />
+    <link rel="stylesheet" href="css/pages/export.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="app-wrapper topbar-inner">
+        <a href="index.html" class="topbar-logo"
+          ><div class="logo-mark">W</div>
+          Workspace</a
+        >
+        <nav class="topbar-nav">
+          <a href="index.html">Tableau de bord</a><a href="rh.html">RH</a
+          ><a href="projects.html">Projets</a> <a href="todos.html">Tâches</a
+          ><a href="snippets.html">Snippets</a><a href="journal.html">Journal</a
+          ><a href="export.html">Export</a
+          ><a href="smart-planning.html">Planification</a>
+        </nav>
+        <div class="topbar-right">
+          <div class="topbar-sep"></div>
+          <span class="topbar-clock"></span
+          ><button class="theme-toggle"></button><a href="settings.html" class="topbar-settings-link" aria-label="Parametres" title="Parametres"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.7 1.5l.2 1.3c.4.1.8.3 1.2.5l1.1-.7 1.6 1.6-.7 1.1c.2.4.4.8.5 1.2l1.3.2v2.3l-1.3.2c-.1.4-.3.8-.5 1.2l.7 1.1-1.6 1.6-1.1-.7c-.4.2-.8.4-1.2.5l-.2 1.3H7.4l-.2-1.3c-.4-.1-.8-.3-1.2-.5l-1.1.7-1.6-1.6.7-1.1c-.2-.4-.4-.8-.5-1.2l-1.3-.2V6.8l1.3-.2c.1-.4.3-.8.5-1.2l-.7-1.1 1.6-1.6 1.1.7c.4-.2.8-.4 1.2-.5l.2-1.3z"/><circle cx="8" cy="8" r="2"/></svg></a>
+          <button
+            class="topbar-menu-btn"
+            aria-label="Menu"
+            aria-expanded="false"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 18 18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            >
+              <path d="M2 4.5h14M2 9h14M2 13.5h14" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="app-wrapper">
+        <div class="page-header">
+          <div class="page-header-top">
+            <div>
+              <h1 class="page-title">Export des données</h1>
+              <div class="page-meta">
+                <span id="export-stats">Calcul…</span>
+                <span class="page-meta-sep">·</span>
+                <span
+                  >Téléchargez vos données dans le format de votre choix</span
+                >
+              </div>
+            </div>
+            <div class="page-header-actions">
+              <button id="btn-export-all-json" class="btn btn-ghost">
+                Sauvegarde JSON
+              </button>
+              <button id="btn-export-all-zip" class="btn btn-primary">
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                >
+                  <path d="M8 1v10M3 7l5 5 5-5M2 14h12" />
+                </svg>
+                Tout exporter (ZIP)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="export-section export-storage-section">
+          <div class="export-storage-header">
+            <h2 class="export-section-title" style="margin: 0">
+              Stockage local
+            </h2>
+            <div id="storage-size-label" class="export-storage-size">…</div>
+          </div>
+          <div class="export-storage-bar-wrap">
+            <div class="export-storage-bar" id="storage-bar"></div>
+          </div>
+          <div class="export-storage-grid" id="storage-counts"></div>
+          <div id="storage-warning" style="display: none"></div>
+        </div>
+
+        <div class="export-intro">
+          <div class="export-intro-icon">💾</div>
+          <div>
+            <strong>Vos données restent locales.</strong> Cette page lit le
+            contenu stocké dans IndexedDB et le transforme en fichier
+            téléchargeable. Aucun envoi vers un serveur n'a lieu.
+          </div>
+        </div>
+
+        <div class="export-grid" id="export-grid"></div>
+
+        <div class="export-section">
+          <h2 class="export-section-title">Sauvegarde complète</h2>
+          <p class="export-section-desc">
+            Récupère l'intégralité du workspace en un seul fichier. Le format
+            JSON est ré-importable, le ZIP contient en plus des versions
+            Markdown lisibles par section.
+          </p>
+          <div class="export-actions">
+            <button class="btn btn-ghost" data-action="all-json">
+              <span class="export-fmt-badge json">JSON</span>
+              workspace-complet.json
+            </button>
+            <button class="btn btn-ghost" data-action="all-md">
+              <span class="export-fmt-badge md">MD</span>
+              workspace-complet.md
+            </button>
+            <button class="btn btn-primary" data-action="all-zip">
+              <span class="export-fmt-badge zip">ZIP</span>
+              workspace-complet.zip
+            </button>
+          </div>
+        </div>
+
+        <div class="export-section export-import">
+          <h2 class="export-section-title">Réimporter une sauvegarde</h2>
+          <p class="export-section-desc">
+            Restaure le workspace depuis un fichier JSON exporté par cette
+            application. Choisissez le mode d'import après avoir sélectionné le
+            fichier.
+          </p>
+          <div class="export-import-modes">
+            <div class="export-import-mode">
+              <div class="export-import-mode-icon">🔄</div>
+              <div>
+                <strong>Fusionner</strong>
+                <p>
+                  Conserve les données existantes et ajoute ou met à jour les
+                  éléments du fichier (par identifiant). Rien n'est supprimé.
+                </p>
+              </div>
+            </div>
+            <div class="export-import-mode">
+              <div class="export-import-mode-icon">⚠️</div>
+              <div>
+                <strong>Écraser tout</strong>
+                <p>
+                  Remplace intégralement toutes les données actuelles par celles
+                  du fichier. Irréversible sans sauvegarde préalable.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="export-actions" style="margin-top: var(--sp-4)">
+            <label class="btn btn-ghost" for="import-file">
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              >
+                <path d="M8 12V2M3 7l5-5 5 5M2 14h12" />
+              </svg>
+              Choisir un fichier JSON…
+            </label>
+            <input
+              id="import-file"
+              type="file"
+              accept="application/json,.json"
+              hidden
+            />
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="assets/vendor/dexie.min.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/safe-storage.js"></script>
+    <script src="js/common-utils.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/modal-utils.js"></script>
+    <script src="js/date-picker-utils.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/global-search.js"></script>
+    <script src="js/shortcuts.js"></script>
+    <script src="js/drag-drop.js"></script>
+    <script src="js/favorites.js"></script>
+    <script src="js/zip-writer.js"></script>
+    <script src="js/pages/export-converters.js"></script>
+    <script src="js/pages/export-import.js"></script>
+    <script src="js/pages/export.js"></script>
+  </body>
+</html>

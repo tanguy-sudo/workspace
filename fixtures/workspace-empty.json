@@ -1,0 +1,56 @@
+{
+  "_meta": {
+    "app": "Workspace",
+    "version": 6,
+    "exportedAt": "2026-01-01T00:00:00.000Z"
+  },
+  "data": {
+    "projects": [],
+    "rh": {
+      "id": "root",
+      "name": "RH",
+      "nodeType": "folder",
+      "children": [],
+      "createdAt": 1767225600000
+    },
+    "todos": [],
+    "snippets": [],
+    "snippetFolders": {
+      "id": "root",
+      "name": "Snippets",
+      "nodeType": "folder",
+      "children": [],
+      "createdAt": 1767225600000
+    },
+    "snippetMixedOrder": {},
+    "favorites": {
+      "id": "root",
+      "name": "Favoris",
+      "nodeType": "folder",
+      "children": [],
+      "createdAt": 1767225600000
+    },
+    "recentlyVisited": [],
+    "journal": [],
+    "trash": [],
+    "activityLog": [],
+    "settings": {
+      "theme": "dark",
+      "userName": "",
+      "siteName": "Workspace",
+      "backupFolder": "Downloads",
+      "autoBackupFrequencyHours": 168,
+      "todoSavedViews": [],
+      "weeklyReview": {
+        "lastCompletedWeek": ""
+      },
+      "todoPriorities": [
+        { "id": "urgent", "label": "Urgent", "color": "#ff5f6e" },
+        { "id": "important", "label": "Important", "color": "#f0a030" },
+        { "id": "normal", "label": "Normal", "color": "#64b0ff" },
+        { "id": "basse", "label": "Basse", "color": "#3d5070" }
+      ],
+      "templates": []
+    }
+  }
+}

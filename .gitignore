@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# Logs and reports
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+coverage/
+__pycache__/
+*.py[cod]
+
+# Build output
+dist/
+build/
+
+# Editor and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Exports Workspace reels places a la racine (donnees personnelles, jamais versionnees)
+/workspace-*.json
+
+# Browser test state and diagnostics
+/e2e/.profiles/
+/e2e/artifacts/
+/_site/

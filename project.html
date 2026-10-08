@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      try {
+        document.documentElement.setAttribute(
+          "data-theme",
+          localStorage.getItem("workspace-theme") || "dark",
+        );
+      } catch (_) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    </script>
+        <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="assets/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Projet — Workspace</title>
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/markdown-editor.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/favorites.css" />
+    <link rel="stylesheet" href="css/global-search.css" />
+    <link rel="stylesheet" href="css/pages/project.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+      integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="app-wrapper topbar-inner">
+        <a href="index.html" class="topbar-logo"
+          ><div class="logo-mark">W</div>
+          Workspace</a
+        >
+        <nav class="topbar-nav">
+          <a href="index.html">Tableau de bord</a><a href="rh.html">RH</a
+          ><a href="projects.html">Projets</a> <a href="todos.html">Tâches</a
+          ><a href="snippets.html">Snippets</a><a href="journal.html">Journal</a
+          ><a href="export.html">Export</a
+          ><a href="smart-planning.html">Planification</a>
+        </nav>
+        <div class="topbar-right">
+          <div class="topbar-sep"></div>
+          <span class="topbar-clock"></span
+          ><button class="theme-toggle"></button><a href="settings.html" class="topbar-settings-link" aria-label="Parametres" title="Parametres"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.7 1.5l.2 1.3c.4.1.8.3 1.2.5l1.1-.7 1.6 1.6-.7 1.1c.2.4.4.8.5 1.2l1.3.2v2.3l-1.3.2c-.1.4-.3.8-.5 1.2l.7 1.1-1.6 1.6-1.1-.7c-.4.2-.8.4-1.2.5l-.2 1.3H7.4l-.2-1.3c-.4-.1-.8-.3-1.2-.5l-1.1.7-1.6-1.6.7-1.1c-.2-.4-.4-.8-.5-1.2l-1.3-.2V6.8l1.3-.2c.1-.4.3-.8.5-1.2l-.7-1.1 1.6-1.6 1.1.7c.4-.2.8-.4 1.2-.5l.2-1.3z"/><circle cx="8" cy="8" r="2"/></svg></a>
+          <button
+            class="topbar-menu-btn"
+            aria-label="Menu"
+            aria-expanded="false"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 18 18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            >
+              <path d="M2 4.5h14M2 9h14M2 13.5h14" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+    <main class="main-content">
+      <div class="app-wrapper">
+        <div class="page-header">
+          <div
+            class="page-meta"
+            style="margin-top: 0; margin-bottom: var(--sp-3)"
+          >
+            <nav class="breadcrumb" id="breadcrumb-project"></nav>
+          </div>
+          <div class="page-header-top">
+            <div>
+              <h1 class="page-title" id="project-name">…</h1>
+              <div class="page-meta">
+                <span><span id="item-count">0</span> items</span>
+              </div>
+            </div>
+            <div class="page-header-actions">
+              <button id="btn-pj-select" class="btn btn-ghost" title="Sélection multiple">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="1.5" y="1.5" width="5" height="11" rx="1"/><path d="M9 4.5h5.5M9 8h5.5M9 11.5h5.5"/></svg>
+                Sélectionner
+              </button>
+              <button id="btn-new-folder" class="btn btn-ghost">
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                >
+                  <path
+                    d="M1.5 4a1 1 0 011-1h3.17a1 1 0 01.71.29l1.12 1.12a1 1 0 00.71.3H13.5a1 1 0 011 1v6a1 1 0 01-1 1h-11a1 1 0 01-1-1V4z"
+                  /></svg
+                >Dossier
+              </button>
+              <button id="btn-new-item" class="btn btn-primary">
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                >
+                  <path d="M8 3v10M3 8h10" /></svg
+                >Item
+              </button>
+              <button id="btn-edit-project" class="btn btn-ghost">
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                >
+                  <path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z" /></svg
+                >Modifier
+              </button>
+              <button id="btn-back" class="btn btn-ghost">
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                >
+                  <path d="M10 3L5 8l5 5" /></svg
+                >Retour
+              </button>
+            </div>
+          </div>
+          <div class="page-header-filters" style="margin-top: var(--sp-4)">
+            <button class="type-filter active" data-filter="all">Tout</button>
+            <button class="type-filter" data-filter="link">Liens</button>
+            <button class="type-filter" data-filter="memo">Mémos</button>
+            <button class="type-filter" data-filter="info">Infos</button>
+            <button class="type-filter" data-filter="code">Code</button>
+            <button class="type-filter" data-filter="password">Mots de passe</button>
+          </div>
+        </div>
+        <div id="tree-container"></div>
+        <div id="project-linked-todos" style="display:none"></div>
+      </div>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous"></script>
+    <script src="assets/vendor/dexie.min.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/safe-storage.js"></script>
+    <script src="js/common-utils.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/password-vault.js"></script>
+    <script src="js/modal-utils.js"></script>
+    <script src="js/date-picker-utils.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/drag-drop.js"></script>
+    <script src="js/wiki-links.js"></script>
+    <script src="js/markdown-editor.js"></script>
+    <script src="js/highlight-init.js"></script>
+    <script src="js/global-search.js"></script>
+    <script src="js/shortcuts.js"></script>
+    <script src="js/favorites.js"></script>
+    <script src="js/pages/project.js"></script>
+  </body>
+</html>

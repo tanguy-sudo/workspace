@@ -1,0 +1,145 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main, plan/angular-migration-windows]
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          git ls-files -z '*.js' | xargs -0 -r -n1 node --check
+
+      - name: Check local resources
+        run: python3 .github/scripts/check-local-resources.py
+
+      - name: Check published security controls
+        run: python3 .github/scripts/check-security-controls.py
+
+      - name: Validate migration fixtures
+        run: python3 .github/scripts/validate-fixtures.py
+
+      - name: Install end-to-end test dependencies
+        run: python3 -m pip install -r e2e/requirements.txt
+
+      - name: Install Chromium for end-to-end tests
+        run: python3 -m playwright install --with-deps chromium
+
+      - name: Install Angular dependencies
+        working-directory: angular
+        run: npm ci
+
+      - name: Verify Angular build and tests
+        working-directory: angular
+        run: npm run verify
+
+      - name: Audit Angular dependencies
+        working-directory: angular
+        run: npm audit --registry=https://registry.npmjs.org --audit-level=high
+
+      - name: Verify Angular transition artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f angular/dist/workspace/app/browser/index.html
+          grep -q '<base href="/workspace/app/">' angular/dist/workspace/app/browser/index.html
+          test ! -e angular/dist/workspace/app/browser/fixtures
+          test ! -e angular/dist/workspace/app/browser/node_modules
+
+      - name: Run end-to-end smoke tests
+        run: python3 e2e/run.py
+
+      - name: Upload end-to-end diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tan-48-e2e-diagnostics
+          path: e2e/artifacts/
+          if-no-files-found: ignore
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: validate
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Set up Node.js for Angular transition build
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Angular dependencies
+        working-directory: angular
+        run: npm ci
+
+      - name: Build Angular transition
+        working-directory: angular
+        run: npm run build
+
+      - name: Prepare Pages artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir _site
+          rsync -a \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='fixtures/' \
+            --exclude='node_modules/' \
+            --exclude='dist/' \
+            --exclude='build/' \
+            --exclude='_site/' \
+            --exclude='e2e/' \
+            --exclude='workspace-*.json' \
+            --exclude='angular/' \
+            ./ _site/
+          mkdir -p _site/app
+          rsync -a angular/dist/workspace/app/browser/ _site/app/
+
+      - name: Verify transition artifact and legacy pages
+        run: python3 .github/scripts/check-angular-transition.py
+
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

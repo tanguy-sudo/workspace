@@ -1,0 +1,94 @@
+/* ── pages/rh.css ── */
+
+.rh-tree { display:flex; flex-direction:column; gap:var(--sp-3); }
+
+.rh-folder-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius:var(--r-lg); padding:var(--sp-3) var(--sp-5);
+  display:flex; align-items:center; gap:var(--sp-3);
+  box-shadow: var(--glass-shadow);
+  cursor:pointer; transition:border-color var(--t-fast), background var(--t-fast), box-shadow var(--t-fast);
+  animation:nodeIn .2s var(--ease) both;
+}
+.rh-folder-card:hover { border-color:var(--border-hi); background:color-mix(in srgb, var(--bg-3) 75%, transparent); box-shadow: var(--glass-shadow-hover); }
+.rh-folder-icon { width:30px; height:30px; border-radius:var(--r-sm); background:var(--success-dim); color:var(--success); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.rh-folder-name { flex:1; font-weight:500; font-size:.9rem; }
+.rh-folder-count { font-family:var(--font-mono); font-size:.7rem; color:var(--text-3); }
+.rh-folder-arrow { color:var(--text-3); }
+.rh-folder-card .card-actions { display:none; gap:2px; }
+.rh-folder-card:hover .card-actions { display:flex; }
+.rh-folder-card:hover .rh-folder-arrow { display:none; }
+
+.doc-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius:var(--r-lg); padding:var(--sp-4) var(--sp-5);
+  display:grid; grid-template-columns:1fr auto;
+  box-shadow: var(--glass-shadow);
+  align-items:start; gap:var(--sp-3);
+  transition:border-color var(--t-fast), box-shadow var(--t-fast); animation:nodeIn .2s var(--ease) both;
+}
+.doc-card:hover { border-color:var(--border-hi); }
+.doc-card-main { min-width: 0; }
+.doc-card-summary { min-width: 0; cursor: pointer; }
+.doc-card-body { margin-top: var(--sp-2); }
+.doc-card-title { font-weight:500; font-size:.9rem; margin-bottom:var(--sp-2); }
+.doc-card-title-link { color: inherit; text-decoration: none; }
+.doc-card-title-link:hover { text-decoration: underline; }
+.doc-card-meta { display:flex; gap:var(--sp-3); align-items:center; flex-wrap:wrap; margin-bottom:var(--sp-2); font-family:var(--font-mono); font-size:.7rem; color:var(--text-3); }
+.doc-card-url { font-family:var(--font-mono); font-size:.7rem; color:var(--link-color); display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-decoration:none; margin-bottom:var(--sp-2); }
+.doc-card-url:hover { text-decoration:underline; }
+.doc-card-note { font-size:.84rem; color:var(--text-2); line-height:1.5; }
+.doc-card-actions { display:flex; gap:2px; opacity:0; transition:opacity var(--t-fast); }
+.doc-card:hover .doc-card-actions { opacity:1; }
+
+.rh-doc-collapse-btn svg { transition: transform 0.2s var(--ease); }
+.rh-doc-collapse-btn.is-collapsed svg { transform: rotate(-90deg); }
+
+.doc-card.collapsed .doc-card-body { display: none; }
+.doc-card.collapsed .doc-card-summary { display: flex; align-items: center; min-height: 24px; }
+
+@keyframes nodeIn { from{opacity:0;transform:translateX(-5px)} to{opacity:1;transform:translateX(0)} }
+
+/* ── Vue document markdown ───────────────────────────────── */
+.modal-doc-view { max-width: 760px; width: 95vw; }
+.modal-doc-body { padding: var(--sp-5) var(--sp-6); overflow-y: auto; max-height: 72vh; }
+.doc-view-url {
+  display: inline-block;
+  font-size: .8rem;
+  color: var(--accent);
+  margin-bottom: var(--sp-3);
+  word-break: break-all;
+}
+.doc-view-date {
+  font-size: .78rem;
+  color: var(--text-3);
+  margin-bottom: var(--sp-4);
+}
+.doc-view-content {
+  font-size: .92rem;
+  line-height: 1.7;
+}
+.doc-view-file { margin-top: var(--sp-5); }
+
+/* ── Mode sélection doc-card ─────────────────────────────── */
+.doc-card.rh-tree .todo-select-cb {
+  align-self: center;
+  margin-right: var(--sp-3);
+}
+
+.doc-card.rh-tree.selected {
+  border-color: var(--accent) !important;
+  background: var(--accent-dim, rgba(240,160,48,.08)) !important;
+  box-shadow: 0 0 0 2px var(--accent) !important;
+}
+
+/* Curseur pointer sur la zone main en mode sélection */
+.doc-card.rh-tree:has(.todo-select-cb) .doc-card-main {
+  cursor: pointer;
+}

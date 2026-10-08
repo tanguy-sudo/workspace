@@ -1,0 +1,97 @@
+<section class="export-page" aria-labelledby="export-title">
+      <header class="export-header">
+        <div>
+          <p class="eyebrow">WORKSPACE / ANGULAR</p>
+          <h1 id="export-title">Export des données</h1>
+          <p class="export-meta">{{ totalCount() }} élément{{ totalCount() > 1 ? 's' : '' }} · vos données restent locales</p>
+        </div>
+        <div class="header-actions">
+          <button class="secondary-button" type="button" (click)="exportAll('json')">Sauvegarde JSON</button>
+          <button class="primary-button" type="button" (click)="exportAll('zip')">Tout exporter (ZIP)</button>
+        </div>
+      </header>
+
+      @if (loading()) {
+        <p class="status-message">Chargement des données...</p>
+      } @else if (!data()) {
+        <p class="status-message error-message" role="alert">Les données ne peuvent pas être chargées.</p>
+      } @else {
+        <section class="local-notice" aria-label="Confidentialité des exports">
+          <strong>Stockage local uniquement.</strong>
+          <span>Aucun export n'est envoyé vers un serveur. Les JSON, y compris ceux présents dans le ZIP, sont lossless et peuvent contenir des secrets en clair si le coffre est désactivé, comme le format legacy. Quand le coffre est actif, ils conservent uniquement les valeurs chiffrées ; les fichiers Markdown, CSV et les fichiers individuels lisibles du ZIP omettent les secrets.</span>
+        </section>
+
+        <section class="storage-card" aria-labelledby="storage-title">
+          <div class="storage-heading"><h2 id="storage-title">Stockage local</h2>@if (quota(); as storage) { <strong>{{ storage.label }} / {{ storage.quotaLabel }}</strong> }</div>
+          @if (quota(); as storage) {
+            <div class="storage-bar" role="progressbar" aria-label="Utilisation du stockage" [attr.aria-valuenow]="storage.percent.toFixed(1)" aria-valuemin="0" aria-valuemax="100"><span [style.width.%]="storage.percent"></span></div>
+            <p>{{ storage.percent.toFixed(1) }} % du quota estimé utilisé.</p>
+            @if (storage.percent > 70) { <p class="storage-warning" role="status">Stockage à plus de 70 % : exportez une sauvegarde préventive.</p> }
+          } @else if (quotaError()) {
+            <p role="alert">Le quota de stockage est indisponible. L'export reste possible si le navigateur l'autorise.</p>
+          } @else {
+            <p>Estimation du stockage en cours...</p>
+          }
+        </section>
+
+        <section class="export-grid" aria-label="Exports par section">
+          @for (section of sections(); track section.id) {
+            <article class="export-card">
+              <header>
+                <div class="section-icon" aria-hidden="true">{{ sectionIcon(section.id) }}</div>
+                <div>
+                  <h2>{{ section.title }}</h2>
+                  <p class="section-count">{{ section.count }}</p>
+                </div>
+              </header>
+              <p class="section-description">{{ section.description }}</p>
+              <div class="section-actions">
+                @for (format of section.formats; track format) {
+                  <button class="format-button" type="button" (click)="exportSection(section, format)"><span class="format-badge" [class]="format">{{ format.toUpperCase() }}</span> Télécharger</button>
+                }
+              </div>
+            </article>
+          }
+        </section>
+
+        <section class="full-export-card" aria-labelledby="full-export-title">
+          <h2 id="full-export-title">Sauvegarde complète</h2>
+          <p>Le JSON est le format canonique réimportable. Le Markdown est lisible, et le ZIP contient les deux versions ainsi que les fichiers individuels des snippets, du journal et des projets.</p>
+          <div class="full-actions">
+            <button class="secondary-button" type="button" (click)="exportAll('json')">JSON complet</button>
+            <button class="secondary-button" type="button" (click)="exportAll('md')">Markdown complet</button>
+            <button class="primary-button" type="button" (click)="exportAll('zip')">ZIP complet</button>
+          </div>
+        </section>
+
+        <section class="import-card" aria-labelledby="import-title">
+          <h2 id="import-title">Réimporter une sauvegarde</h2>
+          <p>Les données sont vérifiées avant toute écriture. Une sauvegarde complète est exigée avant un remplacement.</p>
+          <label class="file-picker">
+            <span>Choisir un fichier JSON</span>
+            <input type="file" accept="application/json,.json" [disabled]="importing()" (change)="readImport($event)" />
+          </label>
+          @if (pendingImport(); as pending) {
+            <div class="import-summary" role="status">
+              <strong>{{ pending.filename }}</strong>
+              <span>{{ pending.imported.full ? 'Sauvegarde complète' : 'Import partiel' }} validé avant écriture.</span>
+            </div>
+            <fieldset class="import-modes">
+              <legend>Mode d'import</legend>
+              <label>
+                <input type="radio" name="import-mode" value="merge" [checked]="importMode() === 'merge'" (change)="setImportMode('merge')" />
+                Fusionner avec les données actuelles
+              </label>
+              <label [class.disabled]="!pending.imported.full">
+                <input type="radio" name="import-mode" value="overwrite" [checked]="importMode() === 'overwrite'" [disabled]="!pending.imported.full" (change)="setImportMode('overwrite')" />
+                Remplacer toutes les données
+              </label>
+            </fieldset>
+            <div class="import-actions">
+              <button class="secondary-button" type="button" [disabled]="importing()" (click)="clearImport()">Annuler</button>
+              <button class="primary-button" type="button" [disabled]="importing()" (click)="applyImport()">{{ importing() ? 'Import en cours...' : 'Importer' }}</button>
+            </div>
+          }
+        </section>
+      }
+    </section>

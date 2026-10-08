@@ -1,0 +1,27 @@
+:host { display: contents; }
+.trash-button { position: relative; display: grid; width: 30px; height: 30px; place-items: center; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg-2); color: var(--text-2); cursor: pointer; }
+.trash-button:hover { border-color: var(--border-hi); background: var(--bg-3); color: var(--text); }
+.trash-button svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
+.trash-button b { position: absolute; top: -6px; right: -6px; min-width: 15px; padding: 1px 3px; border-radius: 999px; background: var(--danger); color: #fff; font-size: .58rem; line-height: 1.2; text-align: center; }
+.trash-backdrop { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 1rem; background: rgb(0 0 0 / 55%); }
+.trash-dialog { width: min(42rem, calc(100vw - 2rem)); }
+.trash-header, .trash-actions, .trash-item, .trash-item-actions { display: flex; align-items: center; }
+.trash-header, .trash-item { justify-content: space-between; gap: var(--sp-3); }
+.trash-header { padding-bottom: var(--sp-3); border-bottom: 1px solid var(--border); }
+.trash-header h2 { margin: 0; }
+.trash-header span, .trash-item small, .trash-info { color: var(--text-2); font-size: .78rem; }
+.trash-actions, .trash-item-actions { gap: var(--sp-2); }
+.trash-info { margin: var(--sp-4) 0; }
+.trash-list { display: grid; gap: var(--sp-2); max-height: 50vh; overflow: auto; scrollbar-width: none; }
+.trash-list::-webkit-scrollbar { display: none; }
+.trash-item { align-items: flex-start; padding: var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-md); }
+.trash-item-content { min-width: 0; display: grid; gap: 4px; }
+.trash-item-content strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.trash-item-actions { flex-shrink: 0; }
+.trash-delete-button { display: grid; width: 2.25rem; height: 2.25rem; min-height: 2.25rem; place-items: center; padding: 0; border: 1px solid var(--danger); border-radius: var(--r-md); background: transparent; color: var(--danger); cursor: pointer; transition: background var(--t-fast), color var(--t-fast); }
+.trash-delete-button svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-width: 1.8; }
+.trash-delete-button:hover { background: var(--danger-dim); color: var(--danger); }
+.trash-empty { padding: var(--sp-6) 0; color: var(--text-2); text-align: center; }
+.danger-button { padding: 8px 14px; border: 1px solid var(--danger); border-radius: var(--r-md); background: transparent; color: var(--danger); font-size: .82rem; font-weight: 500; cursor: pointer; transition: background var(--t-fast), border-color var(--t-fast); }
+.danger-button:hover:not(:disabled) { border-color: var(--danger); background: var(--danger-dim); }
+@media (max-width: 640px) { .trash-header, .trash-item { align-items: stretch; flex-direction: column; } .trash-actions, .trash-item-actions { justify-content: flex-end; } }

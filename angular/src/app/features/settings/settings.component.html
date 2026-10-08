@@ -1,0 +1,114 @@
+<section class="settings-page" aria-labelledby="settings-title">
+      <header class="settings-header">
+        <div>
+          <p class="eyebrow">WORKSPACE / ANGULAR</p>
+          <h1 id="settings-title">Paramètres</h1>
+          <p class="settings-meta">Nom du site, dossier de sauvegarde et fréquence automatique</p>
+        </div>
+        <button class="primary-button" type="button" (click)="saveSettings()" [disabled]="!ready()">Enregistrer</button>
+      </header>
+
+      @if (status() === 'idle' || status() === 'loading') {
+        <p class="status-message">Chargement des paramètres...</p>
+      } @else if (status() === 'error') {
+        <div class="status-message error-message" role="alert">Les paramètres ne peuvent pas être chargés.</div>
+      } @else {
+        <div class="settings-grid">
+          <section class="settings-card">
+            <h2>Personnalisation du site</h2>
+            <label class="field">
+              <span>Nom de l'utilisateur</span>
+              <input type="text" maxlength="40" [value]="userName()" (input)="setUserName($event)" placeholder="Ex : Marie Dupont" />
+            </label>
+            <label class="field">
+              <span>Nom du site</span>
+              <input type="text" maxlength="40" [value]="siteName()" (input)="setSiteName($event)" placeholder="Ex : Workspace équipe IT" />
+            </label>
+            <p class="note">Le nom utilisateur est affiché sur l'accueil. Le nom du site est utilisé dans la barre du haut et les sauvegardes.</p>
+          </section>
+
+          <section class="settings-card">
+            <h2>Sauvegarde automatique</h2>
+            <div class="field">
+              <span>Dossier de sauvegarde</span>
+              <div class="settings-value">{{ backupFolder() }}</div>
+            </div>
+            <div class="actions">
+              <button class="secondary-button" type="button" (click)="pickBackupFolder()">Choisir un dossier par défaut</button>
+              <button class="secondary-button" type="button" (click)="clearBackupFolder()">Réinitialiser</button>
+            </div>
+            <label class="field">
+              <span>Fréquence</span>
+              <select [value]="frequency()" (change)="setFrequency($event)">
+                @for (item of frequencies; track item.value) { <option [value]="item.value">{{ item.label }}</option> }
+              </select>
+            </label>
+            <div class="actions">
+              <button class="secondary-button" type="button" (click)="testBackup()">Tester la sauvegarde maintenant</button>
+            </div>
+            <p class="note">Le picker natif choisit le fichier lorsque le navigateur le permet. Sinon, le fichier est téléchargé dans le dossier configuré par le navigateur.</p>
+          </section>
+
+          <section class="settings-card">
+            <h2>Mot de passe maître</h2>
+            <div class="field">
+              <span>Statut</span>
+              <div class="settings-value">{{ vaultStatus() }}</div>
+            </div>
+            <div class="actions wrap">
+              <button class="primary-button" type="button" (click)="openEnableVault()" [disabled]="vaultEnabled()">Activer</button>
+              <button class="secondary-button" type="button" (click)="openUnlockVault()" [disabled]="!vaultEnabled() || vaultUnlocked()">Déverrouiller</button>
+              <button class="secondary-button" type="button" (click)="lockVault()" [disabled]="!vaultUnlocked()">Verrouiller</button>
+              <button class="secondary-button" type="button" (click)="openChangeVault()" [disabled]="!vaultEnabled()">Changer le mot de passe</button>
+              <button class="secondary-button" type="button" (click)="openDisableVault()" [disabled]="!vaultEnabled()">Désactiver</button>
+            </div>
+            <p class="note">Le coffre conserve le format cryptographique legacy. La désactivation remet explicitement les identifiants et mots de passe en clair.</p>
+          </section>
+
+          <section class="settings-card">
+            <h2>Stockage local</h2>
+            @if (quota(); as storage) {
+              <div class="storage-heading"><strong>{{ storage.label }}</strong><span>{{ storage.quotaLabel }}</span></div>
+              <div class="storage-bar" role="progressbar" aria-label="Utilisation du stockage" [attr.aria-valuenow]="storage.percent.toFixed(1)" aria-valuemin="0" aria-valuemax="100"><span [style.width.%]="storage.percent" [style.background]="storageColor(storage.percent)"></span></div>
+              <p class="note">{{ storage.percent.toFixed(1) }} % du quota estimé utilisé.</p>
+              @if (storage.percent > 70) { <p class="warning" role="status">Stockage à plus de 70 % : un export préventif est conseillé.</p> }
+            } @else {
+              <p class="note">Estimation du stockage en cours...</p>
+            }
+          </section>
+
+          <section class="settings-card summary-card">
+            <h2>Résumé</h2>
+            <dl>
+              <div><dt>Utilisateur</dt><dd>{{ userName() || 'Non défini' }}</dd></div>
+              <div><dt>Site</dt><dd>{{ siteName() || 'Workspace' }}</dd></div>
+              <div><dt>Dossier</dt><dd>{{ backupFolder() }}</dd></div>
+              <div><dt>Fréquence</dt><dd>{{ frequencyLabel() }}</dd></div>
+              <div><dt>Mot de passe maître</dt><dd>{{ vaultStatus() }}</dd></div>
+              <div><dt>Dernière auto-sauvegarde</dt><dd>{{ lastBackupLabel() }}</dd></div>
+            </dl>
+          </section>
+        </div>
+      }
+    </section>
+
+    @if (vaultDialog(); as dialog) {
+      <div class="dialog-backdrop" role="presentation" (click)="cancelVaultDialog()">
+        <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="vault-dialog-title" appFocusTrap tabindex="-1" (click)="$event.stopPropagation()">
+          <h2 id="vault-dialog-title">{{ dialog.title }}</h2>
+          @if (dialog.description) { <p class="note">{{ dialog.description }}</p> }
+          @if (dialog.kind === 'change') {
+            <label class="field"><span>Mot de passe actuel</span><input type="password" autocomplete="current-password" [value]="vaultCurrent()" (input)="setVaultCurrent($event)" /></label>
+            <label class="field"><span>Nouveau mot de passe</span><input type="password" autocomplete="new-password" [value]="vaultNext()" (input)="setVaultNext($event)" /></label>
+            <label class="field"><span>Confirmation du nouveau mot de passe</span><input type="password" autocomplete="new-password" [value]="vaultConfirm()" (input)="setVaultConfirm($event)" /></label>
+          } @else {
+            <label class="field"><span>Mot de passe maître</span><input type="password" [autocomplete]="dialog.kind === 'enable' ? 'new-password' : 'current-password'" [value]="vaultCurrent()" (input)="setVaultCurrent($event)" /></label>
+            @if (dialog.kind === 'enable') { <label class="field"><span>Confirmation</span><input type="password" autocomplete="new-password" [value]="vaultConfirm()" (input)="setVaultConfirm($event)" /></label> }
+          }
+          <div class="dialog-actions">
+            <button class="secondary-button" type="button" (click)="cancelVaultDialog()" [disabled]="vaultBusy()">Annuler</button>
+            <button class="primary-button" type="button" (click)="submitVaultDialog()" [disabled]="vaultBusy()">{{ vaultBusy() ? 'Traitement...' : dialog.confirmLabel }}</button>
+          </div>
+        </section>
+      </div>
+    }

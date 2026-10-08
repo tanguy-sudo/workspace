@@ -1,0 +1,52 @@
+<div class="tree" role="tree" [attr.aria-label]="ariaLabel()" (keydown)="onKeydown($event)">
+      @for (node of nodes(); track node.id; let index = $index) {
+        <ng-container [ngTemplateOutlet]="nodeTemplate" [ngTemplateOutletContext]="{ node, index, level: 1, siblings: nodes() }" />
+      }
+    </div>
+    <div class="sr-only" aria-live="polite">{{ announcement() }}</div>
+
+    <ng-template #nodeTemplate let-node="node" let-index="index" let-level="level" let-siblings="siblings">
+      <div
+        class="treeitem-wrap"
+        [class.drop-before]="isDrop(node.id, 'before')"
+        [class.drop-inside]="isDrop(node.id, 'inside')"
+        [class.drop-after]="isDrop(node.id, 'after')"
+      >
+        <div
+          class="treeitem"
+          role="treeitem"
+          [attr.data-id]="node.id"
+          [attr.aria-level]="level"
+          [attr.aria-posinset]="index + 1"
+          [attr.aria-setsize]="siblings.length"
+           [attr.aria-expanded]="isBranch(node) ? isExpanded(node) : null"
+           [attr.aria-selected]="selectionMode() ? selectedIds().has(node.id) : null"
+           [class.selected]="selectionMode() && selectedIds().has(node.id)"
+           [attr.tabindex]="focusedId() === node.id ? 0 : -1"
+           [attr.draggable]="true"
+          (focus)="focusedId.set(node.id)"
+          (dragstart)="onDragStart($event, node)"
+          (dragover)="onDragOver($event, node)"
+          (dragleave)="onDragLeave(node.id)"
+          (drop)="onDrop($event, node)"
+          (dragend)="onDragEnd()"
+         >
+           @if (selectionMode()) { <input class="treeitem-selection" type="checkbox" [checked]="selectedIds().has(node.id)" (change)="toggleSelection($event, node.id)" [attr.aria-label]="'Sélectionner ' + displayLabel(node)" /> }
+           <button
+            class="treeitem-label"
+            type="button"
+            tabindex="-1"
+            (click)="activate(node)"
+             [attr.aria-label]="nodeAriaLabel(node)"
+            >@if (nodeKindCode(node); as code) { <span class="treeitem-kind" [class.treeitem-kind--folder]="node.nodeType === 'folder'" [class.treeitem-kind--document]="node.nodeType === 'document'" aria-hidden="true">{{ code }}</span> }<span class="treeitem-text">{{ displayLabel(node) }}</span></button>
+           <button class="treeitem-pin" type="button" [class.pinned]="node['pinned'] === true" [attr.aria-label]="node['pinned'] === true ? 'Désépingler ' + displayLabel(node) : 'Épingler ' + displayLabel(node)" [attr.aria-pressed]="node['pinned'] === true" (click)="togglePin($event, node)">{{ node['pinned'] === true ? '★' : '☆' }}</button>
+        </div>
+        @if (isBranch(node) && isExpanded(node)) {
+          <div class="tree-group" role="group">
+            @for (child of node.children; track child.id; let childIndex = $index) {
+              <ng-container [ngTemplateOutlet]="nodeTemplate" [ngTemplateOutletContext]="{ node: child, index: childIndex, level: level + 1, siblings: node.children }" />
+            }
+          </div>
+        }
+      </div>
+    </ng-template>

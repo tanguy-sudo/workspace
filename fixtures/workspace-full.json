@@ -1,0 +1,479 @@
+{
+  "_meta": { "app": "Workspace", "version": 6, "exportedAt": "2026-01-15T10:30:00.000Z" },
+  "data": {
+    "projects": [
+      {
+        "id": "project-alpha",
+        "name": "Projet Alpha",
+        "color": "#4EA7FC",
+        "parentId": null,
+        "categories": ["demo", "migration"],
+        "children": [
+          {
+            "id": "folder-alpha-docs",
+            "nodeType": "folder",
+            "name": "Documentation",
+            "children": [
+              {
+                "id": "folder-alpha-api",
+                "nodeType": "folder",
+                "name": "API",
+                "children": [
+                  {
+                    "id": "item-alpha-link",
+                    "nodeType": "item",
+                    "type": "link",
+                    "title": "Documentation de test",
+                    "category": "docs",
+                    "url": "https://docs.example.invalid/workspace",
+                    "login": "",
+                    "password": "",
+                    "secretEncrypted": null,
+                    "note": "Lien synthetique pour la fixture.",
+                    "code": "",
+                    "language": "",
+                    "tags": ["docs", "fixture"],
+                    "file": null,
+                    "createdAt": 1767225600000
+                  },
+                  {
+                    "id": "item-alpha-code",
+                    "nodeType": "item",
+                    "type": "code",
+                    "title": "Commande de validation",
+                    "category": "tooling",
+                    "url": "",
+                    "login": "",
+                    "password": "",
+                    "secretEncrypted": null,
+                    "note": "",
+                    "code": "console.log('fixture');",
+                    "language": "javascript",
+                    "tags": ["test", "javascript"],
+                    "file": null,
+                    "createdAt": 1767312000000
+                  }
+                ],
+                "createdAt": 1767312000000
+              },
+              {
+                "id": "item-alpha-info",
+                "nodeType": "item",
+                "type": "info",
+                "title": "Information de test",
+                "category": "reference",
+                "url": "",
+                "login": "",
+                "password": "",
+                "secretEncrypted": null,
+                "note": "Information synthetique pour couvrir le type info.",
+                "code": "",
+                "language": "",
+                "tags": ["info", "fixture"],
+                "file": null,
+                "createdAt": 1767355200000
+              },
+              {
+                "id": "item-alpha-memo",
+                "nodeType": "item",
+                "type": "memo",
+                "title": "Note de migration",
+                "category": "planning",
+                "url": "",
+                "login": "",
+                "password": "",
+                "secretEncrypted": null,
+                "note": "Conserver les identifiants et l'ordre des arbres.",
+                "code": "",
+                "language": "",
+                "tags": ["angular", "migration"],
+                "file": null,
+                "createdAt": 1767398400000
+              }
+            ],
+            "createdAt": 1767225600000
+          },
+          {
+            "id": "folder-alpha-security",
+            "nodeType": "folder",
+            "name": "Securite",
+            "children": [
+              {
+                "id": "item-alpha-password",
+                "nodeType": "item",
+                "type": "password",
+                "title": "Compte de demonstration",
+                "category": "test",
+                "url": "https://vault.example.invalid",
+                "login": "fixture-user-a",
+                "password": "fixture-password-a",
+                "secretEncrypted": null,
+                "note": "Item en clair dans la fixture sans coffre actif.",
+                "code": "",
+                "language": "",
+                "tags": ["fixture", "password"],
+                "file": null,
+                "createdAt": 1767484800000
+              }
+            ],
+            "createdAt": 1767484800000
+          }
+        ],
+        "createdAt": 1767225600000,
+        "lastVisited": 1767571200000
+      },
+      {
+        "id": "project-beta",
+        "name": "Projet Beta",
+        "color": "#64B0FF",
+        "parentId": "project-alpha",
+        "categories": ["archive-test"],
+        "children": [
+          {
+            "id": "folder-beta-assets",
+            "nodeType": "folder",
+            "name": "Assets",
+            "children": [],
+            "createdAt": 1767312000000
+          }
+        ],
+        "createdAt": 1767312000000,
+        "lastVisited": 1767398400000
+      },
+      {
+        "id": "project-gamma",
+        "name": "Projet Gamma",
+        "color": "#64C98A",
+        "parentId": "project-beta",
+        "categories": [],
+        "children": [],
+        "createdAt": 1767398400000,
+        "lastVisited": 1767398400000
+      }
+    ],
+    "rh": {
+      "id": "root",
+      "name": "RH",
+      "nodeType": "folder",
+      "children": [
+        {
+          "id": "rh-team",
+          "nodeType": "folder",
+          "name": "Equipe",
+          "children": [
+            {
+              "id": "rh-onboarding",
+              "nodeType": "folder",
+              "name": "Onboarding",
+              "children": [
+                {
+                  "id": "rh-guide",
+                  "nodeType": "document",
+                  "title": "Guide de test",
+                  "url": "https://hr.example.invalid/guide",
+                  "date": "2026-01-05",
+                  "note": "# Guide\n\nDocument RH synthetique avec [[Politique de test]].",
+                  "tags": ["onboarding", "fixture"],
+                  "file": {
+                    "name": "fixture-attachment.txt",
+                    "mime": "text/plain",
+                    "size": 27,
+                    "base64": "data:text/plain;base64,Rml4dHVyZSBhdHRhY2htZW50IGNvbnRlbnQK"
+                  },
+                  "createdAt": 1767484800000
+                }
+              ],
+              "createdAt": 1767398400000
+            }
+          ],
+          "createdAt": 1767312000000
+        },
+        {
+          "id": "rh-policy",
+          "nodeType": "document",
+          "title": "Politique de test",
+          "url": "",
+          "date": "2026-01-04",
+          "note": "Les donnees de recette sont synthetiques.",
+          "tags": ["policy"],
+          "file": null,
+          "createdAt": 1767484800000
+        }
+      ],
+      "createdAt": 1767225600000
+    },
+    "todos": [
+      {
+        "id": "todo-daily",
+        "title": "Verifier le boot quotidien",
+        "description": "Tache recurrente de validation.",
+        "status": "todo",
+        "priorityId": "urgent",
+        "context": "bureau",
+        "attachedTo": "fixture-team",
+        "estimatedTime": 30,
+        "dependencies": [],
+        "tags": ["fixture", "daily"],
+        "dueDate": "2026-02-02",
+        "reminderAt": "2026-02-02T09:30",
+        "recurrence": { "type": "daily" },
+        "pinned": true,
+        "projectId": "project-alpha",
+        "createdAt": 1767225600000,
+        "updatedAt": 1767312000000
+      },
+      {
+        "id": "todo-weekly",
+        "title": "Rejouer la recette hebdomadaire",
+        "description": "Valider les routes et les exports.",
+        "status": "waitinginfo",
+        "priorityId": "important",
+        "context": "remote",
+        "attachedTo": "fixture-team",
+        "estimatedTime": 90,
+        "dependencies": ["todo-daily"],
+        "tags": ["fixture", "weekly"],
+        "dueDate": "2026-02-03",
+        "reminderAt": "",
+        "recurrence": { "type": "weekly", "weeklyDays": [1, 3, 5] },
+        "pinned": false,
+        "projectId": "project-beta",
+        "createdAt": 1767312000000,
+        "updatedAt": 1767398400000
+      },
+      {
+        "id": "todo-monthly",
+        "title": "Revue mensuelle de migration",
+        "description": "Tache terminee servant de fixture mensuelle.",
+        "status": "done",
+        "priorityId": "normal",
+        "context": "review",
+        "attachedTo": "",
+        "estimatedTime": 120,
+        "dependencies": [],
+        "tags": ["fixture", "monthly"],
+        "dueDate": "2026-01-30",
+        "reminderAt": "",
+        "recurrence": { "type": "monthly_nth_weekday", "nth": -1, "weekday": 5 },
+        "pinned": false,
+        "projectId": "",
+        "createdAt": 1767398400000,
+        "updatedAt": 1767484800000
+      },
+      {
+        "id": "todo-unassigned",
+        "title": "Tache sans projet",
+        "description": "Cas de filtre project=none.",
+        "status": "inprogress",
+        "priorityId": "basse",
+        "context": "",
+        "attachedTo": "",
+        "estimatedTime": 0,
+        "dependencies": [],
+        "tags": [],
+        "dueDate": "",
+        "reminderAt": "",
+        "recurrence": null,
+        "pinned": false,
+        "projectId": "",
+        "createdAt": 1767484800000,
+        "updatedAt": 1767571200000
+      }
+    ],
+    "snippets": [
+      {
+        "id": "snippet-json",
+        "title": "Parser JSON",
+        "code": "JSON.parse(value)",
+        "language": "javascript",
+        "tags": ["javascript", "fixture"],
+        "favorite": true,
+        "folderId": "snippet-tools",
+        "createdAt": 1767312000000
+      },
+      {
+        "id": "snippet-sql-item",
+        "title": "Lecture SQL",
+        "code": "SELECT id FROM fixture_items;",
+        "language": "sql",
+        "tags": ["sql"],
+        "favorite": false,
+        "folderId": "snippet-sql-folder",
+        "createdAt": 1767398400000
+      },
+      {
+        "id": "snippet-markdown",
+        "title": "Bloc Markdown",
+        "code": "## Fixture\n\nContenu synthetique.",
+        "language": "markdown",
+        "tags": ["markdown"],
+        "favorite": false,
+        "folderId": null,
+        "createdAt": 1767484800000
+      }
+    ],
+    "snippetFolders": {
+      "id": "root",
+      "name": "Snippets",
+      "nodeType": "folder",
+      "children": [
+        {
+          "id": "snippet-tools",
+          "nodeType": "folder",
+          "name": "Outils",
+          "children": [
+            {
+              "id": "snippet-sql-folder",
+              "nodeType": "folder",
+              "name": "SQL",
+              "children": [],
+              "createdAt": 1767398400000
+            }
+          ],
+          "createdAt": 1767312000000
+        }
+      ],
+      "createdAt": 1767225600000
+    },
+    "snippetMixedOrder": {
+      "root": ["f:snippet-tools", "s:snippet-markdown"],
+      "snippet-tools": ["f:snippet-sql-folder", "s:snippet-json"],
+      "snippet-sql-folder": ["s:snippet-sql-item"]
+    },
+    "favorites": {
+      "id": "root",
+      "name": "Favoris",
+      "nodeType": "folder",
+      "children": [
+        {
+          "id": "favorite-workspace",
+          "nodeType": "folder",
+          "name": "Workspace",
+          "children": [
+            {
+              "id": "favorite-project",
+              "nodeType": "link",
+              "name": "Projet Alpha",
+              "url": "project.html?id=project-alpha"
+            },
+            {
+              "id": "favorite-docs",
+              "nodeType": "link",
+              "name": "Documentation",
+              "url": "https://docs.example.invalid/workspace"
+            }
+          ],
+          "createdAt": 1767312000000
+        }
+      ],
+      "createdAt": 1767225600000
+    },
+    "recentlyVisited": [
+      {
+        "type": "project",
+        "id": "project-alpha",
+        "name": "Projet Alpha",
+        "color": "#4EA7FC",
+        "visitedAt": 1767571200000
+      },
+      {
+        "type": "rh",
+        "id": "rh-team",
+        "name": "Equipe",
+        "color": "#64C98A",
+        "visitedAt": 1767484800000
+      }
+    ],
+    "journal": [
+      {
+        "id": "journal-entry-1",
+        "title": "Recette initiale",
+        "content": "# Notes\n\nWorkspace de test pret.",
+        "mood": "good",
+        "tags": ["fixture", "migration"],
+        "createdAt": 1767312000000,
+        "updatedAt": 1767398400000
+      }
+    ],
+    "trash": [
+      {
+        "id": "todo-deleted",
+        "title": "Tache supprimee de test",
+        "description": "Element present dans la corbeille.",
+        "status": "todo",
+        "priorityId": "normal",
+        "dependencies": [],
+        "tags": ["trash"],
+        "createdAt": 1767225600000,
+        "_trashType": "todo",
+        "_deletedAt": 1764806400000
+      }
+    ],
+    "activityLog": [
+      {
+        "type": "project",
+        "action": "create",
+        "label": "Projet Projet Alpha",
+        "id": "project-alpha",
+        "projectId": "project-alpha",
+        "icon": "#",
+        "color": "#4EA7FC",
+        "ts": 1767571200000
+      },
+      {
+        "type": "todo",
+        "action": "update",
+        "label": "Tache Verifier le boot quotidien",
+        "id": "todo-daily",
+        "icon": "check",
+        "ts": 1767484800000
+      },
+      {
+        "type": "snippet",
+        "action": "create",
+        "label": "Snippet Parser JSON",
+        "id": "snippet-json",
+        "icon": "code",
+        "color": "#64B0FF",
+        "ts": 1767398400000
+      }
+    ],
+    "settings": {
+      "theme": "dark",
+      "userName": "Fixture User",
+      "siteName": "Workspace Fixture",
+      "backupFolder": "Downloads",
+      "autoBackupFrequencyHours": 24,
+      "todoSavedViews": [
+        {
+          "id": "view-active-urgent",
+          "name": "Urgentes actives",
+          "filters": { "status": "active", "priority": "urgent", "context": "all", "project": "all", "due": "all" },
+          "viewMode": "columns",
+          "createdAt": 1767312000000,
+          "updatedAt": 1767398400000
+        }
+      ],
+      "weeklyReview": { "lastCompletedWeek": "2026-W01" },
+      "todoPriorities": [
+        { "id": "urgent", "label": "Urgent", "color": "#ff5f6e" },
+        { "id": "important", "label": "Important", "color": "#f0a030" },
+        { "id": "normal", "label": "Normal", "color": "#64b0ff" },
+        { "id": "basse", "label": "Basse", "color": "#3d5070" }
+      ],
+      "templates": [
+        {
+          "id": "fixture-template",
+          "name": "Template fixture",
+          "type": "journal",
+          "icon": "#",
+          "title": "Fixture {{date}}",
+          "content": "## Notes\n\n- ",
+          "mood": "neutral",
+          "tags": ["fixture"]
+        }
+      ]
+    },
+    "_seeded": true
+  }
+}

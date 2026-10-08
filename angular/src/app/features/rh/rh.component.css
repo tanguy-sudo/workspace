@@ -1,0 +1,60 @@
+/* Aligné sur css/pages/rh.css. Primitives partagées : styles.scss. */
+:host { display: block; }
+
+/* ══ EN-TÊTE ══ */
+.rh-header { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--sp-4); padding: var(--sp-7) 0 var(--sp-5); border-bottom: 1px solid var(--border); }
+.eyebrow { margin: 0 0 var(--sp-2); color: var(--accent); font: .72rem var(--font-mono); letter-spacing: .08em; }
+h1 { margin: 0; font-size: 1.7rem; font-weight: 300; letter-spacing: -.025em; line-height: 1.2; }
+h2 { margin: 0; }
+.rh-meta { margin: var(--sp-3) 0 0; color: var(--text-2); font-size: .82rem; }
+.rh-actions, .document-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.active-button { border-color: var(--accent) !important; background: var(--accent-dim) !important; color: var(--accent) !important; }
+.rh-create-dialog { width: min(32rem, calc(100vw - 2rem)); }
+.rh-create-dialog .dialog-note { margin: 0 0 var(--sp-4); color: var(--text-2); font-size: .8rem; line-height: 1.5; }
+.rh-create-dialog .field small { color: var(--text-3); font-size: .72rem; font-weight: 400; }
+.rh-create-dialog .selected-file { display: flex; align-items: center; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-2); }
+.rh-create-dialog .selected-file button { padding: 2px 7px; border: 1px solid var(--border); border-radius: var(--r-sm); background: transparent; color: var(--text-2); font-size: .7rem; }
+
+/* ══ BARRE D'OUTILS ══ */
+.rh-toolbar { display: flex; flex-wrap: wrap; gap: var(--sp-2); padding: var(--sp-4) 0 var(--sp-3); }
+.rh-toolbar input { flex: 1; min-width: 14rem; padding: 8px 10px; font-size: .85rem; }
+.rh-toolbar button, .document-actions button, .attachment { padding: 8px 14px; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg-2); color: var(--text-2); font-size: .82rem; font-weight: 500; cursor: pointer; transition: border-color var(--t-fast), background var(--t-fast), color var(--t-fast); }
+.rh-toolbar button:hover:not(:disabled), .document-actions button:hover, .attachment:hover { border-color: var(--border-hi); background: var(--bg-3); color: var(--text); }
+.danger-button { border-color: color-mix(in srgb, var(--danger) 40%, transparent) !important; color: var(--danger) !important; }
+.danger-button:hover { border-color: var(--danger) !important; background: var(--danger-dim) !important; }
+.selection-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); margin: var(--sp-3) 0 0; padding: 10px var(--sp-4); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: var(--r-md); background: var(--accent-dim); color: var(--text-2); font-size: .82rem; }
+
+.breadcrumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: var(--sp-3); color: var(--text-3); font: .75rem var(--font-mono); }
+.breadcrumbs button { padding: 3px 10px; min-height: 0; border: 1px solid var(--border); border-radius: 999px; background: transparent; color: var(--text-2); font: inherit; cursor: pointer; transition: border-color var(--t-fast), background var(--t-fast), color var(--t-fast); }
+.breadcrumbs button:hover { border-color: var(--border-hi); background: var(--bg-3); color: var(--text); }
+
+/* ══ LAYOUT DEUX PANNEAUX ══ */
+.rh-layout { display: grid; grid-template-columns: minmax(15rem, 23rem) minmax(0, 1fr); min-height: 34rem; overflow: hidden; border: 1px solid var(--glass-border); border-radius: var(--r-xl); background: var(--glass-bg); box-shadow: var(--glass-shadow); backdrop-filter: blur(12px); }
+.rh-tree-panel { min-width: 0; overflow: hidden; padding: var(--sp-4); border-right: 1px solid var(--border); background: color-mix(in srgb, var(--bg-2) 60%, transparent); }
+.rh-tree-panel app-tree { display: block; width: 100%; min-width: 0; }
+.rh-content { min-width: 0; padding: clamp(1rem, 3vw, 2rem); }
+
+/* ══ DOCUMENT ══ */
+.document-heading { display: flex; justify-content: space-between; gap: var(--sp-4); padding-bottom: var(--sp-4); border-bottom: 1px solid var(--border); }
+.document-heading h2 { font-size: 1.05rem; font-weight: 600; }
+.document-heading p { margin: var(--sp-2) 0 0; color: var(--text-2); font: .75rem var(--font-mono); }
+.tags { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: var(--sp-4) 0; }
+.tags span { padding: 2px 7px; border-radius: 100px; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); font: .7rem var(--font-mono); }
+.document-url { display: block; margin: var(--sp-4) 0; overflow-wrap: anywhere; color: var(--link-color); font: .78rem var(--font-mono); }
+.document-url:hover { text-decoration: underline; }
+.document-card app-safe-markdown { display: block; margin-top: var(--sp-5); font-size: .92rem; line-height: 1.7; }
+
+.attachment-upload { display: block; margin-top: var(--sp-5); color: var(--text-2); font-size: .82rem; }
+.attachment-upload input { display: block; margin-top: var(--sp-2); }
+.attachment { display: block; width: fit-content; margin-top: var(--sp-4); overflow-wrap: anywhere; text-align: left; }
+
+.empty-content { display: grid; min-height: 28rem; place-items: center; align-content: center; gap: var(--sp-2); text-align: center; }
+.empty-content h2 { color: var(--text-2); font-size: .95rem; font-weight: 500; }
+.empty-content p { margin: 0; max-width: 260px; color: var(--text-3); font-size: .84rem; line-height: 1.6; }
+
+@media (max-width: 720px) {
+  .rh-header { align-items: flex-start; flex-direction: column; }
+  .rh-layout { grid-template-columns: 1fr; }
+  .rh-tree-panel { border-right: 0; border-bottom: 1px solid var(--border); }
+  .document-heading { flex-direction: column; }
+}

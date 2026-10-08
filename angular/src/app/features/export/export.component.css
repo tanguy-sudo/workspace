@@ -1,0 +1,71 @@
+/* Aligné sur css/pages/export.css. Primitives partagées : styles.scss. */
+:host { display: block; }
+.export-page { min-height: calc(100dvh - 8rem); }
+
+/* ══ EN-TÊTE ══ */
+.export-header { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--sp-4); padding: var(--sp-7) 0 var(--sp-5); border-bottom: 1px solid var(--border); }
+.eyebrow { margin: 0 0 var(--sp-2); color: var(--accent); font: .72rem var(--font-mono); letter-spacing: .08em; }
+h1 { margin: 0; font-size: 1.7rem; font-weight: 300; letter-spacing: -.025em; line-height: 1.2; }
+h2 { margin: 0; font-size: 1.05rem; font-weight: 500; }
+.export-meta { margin: var(--sp-3) 0 0; color: var(--text-2); font-size: .82rem; }
+.header-actions, .section-actions, .full-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+button:disabled { cursor: not-allowed; opacity: .65; }
+
+/* ══ AVIS LOCAL ══ */
+.local-notice { display: grid; gap: var(--sp-1); margin: var(--sp-5) 0; padding: var(--sp-3) var(--sp-4); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--r-md); background: var(--bg-2); color: var(--text-2); font-size: .88rem; line-height: 1.5; }
+.local-notice strong { color: var(--text); }
+
+/* ══ STOCKAGE ══ */
+.storage-card { margin-bottom: var(--sp-5); padding: var(--sp-5); border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--bg-2); color: var(--text-2); font-size: .82rem; }
+.storage-heading { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); }
+.storage-heading h2 { color: var(--text); }
+.storage-heading strong { color: var(--success); font: 600 .82rem var(--font-mono); transition: color var(--t-fast); }
+.storage-card p { margin: var(--sp-2) 0 0; line-height: 1.5; }
+.storage-bar { height: 8px; margin-top: var(--sp-3); overflow: hidden; border-radius: 6px; background: var(--bg-3); }
+.storage-bar span { display: block; height: 100%; border-radius: inherit; background: var(--success); transition: width .6s var(--ease), background var(--t-fast); }
+.storage-warning { color: var(--accent); }
+
+/* ══ CARTES D'EXPORT ══ */
+.export-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr)); gap: var(--sp-4); }
+.export-card, .full-export-card, .import-card { padding: var(--sp-4); border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--bg-2); transition: border-color var(--t-fast); }
+.export-card { display: flex; flex-direction: column; gap: var(--sp-3); }
+.export-card:hover { border-color: var(--border-hi); }
+.export-card > header { display: flex; align-items: center; gap: var(--sp-3); }
+.section-icon { display: grid; width: 36px; height: 36px; flex-shrink: 0; place-items: center; border-radius: var(--r-md); background: var(--accent-dim); color: var(--accent); font: 700 .82rem var(--font-mono); }
+.section-count { margin: 2px 0 0; color: var(--text-3); font: .72rem var(--font-mono); }
+.section-description { min-height: 2.8rem; flex: 1; margin: 0; color: var(--text-2); font-size: .82rem; line-height: 1.5; }
+.section-actions { padding-top: var(--sp-2); border-top: 1px solid var(--border); gap: 6px; }
+.format-button { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border: 1px solid var(--border-hi); border-radius: var(--r-md); background: var(--bg-3); color: var(--text-2); font-size: .78rem; cursor: pointer; transition: border-color var(--t-fast), color var(--t-fast); }
+.format-button:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+.format-badge { display: inline-block; padding: 2px 6px; border-radius: var(--r-sm); background: var(--bg-3); color: var(--text-2); font: 600 .62rem var(--font-mono); letter-spacing: .05em; }
+.format-badge.json { background: rgba(100, 176, 255, .18); color: #64b0ff; }
+.format-badge.md { background: rgba(120, 200, 130, .18); color: #6ec779; }
+.format-badge.csv { background: rgba(180, 130, 220, .18); color: #b482dc; }
+.format-badge.zip { background: rgba(240, 160, 48, .18); color: var(--accent); }
+
+.full-export-card { margin-top: var(--sp-5); }
+.full-export-card p, .import-card p { margin: var(--sp-2) 0 var(--sp-4); color: var(--text-2); font-size: .85rem; line-height: 1.6; }
+.status-message { padding: var(--sp-7) 0; }
+
+/* ══ IMPORT ══ */
+.import-card { margin-top: var(--sp-5); border-left: 3px solid var(--accent); }
+.file-picker { display: grid; width: min(100%, 30rem); gap: var(--sp-2); padding: var(--sp-4); border: 1px dashed var(--border-hi); border-radius: var(--r-lg); background: color-mix(in srgb, var(--bg-3) 72%, transparent); color: var(--text-2); font-size: .82rem; cursor: pointer; transition: border-color var(--t-fast), background var(--t-fast), color var(--t-fast), box-shadow var(--t-fast); }
+.file-picker:hover, .file-picker:focus-within { border-color: var(--accent); background: var(--accent-dim); color: var(--text); }
+.file-picker:focus-within { box-shadow: 0 0 0 3px var(--accent-dim); }
+.file-picker span { color: inherit; font-weight: 500; }
+.import-summary { display: grid; gap: var(--sp-1); margin-top: var(--sp-4); padding: var(--sp-3); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--r-md); background: var(--bg-3); color: var(--text-2); font-size: .82rem; line-height: 1.5; }
+.import-summary strong { color: var(--text); overflow-wrap: anywhere; }
+.import-modes { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); margin: var(--sp-4) 0; padding: 0; border: 0; color: var(--text-2); font-size: .82rem; }
+.import-modes legend { padding: 0 0 var(--sp-2); color: var(--text); font-weight: 600; }
+.import-modes label { display: flex; align-items: flex-start; gap: var(--sp-3); padding: var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-md); line-height: 1.5; cursor: pointer; transition: border-color var(--t-fast), background var(--t-fast); }
+.import-modes label:has(input:checked) { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.import-modes label.disabled { opacity: .55; cursor: not-allowed; }
+.import-modes input[type="radio"] { flex-shrink: 0; margin-top: 3px; accent-color: var(--accent); }
+.import-actions { display: flex; justify-content: flex-end; gap: var(--sp-2); }
+
+@media (max-width: 700px) {
+  .export-header { align-items: flex-start; flex-direction: column; }
+  .header-actions, .full-actions { width: 100%; }
+  .header-actions button, .full-actions button { flex: 1; }
+  .import-modes { grid-template-columns: 1fr; }
+}

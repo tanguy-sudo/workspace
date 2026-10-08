@@ -1,0 +1,53 @@
+<section class="rh-page" aria-labelledby="rh-title">
+      <header class="rh-header">
+         <div><p class="eyebrow">WORKSPACE / ANGULAR</p><h1 id="rh-title">RH</h1><p class="rh-meta">{{ documentCount() }} document{{ documentCount() > 1 ? 's' : '' }} · donnees locales</p></div>
+         <div class="rh-actions"><button class="secondary-button" type="button" [class.active-button]="selectionMode()" (click)="toggleSelectionMode()">{{ selectionMode() ? 'Annuler' : 'Sélectionner' }}</button><button class="secondary-button" type="button" (click)="openCreateFolder()">+ Dossier</button><button class="primary-button" type="button" (click)="openCreateDocument()">+ Document</button></div>
+      </header>
+
+       <div class="rh-toolbar"><input type="search" [value]="search()" (input)="setSearch($event)" placeholder="Rechercher dans le dossier courant..." aria-label="Rechercher dans RH" /><button type="button" (click)="goParent()" [disabled]="path().length <= 1">Remonter</button><button type="button" (click)="restoreLatest()" [disabled]="!deletedRh().length">Restaurer dernier</button></div>
+       @if (selectionMode()) { <div class="selection-bar" role="status"><span>{{ selectedIds().size }} sélectionné{{ selectedIds().size > 1 ? 's' : '' }}</span><button class="danger-button" type="button" [disabled]="!selectedIds().size" (click)="deleteSelected()">Supprimer</button></div> }
+
+      <nav class="breadcrumbs" aria-label="Chemin RH">
+        @for (crumb of breadcrumbs(); track crumb.id; let index = $index) { <button type="button" (click)="navigateTo(index)">{{ crumb.name }}</button>@if (index < breadcrumbs().length - 1) { <span>/</span> } }
+      </nav>
+
+      <div class="rh-layout">
+         <aside class="rh-tree-panel"><app-tree [nodes]="currentChildren()" [expandedIds]="expandedIds()" [selectionMode]="selectionMode()" [selectedIds]="selectedIds()" ariaLabel="Arborescence RH" (activated)="activateNode($event)" (selectionToggled)="toggleSelection($event)" (pinToggled)="toggleNodePin($event)" (dropped)="drop($event)" /></aside>
+        <section class="rh-content" aria-live="polite">
+          @if (selectedDocument(); as document) {
+            <article class="document-card" (click)="handleDocumentClick($event)">
+              <header class="document-heading"><div><h2>{{ document.title }}</h2><p>{{ document.date || 'Sans date' }} @if (document['pinned']) { · Epingle }</p></div><div class="document-actions"><button type="button" (click)="togglePin(document)">{{ document['pinned'] ? 'Desepingler' : 'Epingler' }}</button><button type="button" (click)="editDocument(document)">Modifier</button><button class="danger-button" type="button" (click)="remove(document)">Supprimer</button></div></header>
+              @if (document.tags?.length) { <div class="tags">@for (tag of document.tags; track tag) { <span>#{{ tag }}</span> }</div> }
+              @if (safeDocumentUrl(document.url); as url) { <a class="document-url" [href]="url" target="_blank" rel="noopener noreferrer">{{ url }}</a> }
+              <app-safe-markdown [markdown]="document.note || ''" (wikiLink)="openWikiLink($event)" />
+              <label class="attachment-upload">Ajouter une piece jointe<input type="file" (change)="attachFileFromInput(document, $event)" /></label>
+              @if (document.file; as file) { <button class="attachment" type="button" (click)="download(file)">{{ file.name }} · {{ file.size }} octets</button> }
+            </article>
+          } @else {
+            <div class="empty-content"><h2>{{ currentFolder().name }}</h2><p>Selectionnez un document ou creez-en un.</p></div>
+          }
+        </section>
+      </div>
+    </section>
+
+    @if (createDialog(); as kind) {
+      <div class="dialog-backdrop" role="presentation" (click)="closeCreateDialog()">
+        <section class="dialog rh-create-dialog" role="dialog" aria-modal="true" aria-labelledby="rh-create-dialog-title" appFocusTrap tabindex="-1" (click)="$event.stopPropagation()">
+           <h2 id="rh-create-dialog-title">{{ kind === 'folder' ? 'Nouveau dossier' : (editingDocumentId() ? 'Modifier le document' : 'Nouveau document') }}</h2>
+           <p class="dialog-note">{{ kind === 'folder' ? 'Organisez vos documents dans un dossier.' : (editingDocumentId() ? 'Modifiez les informations du document.' : 'Ajoutez un document dans le dossier courant.') }}</p>
+           <form (ngSubmit)="submitCreate()">
+             @if (kind === 'folder') {
+               <label class="field"><span>Nom du dossier</span><input name="rh-create-name" maxlength="120" required autofocus [value]="createName()" (input)="setCreateName($event)" /></label>
+             } @else {
+               <label class="field"><span>Titre du document</span><input name="rh-document-title" maxlength="120" required autofocus [(ngModel)]="documentDraft.title" /></label>
+               <label class="field"><span>URL <small>(optionnel)</small></span><input name="rh-document-url" type="url" placeholder="https://..." [(ngModel)]="documentDraft.url" /></label>
+                <label class="field"><span>Date <small>(optionnel)</small></span><app-date-picker name="rh-document-date" [(ngModel)]="documentDraft.date" /></label>
+               <label class="field"><span>Tags <small>(séparés par des virgules)</small></span><input name="rh-document-tags" placeholder="onboarding, interne" [(ngModel)]="documentDraft.tags" /></label>
+                <label class="field"><span>Note Markdown <small>(optionnel)</small></span><app-markdown-editor name="rh-document-note" [(ngModel)]="documentDraft.note" [minHeight]="180" (wikiLink)="openWikiLink($event)" /></label>
+               <label class="field"><span>Pièce jointe</span><input name="rh-document-file" type="file" (change)="selectDocumentFile($event)" />@if (documentDraft.file; as file) { <small class="selected-file">{{ file.name }} · {{ file.size }} octets <button type="button" (click)="clearDocumentFile()">Retirer</button></small> }</label>
+             }
+             <div class="dialog-actions"><button class="secondary-button" type="button" (click)="closeCreateDialog()">Annuler</button><button class="primary-button" type="submit" [disabled]="kind === 'folder' ? !createName().trim() : !documentDraft.title.trim()">{{ kind === 'folder' ? 'Créer' : (editingDocumentId() ? 'Enregistrer' : 'Créer') }}</button></div>
+           </form>
+        </section>
+      </div>
+    }

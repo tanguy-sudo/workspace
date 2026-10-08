@@ -1,0 +1,364 @@
+/* ── styles.scss ──────────────────────────────────────────
+   Le socle (reset, tokens --sp/--r/--t/--ease, 13 thèmes,
+   système glass, styles de formulaire, scrollbar, ::selection,
+   animations) vient de ../css/base.css, chargé AVANT ce fichier
+   via angular.json > architect.build.options.styles.
+   Source unique partagée avec le projet de base : ne pas
+   redupliquer ces règles ici.
+
+   Ce fichier ne contient que ce qui est propre à l'app Angular.
+   ───────────────────────────────────────────────────────── */
+
+html {
+  background: var(--bg);
+}
+
+body {
+  min-width: 320px;
+}
+
+/* Taille de cible minimale (audit a11y) + héritage de la police
+   sur les contrôles natifs (select notamment). */
+button,
+input,
+select {
+  font: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+  min-height: 2.25rem;
+}
+
+.wiki-link {
+  padding: 0;
+  border: 0;
+  border-bottom: 1px dashed var(--accent);
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 500;
+}
+
+/* ══ DIALOGS ══════════════════════════════════════════════ */
+@keyframes modal-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dialog-backdrop,
+.modal-backdrop,
+.viewer-backdrop {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.dialog,
+.modal-backdrop .dialog {
+  animation: modal-pop-in 220ms var(--ease-out) both;
+}
+
+.dialog,
+.viewer,
+.fullscreen-viewer {
+  scrollbar-width: none;
+}
+
+.dialog::-webkit-scrollbar,
+.viewer::-webkit-scrollbar,
+.fullscreen-viewer::-webkit-scrollbar {
+  display: none;
+}
+
+/* ══ PRIMITIVES PARTAGÉES ═════════════════════════════════
+   Équivalent du rôle de css/components.css dans le projet de
+   base : ces classes sont utilisées par ~10 composants. Les
+   styles de composant (encapsulation Angular = spécificité +1)
+   restent prioritaires et peuvent surcharger au cas par cas. */
+
+.primary-button,
+.secondary-button {
+  padding: 8px 14px;
+  border-radius: var(--r-md);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    border-color var(--t-fast),
+    background var(--t-fast),
+    color var(--t-fast);
+}
+
+.primary-button {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.primary-button:hover:not(:disabled) {
+  border-color: var(--accent-hi);
+  background: var(--accent-hi);
+}
+
+.secondary-button {
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+  color: var(--text-2);
+}
+
+.secondary-button:hover:not(:disabled) {
+  border-color: var(--border-hi);
+  background: var(--bg-3);
+  color: var(--text);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: var(--sp-6) var(--sp-4);
+  background: rgb(0 0 0 / 55%);
+}
+
+.dialog {
+  position: relative;
+  width: min(32.5rem, calc(100vw - 2rem));
+  min-width: min(26.25rem, calc(100vw - 2rem));
+  min-height: min(17.5rem, calc(100dvh - 4rem));
+  max-width: calc(100vw - 2rem);
+  max-height: calc(100dvh - 4rem);
+  overflow: auto;
+  padding: var(--sp-5);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r-xl);
+  background: var(--bg-2);
+  box-shadow: var(--shadow-lg);
+}
+
+.dialog-reset-size {
+  position: absolute;
+  top: var(--sp-3);
+  right: var(--sp-3);
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  min-height: 0;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--bg-3);
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.dialog-reset-size svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5; }
+
+.dialog-reset-size:hover,
+.dialog-reset-size:focus-visible {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.dialog-resize-handle {
+  position: absolute;
+  z-index: 2;
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: var(--r-sm);
+  opacity: .65;
+}
+
+.dialog-resize-handle:hover,
+.dialog-resize-handle:focus-visible { opacity: 1; }
+.dialog-resize-handle--nw { top: 5px; left: 5px; cursor: nwse-resize; }
+.dialog-resize-handle--ne { top: 5px; right: 5px; cursor: nesw-resize; }
+.dialog-resize-handle--sw { bottom: 5px; left: 5px; cursor: nesw-resize; }
+.dialog-resize-handle--se { right: 5px; bottom: 5px; cursor: nwse-resize; }
+.dialog-resize-handle::after {
+  position: absolute;
+  inset: 3px;
+  border: 2px solid var(--text-3);
+  border-radius: 2px;
+  content: '';
+}
+.dialog-resize-handle--nw::after { border-right-color: transparent; border-bottom-color: transparent; }
+.dialog-resize-handle--ne::after { border-left-color: transparent; border-bottom-color: transparent; }
+.dialog-resize-handle--sw::after { border-right-color: transparent; border-top-color: transparent; }
+.dialog-resize-handle--se::after { border-left-color: transparent; border-top-color: transparent; }
+
+.dialog > h2 {
+  margin: 0 0 var(--sp-4);
+  padding-right: 9rem;
+  font-size: 1.05rem;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+.field {
+  display: grid;
+  gap: 4px;
+  margin-bottom: var(--sp-3);
+  color: var(--text-2);
+  font: 0.7rem var(--font-mono);
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 8px 10px;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.check-field {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--text-2);
+  font-size: 0.82rem;
+}
+
+/* Les cases à cocher ne doivent pas subir la cible tactile de 2.25rem. */
+input[type='checkbox'],
+input[type='radio'] {
+  width: 16px;
+  min-height: 0;
+  accent-color: var(--accent);
+}
+
+input[type='file'] {
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 8px;
+  border: 1px dashed var(--border-hi);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--bg-3) 72%, transparent);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: border-color var(--t-fast), background var(--t-fast), color var(--t-fast), box-shadow var(--t-fast);
+}
+
+input[type='file']:hover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--text);
+}
+
+input[type='file']:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+input[type='file']::file-selector-button {
+  margin-right: var(--sp-3);
+  padding: 7px 12px;
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r-sm);
+  background: var(--bg-2);
+  color: var(--text);
+  font: 500 .78rem var(--font-sans);
+  cursor: pointer;
+  transition: border-color var(--t-fast), background var(--t-fast), color var(--t-fast);
+}
+
+input[type='file']::file-selector-button:hover {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+}
+
+input[type='file']:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
+
+.status-message {
+  padding: var(--sp-6) 0;
+  color: var(--text-2);
+}
+
+.error-message {
+  color: var(--danger);
+}
+
+/* Les noeuds Markdown sont injectés via innerHTML et ne reçoivent pas
+   l'attribut de style encapsulé d'Angular. */
+app-safe-markdown.todo-description .safe-markdown h1,
+app-safe-markdown.todo-description .safe-markdown h2,
+app-safe-markdown.todo-description .safe-markdown h3,
+app-safe-markdown.todo-description .safe-markdown h4,
+app-safe-markdown.todo-description .safe-markdown h5,
+app-safe-markdown.todo-description .safe-markdown h6 {
+  margin: .3em 0 .2em;
+  color: var(--text-2);
+  font-size: .82rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+app-safe-markdown.todo-description .safe-markdown p { margin: .15rem 0; }
+app-safe-markdown.todo-description .safe-markdown ul,
+app-safe-markdown.todo-description .safe-markdown ol { margin: .2em 0 .3em 1.2em; padding: 0; }
+app-safe-markdown.todo-description .safe-markdown code { padding: 1px 4px; border-radius: 3px; background: var(--bg-3); font: .75rem var(--font-mono); }
+app-safe-markdown.todo-description .safe-markdown a { color: var(--link-color); }
+
+.empty-message {
+  margin: 0;
+  padding: var(--sp-5);
+  color: var(--text-2);
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 650px) {
+  .field-grid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,140 @@
+<section class="journal-page" aria-labelledby="journal-title">
+      <header class="journal-header">
+        <div>
+          <p class="eyebrow">WORKSPACE / ANGULAR</p>
+          <h1 id="journal-title">Journal</h1>
+          <p class="journal-meta">{{ entries().length }} entree{{ entries().length > 1 ? 's' : '' }} · pensees, notes et humeur du jour</p>
+        </div>
+        <div class="header-actions">
+          <button class="secondary-button" type="button" (click)="openTemplates()">Modèles</button>
+          <button class="primary-button" type="button" (click)="createEntry()">+ Nouvelle entree</button>
+        </div>
+      </header>
+
+      <div class="journal-toolbar">
+        <label class="search-label">
+          <span class="sr-only">Rechercher dans le journal</span>
+          <input type="search" [value]="search()" (input)="setSearch($event)" placeholder="Rechercher dans le journal..." />
+        </label>
+      </div>
+
+      @if (loading()) {
+        <p class="journal-status">Chargement du journal...</p>
+      } @else {
+        <div class="journal-layout">
+          <aside class="journal-sidebar" aria-label="Entrees du journal">
+            <div class="sidebar-heading"><span>Entrees</span><span>{{ visibleEntries().length }}</span></div>
+            @if (!visibleEntries().length) {
+              <p class="empty-sidebar">{{ search() ? 'Aucune entree ne correspond.' : 'Aucune entree pour le moment.' }}</p>
+            } @else {
+              @for (entry of visibleEntries(); track entry.id) {
+                <div class="entry-list-row">
+                  <button class="entry-list-item" [class.active]="entry.id === selectedId()" type="button" (click)="selectEntry(entry.id)">
+                    <span class="entry-date" aria-hidden="true">
+                      <strong>{{ formatDay(entry.createdAt) }}</strong>
+                      <small>{{ formatMonth(entry.createdAt) }}</small>
+                    </span>
+                    <span class="entry-copy"><strong>{{ entry.title || ('Entree du ' + formatDate(entry.createdAt)) }}</strong><small>{{ contentPreview(entry.content) }}</small></span>
+                    @if (entry.mood) { <span class="mood-dot" [attr.title]="moodLabel(entry.mood)">{{ moodMark(entry.mood) }}</span> }
+                  </button>
+                  <button class="entry-delete-button" type="button" [attr.aria-label]="'Supprimer ' + (entry.title || 'cette entree')" [attr.title]="'Supprimer ' + (entry.title || 'cette entree')" (click)="$event.stopPropagation(); removeEntryById(entry.id)">
+                    <svg viewBox="0 0 16 16" aria-hidden="true"><polyline points="2,4 3,4 14,4" /><path d="M13 4l-.7 9a1 1 0 0 1-1 1H4.7a1 1 0 0 1-1-1L3 4" /><path d="M6 4V3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1" /></svg>
+                  </button>
+                </div>
+              }
+            }
+          </aside>
+
+          <article class="journal-editor" aria-live="polite">
+            @if (selectedEntry(); as entry) {
+              <div class="editor-heading">
+                <div>
+                  <input class="title-input" type="text" maxlength="120" [value]="draftTitle()" (input)="setTitle($event)" placeholder="Titre de l'entree (optionnel)..." aria-label="Titre de l'entree" />
+                  <p class="date-line">{{ formatDate(entry.createdAt) }} · {{ formatTime(entry.createdAt) }} @if (entry.updatedAt && entry.createdAt && entry.updatedAt > entry.createdAt + 5000) { · modifiee le {{ formatDate(entry.updatedAt) }} }</p>
+                </div>
+                <span class="save-state" [class.saving]="saveState() === 'saving'">{{ saveState() === 'saving' ? 'Enregistrement...' : saveState() === 'saved' ? 'Enregistre' : '' }}</span>
+              </div>
+
+              <div class="mood-row" aria-label="Humeur">
+                @for (mood of moods; track mood.id) {
+                  <button type="button" [class.selected]="draftMood() === mood.id" (click)="setMood(mood.id)" [attr.aria-pressed]="draftMood() === mood.id">{{ mood.label }}</button>
+                }
+              </div>
+
+              <label class="tags-label">
+                <span>Tags</span>
+                <input type="text" [value]="draftTags()" (input)="setTags($event)" placeholder="famille, travail, idee" />
+              </label>
+
+               <app-markdown-editor [ngModel]="draftContent()" (ngModelChange)="setContent($event)" [minHeight]="320" placeholder="Ecris librement ce que tu as en tete..." />
+
+              <footer class="editor-actions">
+                <button class="danger-button" type="button" (click)="removeEntry()">Supprimer</button>
+                <div class="editor-actions-right">
+                  <button class="secondary-button" type="button" (click)="exportJournal('json')">Export JSON</button>
+                  <button class="secondary-button" type="button" (click)="exportJournal('markdown')">Export Markdown</button>
+                  <button class="secondary-button" type="button" (click)="saveNow()">Enregistrer maintenant</button>
+                </div>
+              </footer>
+            } @else {
+              <div class="journal-empty">
+                <p class="empty-icon" aria-hidden="true">J</p>
+                <h2>Votre journal de bord</h2>
+                <p>Un espace personnel pour consigner ce que vous voulez. Les entrees restent stockees dans le navigateur.</p>
+                <button class="primary-button" type="button" (click)="createEntry()">Ecrire ma premiere entree</button>
+              </div>
+            }
+          </article>
+        </div>
+      }
+
+      @if (dialog() === 'templates') {
+        <div class="dialog-backdrop" role="presentation" (click)="closeDialog()">
+          <section class="dialog template-manager-dialog" role="dialog" aria-modal="true" aria-labelledby="journal-templates-title" appFocusTrap tabindex="-1" (click)="$event.stopPropagation()">
+            <h2 id="journal-templates-title">Modèles du journal</h2>
+            <p class="dialog-note">Choisissez un modèle pour préremplir une entrée, ou gérez vos modèles personnalisés.</p>
+            <div class="template-list">
+              @for (template of templates(); track template.id) {
+                <div class="template-item">
+                  <button class="template-item-apply" type="button" (click)="applyTemplate(template)">
+                    <span class="template-item-icon" aria-hidden="true">{{ template.icon }}</span>
+                    <span class="template-item-main"><strong>{{ template.name }}</strong><small>{{ template.title || 'Nouvelle entrée' }}</small></span>
+                  </button>
+                  <div class="template-item-actions">
+                    <button class="secondary-button" type="button" (click)="openEditTemplate(template)">Modifier</button>
+                    <button class="secondary-button template-delete-button" type="button" aria-label="Supprimer le modèle" title="Supprimer le modèle" (click)="removeTemplate(template)">&times;</button>
+                  </div>
+                </div>
+              } @empty {
+                <p class="template-empty">Aucun modèle. Créez-en un pour commencer.</p>
+              }
+            </div>
+            <div class="dialog-actions">
+              <button class="secondary-button" type="button" (click)="closeDialog()">Fermer</button>
+              <button class="primary-button" type="button" (click)="openNewTemplate()">+ Nouveau modèle</button>
+            </div>
+          </section>
+        </div>
+      }
+
+      @if (dialog() === 'templateForm') {
+        <div class="dialog-backdrop" role="presentation" (click)="cancelTemplateForm()">
+          <section class="dialog template-form-dialog" role="dialog" aria-modal="true" aria-labelledby="journal-template-form-title" appFocusTrap tabindex="-1" (click)="$event.stopPropagation()">
+            <h2 id="journal-template-form-title">{{ templateEditingId() ? 'Modifier le modèle' : 'Nouveau modèle' }}</h2>
+            <form (ngSubmit)="submitTemplate()">
+              <div class="field-grid">
+                <label class="field"><span>Icône</span><input name="templateIcon" maxlength="2" [(ngModel)]="templateDraft.icon" /></label>
+                <label class="field"><span>Nom du modèle *</span><input name="templateName" maxlength="60" required placeholder="Standup" [(ngModel)]="templateDraft.name" /></label>
+              </div>
+              <label class="field"><span>Titre pré-rempli</span><input name="templateTitle" maxlength="120" placeholder="Standup {{'{{date}}'}}" [(ngModel)]="templateDraft.title" /><small>{{'{{date}}'}} et {{'{{time}}'}} sont remplacés à l’utilisation.</small></label>
+              <label class="field"><span>Contenu Markdown</span><app-markdown-editor name="templateContent" [(ngModel)]="templateDraft.content" [minHeight]="180" /></label>
+              <div class="field-grid">
+                <label class="field"><span>Humeur par défaut</span><select name="templateMood" [(ngModel)]="templateDraft.mood"><option value="">Aucune</option>@for (mood of moods; track mood.id) { <option [value]="mood.id">{{ mood.label }}</option> }</select></label>
+                <label class="field"><span>Tags, séparés par des virgules</span><input name="templateTags" placeholder="standup, réunion" [(ngModel)]="templateDraft.tags" /></label>
+              </div>
+              <div class="dialog-actions"><button class="secondary-button" type="button" (click)="cancelTemplateForm()">Annuler</button><button class="primary-button" type="submit">{{ templateEditingId() ? 'Enregistrer' : 'Créer' }}</button></div>
+            </form>
+          </section>
+        </div>
+      }
+    </section>

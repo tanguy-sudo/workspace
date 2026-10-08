@@ -1,0 +1,65 @@
+{
+  "projects": [
+    {
+      "id": "legacy-project",
+      "name": "Legacy Project",
+      "color": "#4EA7FC",
+      "parentId": null,
+      "categories": [],
+      "children": [],
+      "createdAt": 1577836800000,
+      "lastVisited": 1577836800000
+    }
+  ],
+  "rh": {
+    "id": "root",
+    "name": "RH",
+    "nodeType": "folder",
+    "children": [],
+    "createdAt": 1577836800000
+  },
+  "todos": [
+    {
+      "id": "legacy-todo",
+      "title": "Tache legacy",
+      "note": "Champ historique conserve pour tester une migration non destructive.",
+      "status": "todo",
+      "priority": "normal",
+      "tags": ["legacy"],
+      "createdAt": 1577836800000
+    }
+  ],
+  "snippets": [
+    {
+      "id": "legacy-snippet",
+      "title": "Snippet legacy",
+      "code": "echo legacy",
+      "language": "bash",
+      "tags": ["legacy"],
+      "favorite": false,
+      "createdAt": 1577836800000
+    }
+  ],
+  "snippetFolders": {
+    "id": "root",
+    "name": "Snippets",
+    "nodeType": "folder",
+    "children": [],
+    "createdAt": 1577836800000
+  },
+  "favorites": {
+    "id": "root",
+    "name": "Favoris",
+    "nodeType": "folder",
+    "children": [],
+    "createdAt": 1577836800000
+  },
+  "journal": [],
+  "trash": [],
+  "settings": {
+    "theme": "dark",
+    "userName": "Legacy Fixture User",
+    "siteName": "Legacy Workspace",
+    "backupFolder": "Downloads"
+  }
+}

@@ -1,0 +1,211 @@
+<section class="todos-page" aria-labelledby="todos-title">
+      <header class="todos-header">
+        <div>
+          <p class="eyebrow">WORKSPACE / ANGULAR</p>
+          <h1 id="todos-title">Tâches</h1>
+          <p class="todos-meta">{{ activeCount() }} active{{ activeCount() > 1 ? 's' : '' }} · {{ filteredTodos().length }} dans la vue</p>
+        </div>
+        <div class="header-actions">
+          <button class="secondary-button" type="button" [class.active-button]="viewMode() === 'columns'" (click)="setViewMode('columns')" aria-label="Vue colonnes">Colonnes</button>
+          <button class="secondary-button" type="button" [class.active-button]="viewMode() === 'list'" (click)="setViewMode('list')" aria-label="Vue liste">Liste</button>
+          <button class="secondary-button" type="button" [class.active-button]="viewMode() === 'priority'" (click)="setViewMode('priority')" aria-label="Vue priorités">Priorités</button>
+          <button class="secondary-button" type="button" [class.active-button]="selectionMode()" (click)="toggleSelectionMode()">{{ selectionMode() ? 'Annuler' : 'Sélectionner' }}</button>
+          <button class="secondary-button" type="button" (click)="openPriorities()">Priorités</button>
+          <button class="secondary-button" type="button" (click)="openViews()">Vues</button>
+          <button class="secondary-button" type="button" (click)="openTemplates()">Modèles</button>
+          <button class="secondary-button danger-outline" type="button" (click)="purgeCompleted()">Purger terminées</button>
+          <button class="primary-button" type="button" (click)="openNewTodo()">+ Nouvelle tâche</button>
+        </div>
+      </header>
+
+      <div class="filters-panel">
+        <div class="filter-section status-filters" role="toolbar" aria-label="Filtrer par statut">
+          <span class="filter-label">Statut</span>
+          <div class="filter-group">
+            <button type="button" [class.active-filter]="statusFilter() === 'all'" (click)="setFilter('status', 'all')">Toutes</button>
+            @for (status of statuses; track status.id) { <button type="button" [class.active-filter]="statusFilter() === status.id" (click)="setFilter('status', status.id)">{{ status.label }}</button> }
+          </div>
+        </div>
+        <div class="filter-section">
+          <span class="filter-label">Priorité</span>
+          <div class="filter-group">
+            <button type="button" [class.active-filter]="priorityFilter() === 'all'" (click)="setFilter('priority', 'all')">Toutes</button>
+            @for (priority of priorities(); track priority.id) { <button type="button" [class.active-filter]="priorityFilter() === priority.id" [style.--filter-color]="safePriorityColor(priority.color)" (click)="setFilter('priority', priority.id)">{{ priority.label }}</button> }
+          </div>
+        </div>
+        @if (contexts().length) {
+          <div class="filter-section"><span class="filter-label">Contexte</span><div class="filter-group"><button type="button" [class.active-filter]="contextFilter() === 'all'" (click)="setFilter('context', 'all')">Tous</button>@for (context of contexts(); track context) { <button type="button" [class.active-filter]="contextFilter() === context" (click)="setFilter('context', context)">{{ context }}</button> }</div></div>
+        }
+        @if (projects().length) {
+          <div class="filter-section"><span class="filter-label">Projet</span><div class="filter-group"><button type="button" [class.active-filter]="projectFilter() === 'all'" (click)="setFilter('project', 'all')">Tous</button><button type="button" [class.active-filter]="projectFilter() === 'none'" (click)="setFilter('project', 'none')">Sans projet</button>@for (project of projects(); track project.id) { <button type="button" [class.active-filter]="projectFilter() === project.id" (click)="setFilter('project', project.id)">{{ project.name }}</button> }</div></div>
+        }
+        <div class="filter-section"><span class="filter-label">Échéance</span><div class="filter-group">@for (due of dueFilters; track due.id) { <button type="button" [class.active-filter]="dueFilter() === due.id" (click)="setFilter('due', due.id)">{{ due.label }}</button> }</div></div>
+      </div>
+
+      @if (selectionMode()) {
+        <div class="selection-bar" role="status"><span>{{ selectedIds().size }} sélectionné{{ selectedIds().size > 1 ? 's' : '' }}</span><div><button class="secondary-button" type="button" [disabled]="!selectedIds().size" (click)="openBulkEdit()">Modifier</button><button class="danger-button" type="button" [disabled]="!selectedIds().size" (click)="deleteSelected()">Supprimer</button></div></div>
+      }
+
+      @if (loading()) {
+        <p class="status-message">Chargement des tâches...</p>
+      } @else if (!data()) {
+        <p class="status-message error-message" role="alert">Les tâches ne peuvent pas être chargées.</p>
+      } @else if (viewMode() === 'columns') {
+         <div class="todos-columns" aria-live="polite">
+          @for (status of statuses; track status.id) {
+            <section class="status-column" [attr.data-status]="status.id" (dragover)="allowLaneDrop($event)" (dragleave)="clearDropPreview()" (drop)="dropToStatus($event, status.id)">
+              <header class="column-header"><h2>{{ status.label }}</h2><span>{{ todosForStatus(status.id).length }}</span></header>
+               <div class="todo-list" role="list">
+                @for (todo of todosForStatus(status.id); track todo.id) { <ng-container [ngTemplateOutlet]="todoCard" [ngTemplateOutletContext]="{ todo, surface: 'columns', laneStatus: status.id }" /> }
+                @if (!todosForStatus(status.id).length) { <p class="drop-hint">Dépose ici</p> }
+              </div>
+            </section>
+          }
+         </div>
+      } @else if (viewMode() === 'list') {
+         <div class="todo-flat-list" role="list" aria-live="polite" (dragover)="allowLaneDrop($event)" (drop)="dropAtListEnd($event)">
+          @for (todo of listTodos(); track todo.id) { <ng-container [ngTemplateOutlet]="todoCard" [ngTemplateOutletContext]="{ todo, surface: 'list' }" /> }
+          @if (!listTodos().length) { <div class="empty-state"><h2>Aucune tâche</h2><p>Aucune tâche ne correspond aux filtres.</p></div> }
+         </div>
+      } @else {
+         <div class="priority-board" aria-live="polite">
+          @for (lane of priorityLanes(); track lane.id) {
+            <section class="priority-lane" (dragover)="allowLaneDrop($event)" (dragleave)="clearDropPreview()" (drop)="dropToPriority($event, lane.id)">
+              <header class="priority-header" [style.--lane-color]="safePriorityColor(lane.color)"><span class="priority-dot"></span><h2>{{ lane.label }}</h2><span>{{ todosForPriority(lane.id).length }}</span></header>
+               <div class="todo-list" role="list">@for (todo of todosForPriority(lane.id); track todo.id) { <ng-container [ngTemplateOutlet]="todoCard" [ngTemplateOutletContext]="{ todo, surface: 'priority', lanePriority: lane.id }" /> } @if (!todosForPriority(lane.id).length) { <p class="drop-hint">Dépose ici</p> }</div>
+            </section>
+          }
+         </div>
+      }
+    </section>
+
+    <ng-template #todoCard let-todo="todo" let-surface="surface" let-laneStatus="laneStatus" let-lanePriority="lanePriority">
+      <article class="todo-card" [class.compact-card]="surface !== 'list'" [class.is-done]="todo.status === 'done'" [class.selected]="selectedIds().has(todo.id)" [class.focused]="focusHighlight() === todo.id" [class.drop-before]="isDrop(todo.id, 'before')" [class.drop-after]="isDrop(todo.id, 'after')" [attr.data-id]="todo.id" draggable="true" role="listitem" (dragstart)="dragStart($event, todo)" (dragend)="dragEnd()" (dragover)="dragOverCard($event, todo.id, surface)" (dragleave)="dragLeave(todo.id)" (drop)="dropCard($event, todo.id, surface, laneStatus, lanePriority)" (click)="selectCard(todo, $event)">
+        <div class="todo-leading">
+          @if (selectionMode()) { <input class="selection-checkbox" type="checkbox" [checked]="selectedIds().has(todo.id)" (click)="$event.stopPropagation()" (change)="toggleSelection(todo.id)" [attr.aria-label]="'Sélectionner ' + todo.title" /> }
+          <button class="status-button" type="button" [class.done]="todo.status === 'done'" [attr.aria-label]="todo.status === 'done' ? 'Rouvrir ' + todo.title : 'Terminer ' + todo.title" (click)="$event.stopPropagation(); toggleStatus(todo)">{{ todo.status === 'done' ? '✓' : '' }}</button>
+        </div>
+        <div class="todo-main">
+          <div class="todo-heading">
+            <button class="todo-title" type="button" (click)="$event.stopPropagation(); openEditTodo(todo)">{{ todo.title }}</button>
+            <div class="todo-actions">
+              <button class="icon-button" type="button" [attr.aria-label]="'Modifier ' + todo.title" [title]="'Modifier ' + todo.title" (click)="$event.stopPropagation(); openEditTodo(todo)">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 20 4.5-1 10-10a2.12 2.12 0 0 0-3-3l-10 10L4 20Zm10-13.5 3.5 3.5" /></svg>
+              </button>
+              <button class="icon-button danger-icon" type="button" [attr.aria-label]="'Supprimer ' + todo.title" [title]="'Supprimer ' + todo.title" (click)="$event.stopPropagation(); removeTodo(todo)">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16m-13 0 1 13h10l1-13M9 7V4h6v3m-4 4v6m4-6v6" /></svg>
+              </button>
+            </div>
+          </div>
+          @if (todo.description) { <app-safe-markdown class="todo-description" [markdown]="descriptionPreview(todo.description)" /> }
+          <div class="todo-meta">
+            @if (priorityFor(todo.priorityId); as priority) { <span class="priority-chip" [style.--priority-color]="safePriorityColor(priority.color)">{{ priority.label }}</span> }
+            @if (todo.estimatedTime) { <span class="meta-chip">{{ formatMinutes(todo.estimatedTime) }}</span> }
+            @for (context of todoContexts(todo); track context) { <span class="meta-chip context-chip">{{ context }}</span> }
+            @if (todo.projectId; as projectId) { <span class="meta-chip project-chip">{{ projectName(projectId) }}</span> }
+            @if (todo.attachedTo) { <span class="meta-chip">Rattaché: {{ todo.attachedTo }}</span> }
+            @if (dueLabel(todo); as due) { <span class="meta-chip" [class.due-late]="due.late">{{ due.text }}</span> }
+            @if (todo.reminderAt && reminderLabel(todo); as reminder) { <span class="meta-chip" [class.due-late]="reminder.late">{{ reminder.text }}</span> }
+            @if (recurrenceLabel(todo.recurrence); as recurrence) { <span class="meta-chip">{{ recurrence }}</span> }
+            @if (blockingCount(todo); as blocked) { <span class="meta-chip blocked-chip">Bloquée ({{ blocked }})</span> }
+            @if (todo.pinned) { <span class="meta-chip pin-chip">Épinglée</span> }
+          </div>
+          @if (todo.tags?.length) { <div class="todo-tags">@for (tag of todo.tags; track tag) { <span>#{{ tag }}</span> }</div> }
+        </div>
+      </article>
+    </ng-template>
+
+    @if (dialog() === 'todo') {
+      <div class="dialog-backdrop" role="presentation" (click)="closeDialog()">
+         <section class="dialog todo-dialog" role="dialog" aria-modal="true" aria-labelledby="todo-dialog-title" appFocusTrap tabindex="-1" (click)="$event.stopPropagation()">
+          <h2 id="todo-dialog-title">{{ editingTodoId() ? 'Modifier la tâche' : 'Nouvelle tâche' }}</h2>
+          <form (ngSubmit)="submitTodo()">
+            <label class="field"><span>Titre *</span><input name="title" maxlength="120" required [(ngModel)]="todoDraft.title" /></label>
+             <label class="field"><span>Description Markdown</span><app-markdown-editor name="description" [(ngModel)]="todoDraft.description" [minHeight]="160" /></label>
+            <div class="field-grid">
+              <label class="field"><span>Priorité</span><select name="priority" [(ngModel)]="todoDraft.priorityId">@for (priority of priorities(); track priority.id) { <option [value]="priority.id">{{ priority.label }}</option> }</select></label>
+              <label class="field"><span>Statut</span><select name="status" [(ngModel)]="todoDraft.status">@for (status of statuses; track status.id) { <option [value]="status.id">{{ status.label }}</option> }</select></label>
+            </div>
+            <div class="field-grid">
+              <label class="field"><span>Temps estimé</span><input name="estimatedTime" inputmode="decimal" placeholder="60 ou 60*5" [(ngModel)]="todoDraft.estimatedTime" /><small>{{ estimateHint() }}</small></label>
+               <label class="field"><span>Date d'échéance</span><app-date-picker name="dueDate" [(ngModel)]="todoDraft.dueDate" /></label>
+            </div>
+            <div class="field-grid">
+               <label class="field"><span>Rappel précis</span><app-date-picker name="reminderAt" mode="datetime" [(ngModel)]="todoDraft.reminderAt" /></label>
+              <label class="check-field"><input name="pinned" type="checkbox" [(ngModel)]="todoDraft.pinned" /><span>Épingler sur l'accueil</span></label>
+            </div>
+            <label class="field"><span>Projet</span><select name="project" [(ngModel)]="todoDraft.projectId"><option value="">Aucun projet</option>@for (project of projects(); track project.id) { <option [value]="project.id">{{ project.name }}</option> }</select></label>
+            <label class="field"><span>Contexte</span><input name="context" maxlength="80" placeholder="@bureau, @client" [(ngModel)]="todoDraft.context" /><small>Un projet ou un contexte est requis.</small></label>
+            <label class="field"><span>Rattaché à</span><input name="attachedTo" maxlength="80" [(ngModel)]="todoDraft.attachedTo" /></label>
+            <fieldset class="field recurrence-field"><legend>Récurrence</legend><select name="recurrenceType" [(ngModel)]="todoDraft.recurrenceType"><option value="none">Aucune</option><option value="daily">Tous les jours</option><option value="weekly">Chaque semaine</option><option value="monthly_nth_weekday">Chaque mois</option></select>
+              @if (todoDraft.recurrenceType === 'weekly') { <div class="weekday-picker">@for (day of weekDays; track day.id) { <label><input type="checkbox" [checked]="todoDraft.recurrenceWeekdays.includes(day.id)" (change)="toggleDraftWeekday(day.id)" />{{ day.label }}</label> }</div> }
+              @if (todoDraft.recurrenceType === 'monthly_nth_weekday') { <div class="field-grid compact-grid"><label class="field"><span>Occurrence</span><select name="recurrenceNth" [(ngModel)]="todoDraft.recurrenceNth"><option [ngValue]="1">1er</option><option [ngValue]="2">2e</option><option [ngValue]="3">3e</option><option [ngValue]="4">4e</option><option [ngValue]="-1">Dernier</option></select></label><label class="field"><span>Jour</span><select name="recurrenceWeekday" [(ngModel)]="todoDraft.recurrenceWeekday">@for (day of fullWeekDays; track day.id) { <option [ngValue]="day.id">{{ day.label }}</option> }</select></label></div> }
+            </fieldset>
+            <fieldset class="field dependency-field"><legend>Dépend de</legend>@if (dependencies().length) { @for (dependency of dependencies(); track dependency.id) { <label><input type="checkbox" [checked]="todoDraft.dependencies.includes(dependency.id)" (change)="toggleDraftDependency(dependency.id)" /><span>{{ dependency.title }}</span><small>{{ statusLabel(dependency.status) }}</small></label> } } @else { <small>Aucune autre tâche disponible.</small> }</fieldset>
+            <label class="field"><span>Tags, séparés par des virgules</span><input name="tags" [(ngModel)]="todoDraft.tags" placeholder="api, frontend" /></label>
+            <div class="dialog-actions"><button class="secondary-button" type="button" (click)="closeDialog()">Annuler</button><button class="primary-button" type="submit">{{ editingTodoId() ? 'Enregistrer' : 'Créer' }}</button></div>
+          </form>
+        </section>
+      </div>
+    }
+
+    @if (dialog() === 'priorities') {
+      <div class="dialog-backdrop" role="presentation" (click)="closeDialog()"><section class="dialog small-dialog" role="dialog" aria-modal="true" aria-labelledby="priorities-dialog-title" appFocusTrap tabindex="-1" (click)="$event.stopPropagation()"><h2 id="priorities-dialog-title">Gérer les priorités</h2><div class="priority-list">@for (priority of priorities(); track priority.id) { <div><span class="priority-dot" [style.--lane-color]="safePriorityColor(priority.color)"></span><strong>{{ priority.label }}</strong><button class="danger-icon" type="button" (click)="removePriority(priority)">Supprimer</button></div> } @if (!priorities().length) { <p>Aucune priorité.</p> }</div><form class="priority-form" (ngSubmit)="submitPriority()"><label class="field"><span>Nouvelle priorité</span><input name="priorityName" maxlength="30" [(ngModel)]="priorityName" required /></label><label class="field"><span>Couleur</span><input name="priorityColor" type="color" [(ngModel)]="priorityColor" /></label><button class="secondary-button" type="submit">Ajouter</button></form><div class="dialog-actions"><button class="primary-button" type="button" (click)="closeDialog()">Fermer</button></div></section></div>
+    }
+
+    @if (dialog() === 'bulk') {
+      <div class="dialog-backdrop" role="presentation" (click)="closeDialog()"><section class="dialog small-dialog" role="dialog" aria-modal="true" aria-labelledby="bulk-dialog-title" appFocusTrap tabindex="-1" (click)="$event.stopPropagation()"><h2 id="bulk-dialog-title">Modifier {{ selectedIds().size }} tâche{{ selectedIds().size > 1 ? 's' : '' }}</h2><form (ngSubmit)="submitBulkEdit()"><label class="field"><span>Projet</span><select name="bulkProject" [(ngModel)]="bulkDraft.projectId"><option value="__keep__">Ne pas changer</option><option value="__none__">Retirer le projet</option>@for (project of projects(); track project.id) { <option [value]="project.id">{{ project.name }}</option> }</select></label><label class="field"><span>Statut</span><select name="bulkStatus" [(ngModel)]="bulkDraft.status"><option value="__keep__">Ne pas changer</option>@for (status of statuses; track status.id) { <option [value]="status.id">{{ status.label }}</option> }</select></label><label class="field"><span>Priorité</span><select name="bulkPriority" [(ngModel)]="bulkDraft.priorityId"><option value="__keep__">Ne pas changer</option>@for (priority of priorities(); track priority.id) { <option [value]="priority.id">{{ priority.label }}</option> }</select></label><label class="field"><span>Contexte</span><input name="bulkContext" maxlength="80" [(ngModel)]="bulkDraft.context" /><label class="check-field"><input name="bulkClearContext" type="checkbox" [(ngModel)]="bulkDraft.clearContext" /> Vider le contexte</label></label><label class="field"><span>Tags</span><input name="bulkTags" [(ngModel)]="bulkDraft.tags" placeholder="api, urgent" /><select name="bulkTagsMode" [(ngModel)]="bulkDraft.tagsMode"><option value="keep">Ne pas changer</option><option value="replace">Remplacer</option><option value="add">Ajouter</option><option value="clear">Vider</option></select></label><div class="dialog-actions"><button class="secondary-button" type="button" (click)="closeDialog()">Annuler</button><button class="primary-button" type="submit">Appliquer</button></div></form></section></div>
+    }
+
+    @if (dialog() === 'templates') {
+      <div class="dialog-backdrop" role="presentation" (click)="closeDialog()">
+        <section class="dialog template-manager-dialog" role="dialog" aria-modal="true" aria-labelledby="templates-dialog-title" appFocusTrap tabindex="-1" (click)="$event.stopPropagation()">
+          <h2 id="templates-dialog-title">Gérer les modèles</h2>
+          <p class="dialog-note">Choisissez un modèle pour préremplir une tâche, ou gérez vos modèles personnalisés.</p>
+          <div class="template-list">
+            @for (template of templates(); track template.id) {
+              <div class="template-item">
+                <button class="template-item-apply" type="button" (click)="applyTemplate(template)">
+                  <span class="template-item-icon" aria-hidden="true">{{ template.icon || '📋' }}</span>
+                  <span class="template-item-main"><strong>{{ template.name }}</strong><small>{{ template.title || 'Nouvelle tâche' }}</small></span>
+                </button>
+                <div class="template-item-actions">
+                  <button class="secondary-button" type="button" (click)="openEditTemplate(template)">Modifier</button>
+                  <button class="danger-icon" type="button" (click)="removeTemplate(template)">Supprimer</button>
+                </div>
+              </div>
+            } @empty {
+              <p class="template-empty">Aucun modèle. Créez-en un pour commencer.</p>
+            }
+          </div>
+          <div class="dialog-actions"><button class="secondary-button" type="button" (click)="closeDialog()">Fermer</button><button class="primary-button" type="button" (click)="openNewTemplate()">+ Nouveau modèle</button></div>
+        </section>
+      </div>
+    }
+
+    @if (dialog() === 'templateForm') {
+      <div class="dialog-backdrop" role="presentation" (click)="cancelTemplateForm()">
+        <section class="dialog template-form-dialog" role="dialog" aria-modal="true" aria-labelledby="template-form-title" appFocusTrap tabindex="-1" (click)="$event.stopPropagation()">
+          <h2 id="template-form-title">{{ templateEditingId() ? 'Modifier le modèle' : 'Nouveau modèle' }}</h2>
+          <form (ngSubmit)="submitTemplate()">
+            <div class="field-grid">
+              <label class="field"><span>Icône</span><input name="templateIcon" maxlength="2" [(ngModel)]="templateDraft.icon" /></label>
+              <label class="field"><span>Nom du modèle *</span><input name="templateName" maxlength="60" required placeholder="Correction de bug" [(ngModel)]="templateDraft.name" /></label>
+            </div>
+            <label class="field"><span>Titre pré-rempli</span><input name="templateTitle" maxlength="120" [placeholder]="'Fix : {{date}}'" [(ngModel)]="templateDraft.title" /><small>{{'{{date}}'}} et {{'{{time}}'}} sont remplacés à l’utilisation.</small></label>
+             <label class="field"><span>Description Markdown</span><app-markdown-editor name="templateDescription" [(ngModel)]="templateDraft.description" [minHeight]="140" /></label>
+            <div class="field-grid">
+              <label class="field"><span>Priorité par défaut</span><select name="templatePriority" [(ngModel)]="templateDraft.priorityId">@for (priority of priorities(); track priority.id) { <option [value]="priority.id">{{ priority.label }}</option> }</select></label>
+              <label class="field"><span>Temps estimé (min)</span><input name="templateEstimatedTime" inputmode="decimal" placeholder="60 ou 60*5" [(ngModel)]="templateDraft.estimatedTime" /></label>
+            </div>
+            <label class="field"><span>Contexte</span><input name="templateContext" maxlength="80" placeholder="@pc" [(ngModel)]="templateDraft.context" /></label>
+            <label class="field"><span>Tags, séparés par des virgules</span><input name="templateTags" placeholder="bug, urgent" [(ngModel)]="templateDraft.tags" /></label>
+            <div class="dialog-actions"><button class="secondary-button" type="button" (click)="cancelTemplateForm()">Annuler</button><button class="primary-button" type="submit">{{ templateEditingId() ? 'Enregistrer' : 'Créer' }}</button></div>
+          </form>
+        </section>
+      </div>
+    }
+
+    @if (dialog() === 'views') {
+      <div class="dialog-backdrop" role="presentation" (click)="closeDialog()"><section class="dialog small-dialog" role="dialog" aria-modal="true" aria-labelledby="views-dialog-title" appFocusTrap tabindex="-1" (click)="$event.stopPropagation()"><h2 id="views-dialog-title">Vues sauvegardées</h2><form (ngSubmit)="submitView()"><label class="field"><span>Nom de la vue</span><input name="viewName" maxlength="60" [(ngModel)]="viewName" required /></label><p class="view-summary">{{ viewSummary() }}</p><button class="secondary-button" type="submit">{{ matchingSavedView() ? 'Mettre à jour' : 'Sauvegarder' }}</button></form><div class="saved-view-list">@for (view of savedViews(); track view.id) { <div><button type="button" (click)="applySavedView(view)">{{ view.name }}</button><span>{{ describeView(view) }}</span><button class="danger-icon" type="button" (click)="removeSavedView(view)">Supprimer</button></div> } @if (!savedViews().length) { <p>Aucune vue enregistrée.</p> }</div><div class="dialog-actions"><button class="primary-button" type="button" (click)="closeDialog()">Fermer</button></div></section></div>
+    }

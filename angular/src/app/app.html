@@ -1,0 +1,70 @@
+<header class="topbar">
+  <a class="brand" routerLink="/home" (click)="closeMenu()" aria-label="Workspace, accueil">
+    <span class="logo-mark" aria-hidden="true">W</span>
+    <span>{{ siteName() }}</span>
+  </a>
+
+  <nav id="main-navigation" class="main-nav" [class.open]="menuOpen()" aria-label="Navigation principale">
+    @for (item of navItems; track item.path) {
+      <a [routerLink]="item.path" routerLinkActive="active" (click)="handleNavClick(item.path)">{{ item.label }}</a>
+    }
+  </nav>
+
+  <div class="topbar-actions">
+    <app-trash />
+    <span class="topbar-separator" aria-hidden="true"></span>
+    <span class="clock" aria-label="Heure actuelle">{{ clock() }}</span>
+    <div class="theme-picker">
+      <button class="theme-toggle" type="button" [attr.aria-expanded]="themePickerOpen()" aria-haspopup="menu" aria-label="Changer le thème et la couleur" [title]="'Thème : ' + activeTheme().label" (click)="toggleThemePicker()">
+        <span class="theme-toggle-swatch" [style.background]="activeTheme().bg"><span [style.background]="accent()"></span></span>
+      </button>
+      @if (themePickerOpen()) {
+        <div class="theme-picker-popup" role="menu" aria-label="Thèmes et couleur d'accent">
+          @for (entry of themes; track entry.id) {
+            <button class="theme-picker-item" [class.active]="theme() === entry.id" type="button" role="menuitem" [attr.aria-current]="theme() === entry.id ? 'true' : null" (click)="selectTheme(entry.id)">
+              <span class="theme-picker-swatch" [style.background]="entry.bg"><span class="theme-picker-dot" [style.background]="entry.accent"></span></span>
+              <span class="theme-picker-label">{{ entry.label }}</span>
+              @if (theme() === entry.id) {
+                <svg class="theme-picker-check" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2,6 5,9 10,3" /></svg>
+              }
+            </button>
+          }
+          <div class="theme-picker-sep"></div>
+          <div class="theme-picker-accent-row">
+            <span class="theme-picker-accent-label">Accent</span>
+            <input class="theme-picker-accent-input" type="color" [value]="accent()" title="Couleur d'accent personnalisée" aria-label="Couleur d'accent personnalisée" (input)="changeAccent($event)" />
+            @if (accentOverride()) {
+              <button class="theme-picker-accent-reset" type="button" title="Remettre l'accent du thème" aria-label="Remettre l'accent du thème" (click)="resetAccent()">✕</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+    <a class="settings-link" routerLink="/settings" routerLinkActive="active" aria-label="Paramètres">&#9881;</a>
+    <button class="menu-button" type="button" [attr.aria-expanded]="menuOpen()" [attr.aria-label]="menuOpen() ? 'Fermer le menu' : 'Ouvrir le menu'" aria-controls="main-navigation" (click)="toggleMenu()">
+      <span class="sr-only">{{ menuOpen() ? 'Fermer le menu' : 'Ouvrir le menu' }}</span>
+      <span aria-hidden="true">&#9776;</span>
+    </button>
+  </div>
+</header>
+
+<button class="skip-link" type="button" (click)="skipToContent()">Aller au contenu</button>
+<main id="main-content" class="page-content" tabindex="-1">
+  <router-outlet />
+</main>
+
+<app-feedback />
+<app-global-search />
+<app-favorites />
+
+@if (shortcutsHelp()) {
+  <div class="shortcuts-overlay" role="presentation" (click)="shortcutsHelp.set(false)">
+    <section class="dialog shortcuts-dialog" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title" appFocusTrap tabindex="-1" (click)="$event.stopPropagation()">
+      <h2 id="shortcuts-title">Raccourcis clavier</h2>
+      <p><kbd>Ctrl K</kbd> recherche globale</p>
+      <p><kbd>g</kbd> puis <kbd>h/t/s/j/p/r/e/n</kbd> navigation</p>
+      <p><kbd>?</kbd> ou <kbd>,</kbd> afficher cette aide</p>
+      <button type="button" (click)="shortcutsHelp.set(false)">Fermer</button>
+    </section>
+  </div>
+}

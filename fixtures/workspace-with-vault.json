@@ -1,0 +1,133 @@
+{
+  "_meta": { "app": "Workspace", "version": 6, "exportedAt": "2026-01-20T10:30:00.000Z" },
+  "data": {
+    "projects": [
+      {
+        "id": "vault-project-a",
+        "name": "Projet coffre A",
+        "color": "#4EA7FC",
+        "parentId": null,
+        "categories": ["security"],
+        "children": [
+          {
+            "id": "vault-folder-a",
+            "nodeType": "folder",
+            "name": "Acces",
+            "children": [
+              {
+                "id": "vault-item-a",
+                "nodeType": "item",
+                "type": "password",
+                "title": "Secret fixture A",
+                "category": "test",
+                "url": "https://vault-a.example.invalid",
+                "login": "",
+                "password": "",
+                "secretEncrypted": {
+                  "iv": "IDFCU2R1hpeoucrb",
+                  "cipher": "qCS7HMKbiAmxi7q1i6mnVfIz69HLaiEHMvS8asMXGtNHhuzX/2HwsD1AWmjzYooqUOiGzc6E/U1ge3EfBFtOkGtSryD7T9Ag25U="
+                },
+                "note": "Secret chiffre de fixture.",
+                "code": "",
+                "language": "",
+                "tags": ["vault", "fixture"],
+                "file": null,
+                "createdAt": 1767225600000
+              }
+            ],
+            "createdAt": 1767225600000
+          }
+        ],
+        "createdAt": 1767225600000,
+        "lastVisited": 1767312000000
+      },
+      {
+        "id": "vault-project-b",
+        "name": "Projet coffre B",
+        "color": "#64C98A",
+        "parentId": null,
+        "categories": [],
+        "children": [
+          {
+            "id": "vault-item-b",
+            "nodeType": "item",
+            "type": "password",
+            "title": "Secret fixture B",
+            "category": "test",
+            "url": "https://vault-b.example.invalid",
+            "login": "",
+            "password": "",
+            "secretEncrypted": {
+              "iv": "MEFSY3SFlqe4ydrr",
+              "cipher": "4NuAoCwYR3tZyAb3o7mfbsJT+xoJwB1phQCMXhHkI72AehJb3lT8RwyOk3J55FIZhbHkrvD/njPJIUg8fCyAWTSNdy6z28UE4xs="
+            },
+            "note": "Deuxieme secret chiffre de fixture.",
+            "code": "",
+            "language": "",
+            "tags": ["vault", "fixture"],
+            "file": null,
+            "createdAt": 1767312000000
+          }
+        ],
+        "createdAt": 1767312000000,
+        "lastVisited": 1767398400000
+      }
+    ],
+    "rh": { "id": "root", "name": "RH", "nodeType": "folder", "children": [], "createdAt": 1767225600000 },
+    "todos": [
+      {
+        "id": "vault-todo",
+        "title": "Verifier le coffre",
+        "description": "Tache de validation du coffre.",
+        "status": "todo",
+        "priorityId": "important",
+        "context": "security",
+        "attachedTo": "",
+        "estimatedTime": 15,
+        "dependencies": [],
+        "tags": ["vault"],
+        "dueDate": "",
+        "reminderAt": "",
+        "recurrence": null,
+        "pinned": false,
+        "projectId": "vault-project-a",
+        "createdAt": 1767225600000,
+        "updatedAt": 1767225600000
+      }
+    ],
+    "snippets": [],
+    "snippetFolders": { "id": "root", "name": "Snippets", "nodeType": "folder", "children": [], "createdAt": 1767225600000 },
+    "snippetMixedOrder": {},
+    "favorites": { "id": "root", "name": "Favoris", "nodeType": "folder", "children": [], "createdAt": 1767225600000 },
+    "recentlyVisited": [],
+    "journal": [],
+    "trash": [],
+    "activityLog": [],
+    "settings": {
+      "theme": "dark",
+      "userName": "Vault Fixture User",
+      "siteName": "Workspace Vault Fixture",
+      "backupFolder": "Downloads",
+      "autoBackupFrequencyHours": 168,
+      "todoSavedViews": [],
+      "weeklyReview": { "lastCompletedWeek": "" },
+      "todoPriorities": [
+        { "id": "urgent", "label": "Urgent", "color": "#ff5f6e" },
+        { "id": "important", "label": "Important", "color": "#f0a030" },
+        { "id": "normal", "label": "Normal", "color": "#64b0ff" },
+        { "id": "basse", "label": "Basse", "color": "#3d5070" }
+      ],
+      "templates": [],
+      "secretVault": {
+        "enabled": true,
+        "salt": "ABEiM0RVZneImaq7zN3u/w==",
+        "iterations": 250000,
+        "verifier": {
+          "iv": "ECEyQ1RldoeYqbrL",
+          "cipher": "UcRPPVmOW0DAR3HPOHfKPRIMpvUC/AE6GYfKKYSYECSl7feENBNaNaFlSw=="
+        }
+      }
+    },
+    "_seeded": true
+  }
+}
