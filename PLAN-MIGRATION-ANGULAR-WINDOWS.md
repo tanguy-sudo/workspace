@@ -641,7 +641,7 @@ L'import Angular doit :
 
 **Critère de bascule :** aucune fonctionnalité critique, donnée ou URL bloquante ne reste sans test documenté.
 
-**Rollback Pages :** le workflow `CI/CD` accepte un lancement manuel depuis `main` avec `pages_mode=legacy` et un `legacy_ref` contrôlé. Le défaut `5e40093` conserve le verrou TAN-58 dans le snapshot legacy. Le job valide puis publie ce snapshot sans code Angular ; relancer en mode `transition` restaure le site de transition (tout push sur `main` le fait également). Les snapshots antérieurs au verrou ne doivent être utilisés qu'après fermeture de toutes les fenêtres Workspace. Ne jamais supprimer le commit de référence avant d'avoir exécuté et vérifié le rollback sur l'environnement public.
+**Rollback Pages :** le workflow `CI/CD` accepte un lancement manuel depuis `main` avec `pages_mode=legacy` et un `legacy_ref` contrôlé. Le défaut `legacy-rollback-tan58` conserve le snapshot legacy avec le verrou TAN-58. Le job valide puis publie ce snapshot sans code Angular ; relancer en mode `transition` restaure le site de transition (tout push sur `main` le fait également). Les snapshots antérieurs au verrou ne doivent être utilisés qu'après fermeture de toutes les fenêtres Workspace. Ne jamais supprimer la référence de rollback avant d'avoir exécuté et vérifié le rollback sur l'environnement public.
 
 ## 7. Routage et GitHub Pages
 

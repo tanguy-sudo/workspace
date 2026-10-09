@@ -13,9 +13,9 @@ on:
         options: [transition, legacy]
         default: transition
       legacy_ref:
-        description: "Git commit or tag containing the legacy site to restore"
+        description: "Git branch, tag, or commit containing the legacy site to restore"
         type: string
-        default: 5e40093
+        default: legacy-rollback-tan58
 
 concurrency:
   group: pages

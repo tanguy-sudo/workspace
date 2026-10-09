@@ -117,8 +117,8 @@ pendant que `export.html` reste disponible pour le rollback legacy.
 
 Depuis l'onglet Actions, lancer `CI/CD` avec `workflow_dispatch`, choisir le
 mode `legacy` sur la branche `main` et vérifier le champ `legacy_ref` avant de confirmer. Il doit
-pointer vers un commit ou tag contenant le site legacy complet et le verrou de coexistence TAN-58
-(par défaut `5e40093`). Ce déploiement remplace le site public par le snapshot legacy ;
+pointer vers une branche, un tag ou un commit contenant le site legacy complet et le verrou de coexistence TAN-58
+(par défaut `legacy-rollback-tan58`). Ce déploiement remplace le site public par le snapshot legacy ;
 pour revenir à Angular, relancer le workflow en mode `transition`. Un push sur
 `main` publie aussi automatiquement le mode `transition` après validation CI.
 

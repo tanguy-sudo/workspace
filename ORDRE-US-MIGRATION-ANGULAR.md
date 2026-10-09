@@ -189,7 +189,7 @@
 
 38. - [ ] [TAN-56 - Tester l'origine navigateur et la persistance au redémarrage Windows](https://linear.app/tanguy-sudo/issue/TAN-56/us-tester-lorigine-navigateur-et-la-persistance-au-redemarrage-windows)
 39. - [x] [TAN-58 - Organiser la coexistence et le propriétaire des écritures](https://linear.app/tanguy-sudo/issue/TAN-58/us-organiser-la-coexistence-et-le-proprietaire-des-ecritures)
-40. - [ ] [TAN-59 - Préparer le rollback et retirer progressivement les pages legacy](https://linear.app/tanguy-sudo/issue/TAN-59/us-preparer-le-rollback-et-retirer-progressivement-les-pages-legacy)
+40. - [x] [TAN-59 - Préparer le rollback et retirer progressivement les pages legacy](https://linear.app/tanguy-sudo/issue/TAN-59/us-preparer-le-rollback-et-retirer-progressivement-les-pages-legacy)
 41. - [ ] [TAN-61 - Réaliser la recette finale et basculer Angular en production](https://linear.app/tanguy-sudo/issue/TAN-61/us-realiser-la-recette-finale-et-basculer-angular-en-production)
 
 ### Validation M7
@@ -214,9 +214,9 @@
 
 **Limite de déploiement :** les onglets ouverts avec un ancien JavaScript legacy qui ne connaît pas ce verrou doivent être rechargés après le déploiement ; ils ne peuvent pas être coordonnés rétroactivement.
 
-**TAN-59 préparée sur la branche dédiée :** `workflow_dispatch` propose le rollback Pages vers un snapshot legacy explicite (`legacy_ref`, par défaut `5e40093`, qui inclut le verrou TAN-58). Le workflow et l'artifact ont été validés localement. Après fusion sur `main`, le rollback réel et le retour au mode transition resteront à tester sur GitHub Pages.
+**TAN-59 préparée :** `workflow_dispatch` propose le rollback Pages vers le snapshot legacy dédié `legacy-rollback-tan58`. Les modes `legacy` et `transition` passent leur validation GitHub Actions sur la branche `tan-59-rollback-legacy`. Aucun de ces runs n'a modifié le site public. Le rollback réel et le retour au mode transition restent à tester après fusion sur `main`.
 
-**Retrait legacy :** différé après la recette TAN-61 et au moins 7 jours d'observation sans incident. Le test effectif du rollback public et la conservation du snapshot sont encore à valider.
+**Retrait legacy :** différé après la recette TAN-61 et au moins 7 jours d'observation sans incident. TAN-59 prépare le rollback ; le retrait des sources legacy reste conditionné à TAN-61 et à cette période d'observation.
 
 ## Suivi des décisions et écarts
 
