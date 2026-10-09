@@ -28,7 +28,7 @@ Build Angular de production sur GitHub Pages
 
 Cette solution ne demande ni Node.js, ni Python, ni serveur local sur le poste au moment du démarrage. Elle nécessite une connexion Internet et l'acceptation de stocker les données dans l'origine navigateur de GitHub Pages.
 
-Une variante « build local hors ligne + serveur HTTP sur `127.0.0.1` » est décrite à la fin. Elle ne doit être retenue que si l'accès hors ligne, l'indépendance vis-à-vis de GitHub Pages ou la confidentialité du code l'impose.
+La distribution retenue est en ligne uniquement via GitHub Pages. Aucun build utilisateur, serveur loopback ou mode hors ligne n'est prévu.
 
 ## 2. État actuel du projet
 
@@ -126,7 +126,7 @@ Le thème existe actuellement à la fois dans `settings.theme` et dans `localSto
 - améliorer la testabilité avec des services, des types et des tests automatisés ;
 - faire produire à la CI un artefact Angular vérifié ;
 - ouvrir l'application manuellement depuis son URL HTTPS ;
-- disposer d'une procédure d'installation, de vérification et de désinstallation reproductible.
+- disposer d'une procédure d'accès et de vérification reproductible.
 
 ### 3.2 Hors périmètre initial
 
@@ -166,7 +166,7 @@ Les décisions suivantes constituent le périmètre de référence pour commence
 | Coexistence legacy/Angular | jusqu'à la recette finale, puis période d'observation minimale de 7 jours | permet un rollback sans maintenir deux propriétaires d'une même fonctionnalité indéfiniment |
 | Écriture pendant coexistence | une seule version possède l'écriture pour chaque fonctionnalité ; édition simultanée legacy/Angular non supportée | évite l'écrasement de caches complets sans ajouter de synchronisation prématurée |
 | GitHub Pages pour les données | accepté pour l'application personnelle sous HTTPS, avec données uniquement dans le navigateur | le code client est public et ne constitue pas une frontière de sécurité ; aucun backend ne reçoit les données |
-| Mode hors ligne | non requis pour le premier parcours ; traité séparément dans [TAN-55](https://linear.app/tanguy-sudo/issue/TAN-55/us-preparer-la-variante-locale-hors-ligne-sur-127001) | évite de gérer deux origines et deux procédures de distribution dès le départ |
+| Mode hors ligne | non prévu ; distribution GitHub Pages uniquement | évite de gérer une seconde origine, un build local et une procédure d'installation |
 | Notifications | notifications best effort lorsque l'application est ouverte ; pas de service worker initial | le service worker est un chantier distinct et le comportement actuel est conservé |
 | Ressources tierces | audit puis contrôle/auto-hébergement avant la publication finale | réduit la dépendance aux CDN et relève de [TAN-51](https://linear.app/tanguy-sudo/issue/TAN-51/us-realiser-laudit-securite-et-accessibilite-angular) |
 
@@ -179,13 +179,13 @@ Les décisions suivantes constituent le périmètre de référence pour commence
 | Base `workspace` inchangée | écritures initiales dans une valeur complète `kv["data"]` | revenir à l'application legacy sans migration destructive |
 | Une version propriétaire des écritures | pas d'édition simultanée legacy/Angular | désactiver les routes Angular concernées et reprendre sur legacy |
 | Ouverture manuelle | le profil choisi par l'utilisateur est utilisé | ouvrir manuellement l'URL legacy pendant la coexistence |
-| Mode hors ligne reporté | pas de serveur local ni de build installé sur le PC au premier déploiement | ouvrir le chantier TAN-55 avec export/import entre origines |
+| Pas de mode hors ligne | connexion Internet nécessaire ; aucune origine locale ni installation maintenue | les exports JSON restent le moyen manuel de transférer des données si le besoin change |
 
 ### Décisions reportées et issues associées
 
 Les sujets non nécessaires au premier parcours sont explicitement reportés dans des issues existantes :
 
-- **Build local hors ligne et serveur loopback :** [TAN-55](https://linear.app/tanguy-sudo/issue/TAN-55/us-preparer-la-variante-locale-hors-ligne-sur-127001).
+- **Build local hors ligne et serveur loopback :** TAN-55 est abandonnée ; le produit reste exclusivement sur GitHub Pages.
 - **Notifications lorsque l'application est fermée :** [TAN-49](https://linear.app/tanguy-sudo/issue/TAN-49/us-encadrer-les-notifications-locales-et-leurs-fallbacks).
 - **Audit des dépendances, CSP, sécurité et accessibilité :** [TAN-51](https://linear.app/tanguy-sudo/issue/TAN-51/us-realiser-laudit-securite-et-accessibilite-angular).
 - **Propriétaire des écritures et fin de coexistence :** [TAN-58](https://linear.app/tanguy-sudo/issue/TAN-58/us-organiser-la-coexistence-et-le-proprietaire-des-ecritures).
@@ -302,7 +302,7 @@ Chaque phase doit être livrée avec son code, ses tests et un critère de sorti
 3. relever les URLs publiques actuelles et tous leurs paramètres ;
 4. inventorier les navigateurs supportés et les APIs facultatives ;
 5. confirmer le chemin GitHub Pages et le mode de routage ;
-6. décider si l'application doit fonctionner hors ligne ;
+6. confirmer l'utilisation en ligne uniquement via GitHub Pages ;
 7. définir la durée de coexistence legacy/Angular ;
 8. consigner la stratégie de sauvegarde et de restauration avant toute migration.
 
@@ -635,10 +635,13 @@ L'import Angular doit :
 6. conserver les anciennes pages pendant une période d'observation ;
 7. publier l'artifact final Angular à la racine lorsque le rollback est encore possible ;
 8. transformer les anciennes URL `.html` en redirections ou wrappers compatibles ;
-9. retirer les scripts legacy uniquement après validation des sauvegardes et URLs ;
-10. conserver une archive versionnée du dernier build legacy.
+9. conserver le commit legacy de référence et l'action de rollback `workflow_dispatch` ;
+10. retirer progressivement les routes/pages legacy seulement après TAN-61 et au moins 7 jours d'observation sans incident ;
+11. conserver une archive versionnée du dernier build legacy et tester réellement le rollback avant de supprimer les sources legacy.
 
 **Critère de bascule :** aucune fonctionnalité critique, donnée ou URL bloquante ne reste sans test documenté.
+
+**Rollback Pages :** le workflow `CI/CD` accepte un lancement manuel depuis `main` avec `pages_mode=legacy` et un `legacy_ref` contrôlé. Le défaut `legacy-rollback-tan58` conserve le snapshot legacy avec le verrou TAN-58. Le job valide puis publie ce snapshot sans code Angular ; relancer en mode `transition` restaure le site de transition (tout push sur `main` le fait également). Les snapshots antérieurs au verrou ne doivent être utilisés qu'après fermeture de toutes les fenêtres Workspace. Ne jamais supprimer la référence de rollback avant d'avoir exécuté et vérifié le rollback sur l'environnement public.
 
 ## 7. Routage et GitHub Pages
 
@@ -694,65 +697,9 @@ Après connexion à Windows, l'utilisateur ouvre manuellement l'URL HTTPS GitHub
 
 Le navigateur doit ouvrir un build `ng build` de production déjà publié.
 
-### Variante hors ligne : build local et serveur loopback
-
-Si l'application doit fonctionner sans Internet, prévoir une distribution locale distincte :
-
-```text
-%LOCALAPPDATA%\Workspace\
-  app\       build Angular de production
-  bin\       lanceur et procédure d'arrêt
-  logs\      journaux techniques sans données métier
-```
-
-Le lanceur devra :
-
-1. vérifier que `app\index.html` existe ;
-2. vérifier si le port fixe est déjà occupé par l'application ;
-3. démarrer un serveur statique uniquement si nécessaire ;
-4. écouter exclusivement sur `127.0.0.1` ;
-5. attendre une réponse HTTP avant d'ouvrir le navigateur ;
-6. utiliser une URL stable, par exemple `http://127.0.0.1:8080/` ;
-7. journaliser uniquement les erreurs de démarrage et le PID ;
-8. permettre un arrêt propre en vérifiant le processus ;
-9. ouvrir l'application avec le profil navigateur habituel ;
-10. ne jamais exposer le serveur sur `0.0.0.0`.
-
-Le dépôt documente déjà Python avec `python -m http.server 8080`. Cette solution peut servir de variante personnelle si Python est installé, mais elle doit être vérifiée sur le poste cible. Pour une distribution destinée à plusieurs postes, il faudra fournir un serveur statique approuvé ou un installeur, ce qui devient un chantier distinct.
-
 ### Origine et données IndexedDB
 
-Les origines suivantes ne partagent pas automatiquement leurs données :
-
-```text
-https://tanguy-sudo.github.io/workspace/
-http://127.0.0.1:8080/
-http://localhost:8080/
-file:///C:/...
-```
-
-Avant de passer de GitHub Pages à un serveur local, ou inversement :
-
-1. exporter le workspace complet en JSON ;
-2. ouvrir la nouvelle origine avec le même profil navigateur ;
-3. importer le JSON ;
-4. vérifier les tâches, projets, fichiers et coffre ;
-5. ne supprimer l'ancienne origine qu'après validation.
-
-Ne pas alterner `localhost` et `127.0.0.1`, ni changer de port sans raison. L'API File System Access nécessite un contexte sécurisé ; HTTPS est le cas nominal et `127.0.0.1` est généralement traité comme contexte local sécurisé par les navigateurs Chromium.
-
-### Installation et désinstallation
-
-Le mode GitHub Pages ne nécessite aucune installation : il suffit d'ouvrir l'URL dans le navigateur. Fournir des scripts d'installation et de désinstallation uniquement si le mode local hors ligne est retenu.
-
-Si un script d'installation du mode local est ajouté, il doit :
-
-- utiliser le compte courant ;
-- ne pas demander de privilèges administrateur sans nécessité ;
-- utiliser des chemins absolus et correctement quotés ;
-- vérifier l'URL ou le fichier avant l'enregistrement ;
-- permettre une désinstallation sans supprimer les données du navigateur ;
-- ne jamais supprimer les sauvegardes automatiquement.
+Les données sont conservées pour l'origine HTTPS GitHub Pages et le profil navigateur habituel. Une autre origine ou un autre profil ne partage pas ces données. Le produit ne fournit ni build local hors ligne, ni serveur loopback, ni installateur.
 
 
 Le projet contient des données RH, des notes et un coffre local. La migration doit traiter les points suivants comme des exigences, pas comme des améliorations facultatives :
@@ -879,7 +826,7 @@ Avec un profil navigateur persistant :
 
 - l'utilisateur peut ouvrir manuellement l'URL HTTPS avec le profil navigateur souhaité ;
 - un redémarrage de Windows ne change pas l'origine ni les données du profil navigateur ;
-- aucune installation, tâche planifiée, élévation ou exécution de Node.js n'est nécessaire pour le mode GitHub Pages.
+- l'accès de production s'effectue via GitHub Pages ; aucun build local ou mode hors ligne n'est livré.
 
 ## 12. Rollback et gestion des incidents
 
@@ -929,7 +876,7 @@ Règles de collaboration :
 
 L'ordre le plus sûr et le moins coûteux est :
 
-1. confirmer URL, navigateur, routage et mode hors ligne ;
+1. confirmer l'URL, le navigateur et le routage ;
 2. créer fixtures et export de référence ;
 3. initialiser Angular et la CI sans toucher aux pages legacy ;
 4. porter l'adaptateur Dexie et les préférences ;
@@ -954,4 +901,4 @@ La migration est faisable sans réécrire immédiatement tout le projet, à cond
 
 Le chemin recommandé est donc : **Angular standalone + services typés + Dexie compatible + hash routing initial + migration verticale + GitHub Pages + ouverture manuelle dans le navigateur**.
 
-La variante locale hors ligne doit rester optionnelle. Elle nécessite un serveur statique distribué et une migration d'origine navigateur, alors que la version GitHub Pages s'ouvre directement dans le navigateur sans processus local permanent.
+La distribution est exclusivement assurée par GitHub Pages ; aucune variante locale hors ligne ou procédure d'installation n'est prévue.

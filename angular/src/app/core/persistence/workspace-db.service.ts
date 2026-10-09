@@ -211,7 +211,7 @@ export class WorkspaceDbService implements OnDestroy {
 
       if (typeof navigator === 'undefined' || !navigator.locks) {
         this.writeAccess.set('read-only');
-        this.writeAccessError.set('Exclusive browser locks are unavailable');
+        this.writeAccessError.set('Le verrou exclusif n’est pas disponible dans ce navigateur');
         acquired();
         return;
       }
@@ -219,12 +219,12 @@ export class WorkspaceDbService implements OnDestroy {
       const hold = new Promise<void>((release) => { this.releaseWriteLock = release; });
       void navigator.locks.request('workspace:data-write', { mode: 'exclusive', ifAvailable: true }, async (lock) => {
         this.writeAccess.set(lock ? 'writer' : 'read-only');
-        if (!lock) this.writeAccessError.set('Another Workspace window owns the write lock');
+        if (!lock) this.writeAccessError.set('Une autre fenêtre Workspace détient le verrou d’écriture');
         acquired();
         if (lock) await hold;
       }).catch(() => {
         this.writeAccess.set('read-only');
-        this.writeAccessError.set('Could not acquire the Workspace write lock');
+        this.writeAccessError.set('Impossible d’acquérir le verrou d’écriture Workspace');
         acquired();
       });
     });

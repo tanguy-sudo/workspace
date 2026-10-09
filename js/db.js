@@ -41,7 +41,7 @@
     notice.id = "workspace-write-access-warning";
     notice.className = "workspace-write-access-warning";
     notice.setAttribute("role", "status");
-    notice.textContent = "Une autre fenêtre utilise déjà Workspace en écriture. Cette fenêtre est en lecture seule ; fermez l'autre version avant toute modification.";
+    notice.textContent = "Workspace est en lecture seule : le verrou d'écriture est déjà détenu ou n'est pas supporté par ce navigateur.";
     document.body.append(notice);
   }
 
