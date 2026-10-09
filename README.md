@@ -113,6 +113,22 @@ publiés.
 La route Angular `/export` conserve les exports JSON, Markdown, CSV et ZIP
 pendant que `export.html` reste disponible pour le rollback legacy.
 
+### Rollback GitHub Pages
+
+Depuis l'onglet Actions, lancer `CI/CD` avec `workflow_dispatch`, choisir le
+mode `legacy` sur la branche `main` et vérifier le champ `legacy_ref` avant de confirmer. Il doit
+pointer vers un commit ou tag contenant le site legacy complet et le verrou de coexistence TAN-58
+(par défaut `5e40093`). Ce déploiement remplace le site public par le snapshot legacy ;
+pour revenir à Angular, relancer le workflow en mode `transition`. Un push sur
+`main` publie aussi automatiquement le mode `transition` après validation CI.
+
+Ne retirer les pages legacy de `main` qu'après la recette TAN-61 et la période
+d'observation documentée d'au moins 7 jours. Garder le commit legacy référencé par
+`legacy_ref` jusqu'à ce que le rollback ait été essayé et que les exports/imports
+aient été validés sur la version cible. Les snapshots plus anciens que TAN-58
+peuvent écraser des données si un onglet Angular est resté ouvert ; ne les utiliser
+qu'après fermeture de toutes les fenêtres Workspace.
+
 ## Structure du projet
 
 ```text

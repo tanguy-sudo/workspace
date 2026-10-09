@@ -6,6 +6,16 @@ on:
   pull_request:
     branches: [main, plan/angular-migration-windows]
   workflow_dispatch:
+    inputs:
+      pages_mode:
+        description: "Choose the transition site or restore a legacy snapshot"
+        type: choice
+        options: [transition, legacy]
+        default: transition
+      legacy_ref:
+        description: "Git commit or tag containing the legacy site to restore"
+        type: string
+        default: 5e40093
 
 concurrency:
   group: pages
@@ -15,51 +25,99 @@ jobs:
   validate:
     name: Validate
     runs-on: ubuntu-latest
+    env:
+      PAGES_MODE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.pages_mode == 'legacy' && 'legacy' || 'transition' }}
     permissions:
       contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Checkout legacy rollback snapshot for validation
+        if: env.PAGES_MODE == 'legacy'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.legacy_ref }}
+          path: _legacy_source
+          persist-credentials: false
+          sparse-checkout: |
+            index.html
+            todos.html
+            projects.html
+            project.html
+            snippets.html
+            rh.html
+            journal.html
+            smart-planning.html
+            settings.html
+            export.html
+            assets
+            css
+            js
+
+      - name: Prepare legacy rollback artifact for validation
+        if: env.PAGES_MODE == 'legacy'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir _site
+          cp _legacy_source/*.html _site/
+          cp -r _legacy_source/assets _legacy_source/css _legacy_source/js _site/
+
+      - name: Verify legacy rollback artifact
+        if: env.PAGES_MODE == 'legacy'
+        run: python3 .github/scripts/check-legacy-rollback.py
+
       - name: Set up Node.js
+        if: env.PAGES_MODE == 'transition'
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
       - name: Check JavaScript syntax
+        if: env.PAGES_MODE == 'transition'
         shell: bash
         run: |
           set -euo pipefail
           git ls-files -z '*.js' | xargs -0 -r -n1 node --check
 
       - name: Check local resources
+        if: env.PAGES_MODE == 'transition'
         run: python3 .github/scripts/check-local-resources.py
 
       - name: Check published security controls
+        if: env.PAGES_MODE == 'transition'
         run: python3 .github/scripts/check-security-controls.py
 
       - name: Validate migration fixtures
+        if: env.PAGES_MODE == 'transition'
         run: python3 .github/scripts/validate-fixtures.py
 
       - name: Install end-to-end test dependencies
+        if: env.PAGES_MODE == 'transition'
         run: python3 -m pip install -r e2e/requirements.txt
 
       - name: Install Chromium for end-to-end tests
+        if: env.PAGES_MODE == 'transition'
         run: python3 -m playwright install --with-deps chromium
 
       - name: Install Angular dependencies
+        if: env.PAGES_MODE == 'transition'
         working-directory: angular
         run: npm ci
 
       - name: Verify Angular build and tests
+        if: env.PAGES_MODE == 'transition'
         working-directory: angular
         run: npm run verify
 
       - name: Audit Angular dependencies
+        if: env.PAGES_MODE == 'transition'
         working-directory: angular
         run: npm audit --registry=https://registry.npmjs.org --audit-level=high
 
       - name: Verify Angular transition artifact
+        if: env.PAGES_MODE == 'transition'
         shell: bash
         run: |
           set -euo pipefail
@@ -69,10 +127,11 @@ jobs:
           test ! -e angular/dist/workspace/app/browser/node_modules
 
       - name: Run end-to-end smoke tests
+        if: env.PAGES_MODE == 'transition'
         run: python3 e2e/run.py
 
       - name: Upload end-to-end diagnostics
-        if: always()
+        if: env.PAGES_MODE == 'transition' && always()
         uses: actions/upload-artifact@v4
         with:
           name: tan-48-e2e-diagnostics
@@ -91,23 +150,50 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      PAGES_MODE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.pages_mode == 'legacy' && 'legacy' || 'transition' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Checkout legacy rollback snapshot
+        if: env.PAGES_MODE == 'legacy'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.legacy_ref }}
+          path: _legacy_source
+          persist-credentials: false
+          sparse-checkout: |
+            index.html
+            todos.html
+            projects.html
+            project.html
+            snippets.html
+            rh.html
+            journal.html
+            smart-planning.html
+            settings.html
+            export.html
+            assets
+            css
+            js
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
       - name: Set up Node.js for Angular transition build
+        if: env.PAGES_MODE == 'transition'
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
       - name: Install Angular dependencies
+        if: env.PAGES_MODE == 'transition'
         working-directory: angular
         run: npm ci
 
       - name: Build Angular transition
+        if: env.PAGES_MODE == 'transition'
         working-directory: angular
         run: npm run build
 
@@ -117,23 +203,34 @@ jobs:
           set -euo pipefail
           rm -rf _site
           mkdir _site
-          rsync -a \
-            --exclude='.git/' \
-            --exclude='.github/' \
-            --exclude='fixtures/' \
-            --exclude='node_modules/' \
-            --exclude='dist/' \
-            --exclude='build/' \
-            --exclude='_site/' \
-            --exclude='e2e/' \
-            --exclude='workspace-*.json' \
-            --exclude='angular/' \
-            ./ _site/
-          mkdir -p _site/app
-          rsync -a angular/dist/workspace/app/browser/ _site/app/
+          if [[ "$PAGES_MODE" == "transition" ]]; then
+            rsync -a \
+              --exclude='.git/' \
+              --exclude='.github/' \
+              --exclude='fixtures/' \
+              --exclude='node_modules/' \
+              --exclude='dist/' \
+              --exclude='build/' \
+              --exclude='_site/' \
+              --exclude='e2e/' \
+              --exclude='workspace-*.json' \
+              --exclude='angular/' \
+              ./ _site/
+            mkdir -p _site/app
+            rsync -a angular/dist/workspace/app/browser/ _site/app/
+          else
+            cp _legacy_source/*.html _site/
+            cp -r _legacy_source/assets _legacy_source/css _legacy_source/js _site/
+          fi
 
       - name: Verify transition artifact and legacy pages
+        if: env.PAGES_MODE == 'transition'
         run: python3 .github/scripts/check-angular-transition.py
+
+      - name: Verify legacy rollback artifact
+        if: env.PAGES_MODE == 'legacy'
+        run: |
+          python3 .github/scripts/check-legacy-rollback.py
 
       - name: Upload site
         uses: actions/upload-pages-artifact@v3

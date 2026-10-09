@@ -38,7 +38,7 @@
 ### Validation M0
 
 - [x] URL GitHub Pages et stratégie de routage validées.
-- [x] Mode hors ligne confirmé ou explicitement reporté.
+- [x] Distribution en ligne uniquement via GitHub Pages confirmée ; aucune version locale/hors ligne prévue.
 - [ ] Export JSON de référence vérifié et conservé hors du dépôt.
 - [x] Fixtures anonymisées disponibles.
 - [x] Contrat IndexedDB et coffre documenté.
@@ -190,8 +190,7 @@
 38. - [ ] [TAN-56 - Tester l'origine navigateur et la persistance au redémarrage Windows](https://linear.app/tanguy-sudo/issue/TAN-56/us-tester-lorigine-navigateur-et-la-persistance-au-redemarrage-windows)
 39. - [x] [TAN-58 - Organiser la coexistence et le propriétaire des écritures](https://linear.app/tanguy-sudo/issue/TAN-58/us-organiser-la-coexistence-et-le-proprietaire-des-ecritures)
 40. - [ ] [TAN-59 - Préparer le rollback et retirer progressivement les pages legacy](https://linear.app/tanguy-sudo/issue/TAN-59/us-preparer-le-rollback-et-retirer-progressivement-les-pages-legacy)
-41. - [ ] [TAN-55 - Préparer la variante locale hors ligne sur 127.0.0.1](https://linear.app/tanguy-sudo/issue/TAN-55/us-preparer-la-variante-locale-hors-ligne-sur-127001) *(optionnel, uniquement si le mode hors ligne est retenu)*
-42. - [ ] [TAN-61 - Réaliser la recette finale et basculer Angular en production](https://linear.app/tanguy-sudo/issue/TAN-61/us-realiser-la-recette-finale-et-basculer-angular-en-production)
+41. - [ ] [TAN-61 - Réaliser la recette finale et basculer Angular en production](https://linear.app/tanguy-sudo/issue/TAN-61/us-realiser-la-recette-finale-et-basculer-angular-en-production)
 
 ### Validation M7
 
@@ -202,14 +201,22 @@
 - [ ] Angular devient la cible par défaut.
 - [ ] Le retrait des pages legacy est validé ou reporté explicitement.
 - [x] Une seule fenêtre Workspace peut écrire : verrou Web Locks partagé entre Angular et legacy, conflit couvert par tests unitaires et E2E.
+- [x] Le snapshot legacy de rollback est conservé et son artifact se valide localement.
+- [ ] Le mode rollback est exécuté sur GitHub Pages, puis le retour au mode transition est vérifié.
 
 **Décision :** TAN-60 (démarrage automatique via Task Scheduler) est abandonnée ; l'ouverture manuelle de l'URL répond au besoin.
 
-**Décision :** TAN-57 (documentation d'installation/désinstallation Windows) est retirée du périmètre ; GitHub Pages ne nécessite aucune installation Windows. À réexaminer uniquement si le mode local hors ligne TAN-55 est retenu.
+**Décision :** TAN-57 (documentation d'installation/désinstallation Windows) est retirée du périmètre ; GitHub Pages ne nécessite aucune installation Windows.
+
+**Décision :** TAN-55 (variante locale hors ligne) est abandonnée ; l'application sera distribuée uniquement par GitHub Pages et ouverte dans un navigateur. La demande Linear correspondante reste à fermer/annuler.
 
 **TAN-58 validée :** verrou Web Locks exclusif par origine sur la racine IndexedDB partagée ; le premier onglet est écrivain, les autres versions Angular/legacy sont en lecture seule avec avertissement. Sans support Web Locks, l'application reste en lecture seule. Pas de coordination multi-onglet des modifications : fermer les autres onglets Workspace avant d'éditer.
 
 **Limite de déploiement :** les onglets ouverts avec un ancien JavaScript legacy qui ne connaît pas ce verrou doivent être rechargés après le déploiement ; ils ne peuvent pas être coordonnés rétroactivement.
+
+**TAN-59 préparée sur la branche dédiée :** `workflow_dispatch` propose le rollback Pages vers un snapshot legacy explicite (`legacy_ref`, par défaut `5e40093`, qui inclut le verrou TAN-58). Le workflow et l'artifact ont été validés localement. Après fusion sur `main`, le rollback réel et le retour au mode transition resteront à tester sur GitHub Pages.
+
+**Retrait legacy :** différé après la recette TAN-61 et au moins 7 jours d'observation sans incident. Le test effectif du rollback public et la conservation du snapshot sont encore à valider.
 
 ## Suivi des décisions et écarts
 
