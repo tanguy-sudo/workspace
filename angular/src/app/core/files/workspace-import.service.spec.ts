@@ -82,6 +82,17 @@ describe('WorkspaceImportService', () => {
     expect(data().snippets).toMatchObject([{ id: 'legacy-snippet', title: 'Snippet legacy', code: 'echo legacy', language: 'plaintext', tags: [], favorite: false, folderId: null }]);
   });
 
+  it('accepts a complete legacy export whose settings predate saved views and templates', async () => {
+    const legacy = structuredClone(fixture);
+    Object.assign(legacy.data, { settings: { theme: 'dark' } });
+    const imported = parseWorkspaceImport(JSON.stringify(legacy), 'workspace-complet-legacy.json');
+
+    await expect(service.apply(imported, 'overwrite')).resolves.toEqual({ mode: 'overwrite', full: true });
+    expect(data().settings.todoSavedViews).toEqual([]);
+    expect(data().settings.templates).toEqual([]);
+    expect(data().settings.weeklyReview).toEqual({ lastCompletedWeek: '' });
+  });
+
   it('does not write when the required overwrite backup is cancelled', async () => {
     saveWorkspaceBackup.mockResolvedValue({ saved: false, cancelled: true });
     const imported = parseWorkspaceImport(JSON.stringify(fixture), 'workspace-full.json');
