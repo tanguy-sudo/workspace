@@ -367,15 +367,13 @@ function journal(value: unknown, path: string, sparse: boolean): void {
   optional(entry, 'updatedAt', path, timestamp);
 }
 
-function savedView(value: unknown, path: string, strict: boolean): void {
+function savedView(value: unknown, path: string): void {
   const entry = object(value, path);
   string(entry['id'], `${path}.id`, true);
   string(entry['name'], `${path}.name`);
-  if (strict && !hasOwn(entry, 'filters')) fail(`${path}.filters`, 'est obligatoire');
   optional(entry, 'filters', path, (item, itemPath) => {
     const filters = object(item, itemPath);
     for (const key of ['status', 'priority', 'context', 'project', 'due']) {
-      if (strict && !hasOwn(filters, key)) fail(`${itemPath}.${key}`, 'est obligatoire');
       optional(filters, key, itemPath, (filter, filterPath) => string(filter, filterPath));
     }
   });
@@ -384,22 +382,17 @@ function savedView(value: unknown, path: string, strict: boolean): void {
   optional(entry, 'updatedAt', path, timestamp);
 }
 
-function settings(value: unknown, path: string, strict: boolean): void {
+function settings(value: unknown, path: string): void {
   const entry = object(value, path);
   optionalStringFields(entry, path, ['theme', 'userName', 'siteName', 'backupFolder']);
   optional(entry, 'autoBackupFrequencyHours', path, (item, itemPath) => {
     if (typeof item !== 'number' || !Number.isFinite(item) || item < 0) fail(itemPath, 'doit être un nombre positif');
   });
-  for (const key of ['todoSavedViews', 'todoPriorities', 'templates']) {
-    if (strict && !hasOwn(entry, key)) fail(`${path}.${key}`, 'est obligatoire');
-  }
   optional(entry, 'todoSavedViews', path, (item, itemPath) => {
-    identifiedArray(item, itemPath, (view, viewPath) => savedView(view, viewPath, strict), false);
+    identifiedArray(item, itemPath, savedView, false);
   });
-  if (strict && !hasOwn(entry, 'weeklyReview')) fail(`${path}.weeklyReview`, 'est obligatoire');
   optional(entry, 'weeklyReview', path, (item, itemPath) => {
     const review = object(item, itemPath);
-    if (strict && !hasOwn(review, 'lastCompletedWeek')) fail(`${itemPath}.lastCompletedWeek`, 'est obligatoire');
     optional(review, 'lastCompletedWeek', itemPath, (value, valuePath) => string(value, valuePath));
   });
   optional(entry, 'todoPriorities', path, (item, itemPath) => {
@@ -647,7 +640,7 @@ function validateData(value: unknown, strict: boolean): void {
       timestamp(activity['ts'], `${path}.ts`);
     });
   }
-  if (hasOwn(data, 'settings')) settings(data['settings'], 'settings', strict);
+  if (hasOwn(data, 'settings')) settings(data['settings'], 'settings');
   if (strict) validateFullReferences(data);
 }
 
