@@ -504,6 +504,26 @@ def run_legacy_smoke(page: Page) -> None:
         expect(page.locator('body')).to_contain_text(heading)
 
 
+def run_coexistence_lock(context: Any, writer_page: Page) -> None:
+    seed_fixture(writer_page, 'workspace-full.json')
+    writer_page.goto(app_route('/settings'), wait_until='domcontentloaded')
+    readonly_page = context.new_page()
+    try:
+        readonly_page.goto(f'{BASE_URL}/settings.html', wait_until='domcontentloaded')
+        notice = readonly_page.locator('#workspace-write-access-warning')
+        expect(notice).to_be_visible()
+        expect(notice).to_contain_text('lecture seule')
+        legacy_before = readonly_page.evaluate('JSON.stringify(WorkspaceDB.getSync())')
+        readonly_page.locator('#site-name').fill('E2E écriture interdite')
+        readonly_page.get_by_role('button', name=re.compile('Enregistrer')).click()
+        expect(notice).to_be_visible()
+        assert readonly_page.evaluate('JSON.stringify(WorkspaceDB.getSync())') == legacy_before
+        workspace = read_workspace(writer_page)
+        assert workspace['settings']['siteName'] == 'Workspace Fixture'
+    finally:
+        readonly_page.close()
+
+
 def launch_context(playwright: Any, profile: Path, diagnostics: list[str]) -> Any:
     options: dict[str, Any] = {
         'headless': True,
@@ -591,6 +611,7 @@ def run_suite() -> None:
             run_notification_fallback(page)
             run_responsive_and_shortcuts(page)
             run_legacy_smoke(page)
+            run_coexistence_lock(context, page)
             actionable = [message for message in diagnostics if not message.startswith('Failed to load resource')]
             if actionable:
                 raise AssertionError('Browser diagnostics: ' + ' | '.join(redact_text(message) for message in actionable))

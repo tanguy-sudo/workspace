@@ -50,6 +50,30 @@ describe('WorkspaceDbService', () => {
     expect(row.value).toEqual(updated);
   });
 
+  it('grants one writer and refuses writes from a concurrent window', async () => {
+    const source = structuredClone(fixture.data) as WorkspaceData;
+    const db = openRawDb();
+    await db.table('kv').put({ key: WORKSPACE_DATA_KEY, value: source });
+    db.close();
+
+    await service.init();
+    const request = vi.spyOn(navigator.locks, 'request').mockImplementation((_name, _options, callback) => {
+      void callback(null);
+      return Promise.resolve(undefined);
+    });
+    const secondWindow = new WorkspaceDbService();
+    await secondWindow.init();
+    expect(service.canWrite()).toBe(true);
+    expect(secondWindow.canWrite()).toBe(false);
+    expect(secondWindow.setSync({ overwritten: true })).toBe(false);
+
+    const reopened = openRawDb();
+    expect((await reopened.table('kv').get(WORKSPACE_DATA_KEY))?.value).toEqual(source);
+    reopened.close();
+    secondWindow.ngOnDestroy();
+    request.mockRestore();
+  });
+
   it('migrates the raw localStorage value only when the data row is absent', async () => {
     const legacy = {
       projects: [],

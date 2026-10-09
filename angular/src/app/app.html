@@ -48,6 +48,10 @@
   </div>
 </header>
 
+@if (store.writeAccess() === 'read-only') {
+  <div class="write-access-warning" role="status">Lecture seule : {{ store.writeAccessError() || 'le verrou d’écriture est détenu ailleurs' }}. Fermez les autres fenêtres Workspace puis rechargez cette page.</div>
+}
+
 <button class="skip-link" type="button" (click)="skipToContent()">Aller au contenu</button>
 <main id="main-content" class="page-content" tabindex="-1">
   <router-outlet />

@@ -25,16 +25,69 @@
     kv: "key",
   });
   const BACKUP_DIR_HANDLE_KEY = "backupDirHandle";
+  const WRITE_LOCK_NAME = "workspace:data-write";
+  let writeAccess = "checking";
+  let releaseWriteLock;
+  let lockReady;
+
+  function showReadOnlyNotice() {
+    if (writeAccess !== "read-only") return;
+    const existing = document.getElementById("workspace-write-access-warning");
+    if (existing) {
+      existing.hidden = false;
+      return;
+    }
+    const notice = document.createElement("div");
+    notice.id = "workspace-write-access-warning";
+    notice.className = "workspace-write-access-warning";
+    notice.setAttribute("role", "status");
+    notice.textContent = "Une autre fenêtre utilise déjà Workspace en écriture. Cette fenêtre est en lecture seule ; fermez l'autre version avant toute modification.";
+    document.body.append(notice);
+  }
+
+  function acquireWriteLock() {
+    return new Promise((resolve) => {
+      let settled = false;
+      const ready = () => {
+        if (settled) return;
+        settled = true;
+        resolve();
+      };
+
+      if (!navigator.locks) {
+        writeAccess = "read-only";
+        ready();
+        showReadOnlyNotice();
+        return;
+      }
+
+      const hold = new Promise((release) => { releaseWriteLock = release; });
+      navigator.locks.request(WRITE_LOCK_NAME, { mode: "exclusive", ifAvailable: true }, async (lock) => {
+        writeAccess = lock ? "writer" : "read-only";
+        ready();
+        showReadOnlyNotice();
+        if (lock) await hold;
+      }).catch(() => {
+        writeAccess = "read-only";
+        ready();
+        showReadOnlyNotice();
+      });
+    });
+  }
+  lockReady = acquireWriteLock();
 
   const WorkspaceDB = {
     ready: false,
     cache: null,
+    writeAccess: "checking",
+    persistenceError: null,
     _persistTimer: null,
     _persistPending: false,
     _flushPromise: null,
 
     /** Charge l'état depuis IndexedDB (ou migre depuis localStorage la 1re fois). */
     async init() {
+      await lockReady;
       try {
         const row = await db.table("kv").get(ROW_KEY);
         if (row && row.value) {
@@ -45,10 +98,10 @@
           if (legacy) {
             try {
               this.cache = JSON.parse(legacy);
-              await db.table("kv").put({ key: ROW_KEY, value: this.cache });
-              console.info(
-                "[WorkspaceDB] Migration localStorage → IndexedDB effectuée.",
-              );
+              if (writeAccess === "writer") {
+                await db.table("kv").put({ key: ROW_KEY, value: this.cache });
+                console.info("[WorkspaceDB] Migration localStorage → IndexedDB effectuée.");
+              }
             } catch {
               this.cache = null;
             }
@@ -68,8 +121,18 @@
 
     /** Écriture synchrone du cache + persistance différée vers IndexedDB. */
     setSync(value) {
+      if (writeAccess !== "writer") {
+        this.persistenceError = "Workspace is open read-only in this window";
+        showReadOnlyNotice();
+        return false;
+      }
       this.cache = value;
       this._schedulePersist();
+      return true;
+    },
+
+    canWrite() {
+      return writeAccess === "writer";
     },
 
     _schedulePersist() {
@@ -82,6 +145,7 @@
     },
 
     async _flush() {
+      if (writeAccess !== "writer") return;
       if (this._flushPromise) return this._flushPromise;
       if (!this._persistPending) return;
       const pending = (async () => {
@@ -124,6 +188,7 @@
 
     /** Efface tout (debug). */
     async clear() {
+      if (writeAccess !== "writer") return;
       this.cache = null;
       await db.table("kv").clear();
     },
@@ -139,6 +204,7 @@
     },
 
     async setBackupDirectoryHandle(handle) {
+      if (writeAccess !== "writer") return;
       try {
         if (handle) {
           await db.table("kv").put({ key: BACKUP_DIR_HANDLE_KEY, value: handle });
@@ -163,6 +229,14 @@
   // Promise globale que les pages attendent avant de démarrer.
   window.WorkspaceDB = WorkspaceDB;
   window.WorkspaceDB_READY = WorkspaceDB.init();
+  Object.defineProperty(WorkspaceDB, "writeAccess", { get: () => writeAccess });
+  document.addEventListener("DOMContentLoaded", showReadOnlyNotice, { once: true });
+  const flushOnPageHide = (event) => {
+    void WorkspaceDB.flush().finally(() => {
+      if (!event.persisted) releaseWriteLock?.();
+    });
+  };
+  window.addEventListener("pagehide", flushOnPageHide);
 
   /**
    * Helper d'amorçage : exécute `fn` quand le DOM ET la base IndexedDB

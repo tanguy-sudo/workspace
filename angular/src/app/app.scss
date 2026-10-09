@@ -197,6 +197,8 @@
   padding: 82px 0 var(--sp-8);
 }
 
+.write-access-warning { position: fixed; z-index: 101; inset: 68px 1rem auto; margin: 0 auto; width: min(100% - 2rem, 48rem); padding: .7rem 1rem; border: 1px solid color-mix(in srgb, var(--danger) 50%, var(--border)); border-radius: var(--r-md); background: var(--bg-2); color: var(--text); box-shadow: var(--shadow-lg); text-align: center; font-size: .82rem; }
+
 .skip-link {
   position: fixed;
   top: .5rem;

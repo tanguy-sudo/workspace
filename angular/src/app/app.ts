@@ -53,13 +53,13 @@ export class App implements OnInit {
   protected readonly themePickerOpen = signal(false);
   protected readonly accentOverride = signal(false);
   protected readonly siteName = signal('Workspace');
+  protected readonly store = inject(WorkspaceStoreService);
   protected readonly clock = signal('');
   protected readonly menuOpen = signal(false);
   protected readonly shortcutsHelp = signal(false);
 
   private readonly destroyRef = inject(DestroyRef);
   private readonly preferences = inject(StoragePreferencesService);
-  private readonly store = inject(WorkspaceStoreService);
   private readonly router = inject(Router);
   private readonly search = inject(GlobalSearchService);
   private readonly backups = inject(WorkspaceBackupService);

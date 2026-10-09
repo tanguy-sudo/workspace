@@ -11,13 +11,17 @@ const STORAGE_KEY = "workspace_data"; // conservé pour migration / rétrocompat
 
 function getData() {
   const cached = typeof WorkspaceDB !== "undefined" ? WorkspaceDB.getSync() : null;
-  if (!cached) return _defaultData();
-  return { ..._defaultData(), ...cached };
+  const data = cached ? { ..._defaultData(), ...cached } : _defaultData();
+  return typeof WorkspaceDB !== "undefined" && WorkspaceDB.canWrite?.() === false
+    ? structuredClone(data)
+    : data;
 }
 
 function setData(data) {
   if (typeof WorkspaceDB !== "undefined") {
-    WorkspaceDB.setSync(data);
+    if (!WorkspaceDB.setSync(data) && typeof showToast === "function") {
+      showToast("Lecture seule : une autre fenêtre détient le verrou d’écriture Workspace", "error");
+    }
   } else {
     console.error("[storage] WorkspaceDB indisponible — écriture ignorée.");
   }

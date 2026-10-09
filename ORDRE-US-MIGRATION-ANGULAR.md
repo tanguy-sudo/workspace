@@ -171,39 +171,45 @@
 
 ### Ordre
 
-37. - [ ] [TAN-52 - Publier le build Angular de production sur GitHub Pages](https://linear.app/tanguy-sudo/issue/TAN-52/us-publier-le-build-angular-de-production-sur-github-pages)
+37. - [x] [TAN-52 - Publier le build Angular de production sur GitHub Pages](https://linear.app/tanguy-sudo/issue/TAN-52/us-publier-le-build-angular-de-production-sur-github-pages)
 
 ### Validation M6
 
-- [ ] L'URL HTTPS de production est confirmée.
-- [ ] Le `base href` fonctionne sous le sous-chemin GitHub Pages.
-- [ ] Les assets et routes se chargent après rechargement direct.
-- [ ] L'artifact ne contient ni dépendances de développement ni fixtures sensibles.
-- [ ] La version legacy reste accessible pour le rollback.
+- [x] L'URL HTTPS de production est confirmée : `https://tanguy-sudo.github.io/workspace/`.
+- [x] Le `base href` fonctionne sous le sous-chemin GitHub Pages (`/workspace/app/`).
+- [x] Les assets et routes se chargent après rechargement direct (route Angular `/app/#/todos` vérifiée).
+- [x] L'artifact ne contient ni dépendances de développement ni fixtures sensibles (vérification CI de l'artifact réussie).
+- [x] La version legacy reste accessible pour le rollback (`/todos.html` vérifiée).
 
-## M7 - Windows et bascule
+## M7 - Persistance et bascule
 
-**Objectif :** automatiser l'ouverture de l'application et finaliser la bascule avec rollback.
+**Objectif :** valider la persistance navigateur et finaliser la bascule avec rollback. L'application sera ouverte manuellement dans le navigateur ; aucun démarrage automatique Windows n'est requis.
 
 ### Ordre
 
-38. - [ ] [TAN-60 - Préparer le démarrage Windows via Task Scheduler](https://linear.app/tanguy-sudo/issue/TAN-60/us-preparer-le-demarrage-windows-via-task-scheduler)
-39. - [ ] [TAN-57 - Documenter l'installation et la désinstallation Windows](https://linear.app/tanguy-sudo/issue/TAN-57/us-documenter-linstallation-et-la-desinstallation-windows)
-40. - [ ] [TAN-56 - Tester l'origine navigateur et la persistance au redémarrage Windows](https://linear.app/tanguy-sudo/issue/TAN-56/us-tester-lorigine-navigateur-et-la-persistance-au-redemarrage-windows)
-41. - [ ] [TAN-58 - Organiser la coexistence et le propriétaire des écritures](https://linear.app/tanguy-sudo/issue/TAN-58/us-organiser-la-coexistence-et-le-proprietaire-des-ecritures)
-42. - [ ] [TAN-59 - Préparer le rollback et retirer progressivement les pages legacy](https://linear.app/tanguy-sudo/issue/TAN-59/us-preparer-le-rollback-et-retirer-progressivement-les-pages-legacy)
-43. - [ ] [TAN-55 - Préparer la variante locale hors ligne sur 127.0.0.1](https://linear.app/tanguy-sudo/issue/TAN-55/us-preparer-la-variante-locale-hors-ligne-sur-127001) *(optionnel, uniquement si le mode hors ligne est retenu)*
-44. - [ ] [TAN-61 - Réaliser la recette finale et basculer Angular en production](https://linear.app/tanguy-sudo/issue/TAN-61/us-realiser-la-recette-finale-et-basculer-angular-en-production)
+38. - [ ] [TAN-56 - Tester l'origine navigateur et la persistance au redémarrage Windows](https://linear.app/tanguy-sudo/issue/TAN-56/us-tester-lorigine-navigateur-et-la-persistance-au-redemarrage-windows)
+39. - [x] [TAN-58 - Organiser la coexistence et le propriétaire des écritures](https://linear.app/tanguy-sudo/issue/TAN-58/us-organiser-la-coexistence-et-le-proprietaire-des-ecritures)
+40. - [ ] [TAN-59 - Préparer le rollback et retirer progressivement les pages legacy](https://linear.app/tanguy-sudo/issue/TAN-59/us-preparer-le-rollback-et-retirer-progressivement-les-pages-legacy)
+41. - [ ] [TAN-55 - Préparer la variante locale hors ligne sur 127.0.0.1](https://linear.app/tanguy-sudo/issue/TAN-55/us-preparer-la-variante-locale-hors-ligne-sur-127001) *(optionnel, uniquement si le mode hors ligne est retenu)*
+42. - [ ] [TAN-61 - Réaliser la recette finale et basculer Angular en production](https://linear.app/tanguy-sudo/issue/TAN-61/us-realiser-la-recette-finale-et-basculer-angular-en-production)
 
 ### Validation M7
 
-- [ ] La tâche Windows s'exécute à l'ouverture de session du bon compte.
-- [ ] Aucun privilège élevé, secret ou `ng serve` n'est utilisé.
-- [ ] Le navigateur ouvre la bonne origine et le bon profil.
-- [ ] Les données persistent après fermeture et redémarrage Windows.
+- [ ] L'application s'ouvre manuellement sur l'origine et dans le profil navigateur attendus.
+- [x] Les données IndexedDB persistent après fermeture complète et réouverture du navigateur sur l'origine HTTPS de production (Chromium, profil temporaire isolé).
+- [ ] La persistance est confirmée après un redémarrage réel de Windows avec le profil navigateur habituel.
 - [ ] Le rollback vers legacy a été testé.
 - [ ] Angular devient la cible par défaut.
 - [ ] Le retrait des pages legacy est validé ou reporté explicitement.
+- [x] Une seule fenêtre Workspace peut écrire : verrou Web Locks partagé entre Angular et legacy, conflit couvert par tests unitaires et E2E.
+
+**Décision :** TAN-60 (démarrage automatique via Task Scheduler) est abandonnée ; l'ouverture manuelle de l'URL répond au besoin.
+
+**Décision :** TAN-57 (documentation d'installation/désinstallation Windows) est retirée du périmètre ; GitHub Pages ne nécessite aucune installation Windows. À réexaminer uniquement si le mode local hors ligne TAN-55 est retenu.
+
+**TAN-58 validée :** verrou Web Locks exclusif par origine sur la racine IndexedDB partagée ; le premier onglet est écrivain, les autres versions Angular/legacy sont en lecture seule avec avertissement. Sans support Web Locks, l'application reste en lecture seule. Pas de coordination multi-onglet des modifications : fermer les autres onglets Workspace avant d'éditer.
+
+**Limite de déploiement :** les onglets ouverts avec un ancien JavaScript legacy qui ne connaît pas ce verrou doivent être rechargés après le déploiement ; ils ne peuvent pas être coordonnés rétroactivement.
 
 ## Suivi des décisions et écarts
 

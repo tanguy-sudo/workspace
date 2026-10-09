@@ -117,6 +117,10 @@ Le modele est volontairement simple: une seule racine de donnees, lue en memoire
 - `WorkspaceDB.cache` sert de source synchrone pour les pages
 - `WorkspaceDB.setSync` programme un flush differe (~80 ms)
 - flush force sur `beforeunload`, `pagehide`, `visibilitychange`
+- un verrou Web Locks exclusif `workspace:data-write` attribue l'ecriture a un seul onglet par origine ; les autres versions Workspace restent en lecture seule
+- l'ecriture refusee en lecture seule ne modifie pas le cache memoire
+- navigateur sans Web Locks : mode lecture seule par securite
+- verrou volontairement global car legacy et Angular remplacent tous deux la racine `kv.data`; aucune edition simultanee multi-onglet n'est prise en charge
 
 ### localStorage
 

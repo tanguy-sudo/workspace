@@ -50,6 +50,10 @@ function initSettingsPage() {
   void _syncFolderLabel(folderValue, renderSummary);
 
   const save = () => {
+    if (typeof WorkspaceDB?.canWrite === "function" && !WorkspaceDB.canWrite()) {
+      showToast("Lecture seule : une autre fenêtre détient le verrou d’écriture Workspace", "error");
+      return;
+    }
     const userName = userInput.value.trim();
     const siteName = siteInput.value.trim() || "Workspace";
     const backupFolder = folderValue.textContent?.trim() || "Téléchargements";

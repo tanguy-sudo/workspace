@@ -29,6 +29,7 @@ interface LegacyRoundTripApi {
   importFull(json: string, filename?: string): WorkspaceData;
   exportedBlob(): Blob | null;
   close(): void;
+  writeAccess(): string;
   readBlob(blob: Blob): Promise<string>;
 }
 
@@ -57,7 +58,7 @@ async function readPersisted(): Promise<WorkspaceData> {
   return row.value as WorkspaceData;
 }
 
-async function loadLegacyRuntime(): Promise<LegacyRoundTripApi> {
+async function loadLegacyRuntime(writeLockAvailable = true): Promise<LegacyRoundTripApi> {
   const source = async (...parts: string[]): Promise<string> => readFile(resolve(process.cwd(), '..', ...parts), 'utf8');
   const [dbSource, safeStorageSource, storageSource, commonUtilsSource, convertersSource, importSource, exportSource] = await Promise.all([
     source('js', 'db.js'),
@@ -75,6 +76,10 @@ async function loadLegacyRuntime(): Promise<LegacyRoundTripApi> {
       Object.defineProperty(target, 'Dexie', { configurable: true, value: Dexie });
       Object.defineProperty(target, 'indexedDB', { configurable: true, value: globalThis.indexedDB });
       Object.defineProperty(target, 'IDBKeyRange', { configurable: true, value: globalThis.IDBKeyRange });
+      Object.defineProperty((target as unknown as Window).navigator, 'locks', {
+        configurable: true,
+        value: { request: (_name: string, _options: unknown, callback: (lock: { name: string } | null) => Promise<void>) => callback(writeLockAvailable ? { name: 'workspace:data-write' } : null) },
+      });
     },
   });
   const target = dom.window as unknown as LegacyRoundTripWindow;
@@ -111,6 +116,7 @@ async function loadLegacyRuntime(): Promise<LegacyRoundTripApi> {
         return next;
       },
       close: () => window.close(),
+      writeAccess: () => WorkspaceDB.writeAccess,
       readBlob: (blob) => new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(String(reader.result));
@@ -259,5 +265,26 @@ describe('Legacy and Angular data round-trips', () => {
     await legacy.flush();
 
     expect(await readPersisted()).toEqual(source);
+  });
+
+  it('keeps legacy read-only when Angular already owns the writer lock', async () => {
+    const source = structuredClone(fullFixture.data) as WorkspaceData;
+    await writePersisted(source);
+    TestBed.configureTestingModule({ providers: [WorkspaceDbService, WorkspaceStoreService] });
+    angularDb = TestBed.inject(WorkspaceDbService);
+    const store = TestBed.inject(WorkspaceStoreService);
+    await store.init();
+    expect(angularDb.canWrite()).toBe(true);
+
+    const readOnlyLegacy = await loadLegacyRuntime(false);
+    try {
+      readOnlyLegacy.setData({ overwritten: true } as unknown as WorkspaceData);
+      await readOnlyLegacy.flush();
+
+      expect(readOnlyLegacy.writeAccess()).toBe('read-only');
+      expect(await readPersisted()).toEqual(source);
+    } finally {
+      readOnlyLegacy.close();
+    }
   });
 });

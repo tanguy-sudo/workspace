@@ -36,6 +36,8 @@ export class WorkspaceDbService implements OnDestroy {
   readonly persistenceError = signal<string | null>(null);
   readonly legacyMigrationState = signal<LegacyMigrationState>('not-run');
   readonly legacyMigrationError = signal<string | null>(null);
+  readonly writeAccess = signal<'checking' | 'writer' | 'read-only'>('checking');
+  readonly writeAccessError = signal<string | null>(null);
 
   private readonly db: Dexie;
   private readonly kv: Table<KvRow, string>;
@@ -44,9 +46,15 @@ export class WorkspaceDbService implements OnDestroy {
   private persistPending = false;
   private flushPromise: Promise<void> | null = null;
   private initialized = false;
+  private writeLockReady: Promise<void> | null = null;
+  private releaseWriteLock: (() => void) | null = null;
 
   private readonly flushOnPageHide = (): void => {
     void this.flush().catch(() => undefined);
+  };
+
+  private readonly releaseOnPageHide = (event: PageTransitionEvent): void => {
+    if (!event.persisted) void this.flush().finally(() => this.releaseWriteLock?.());
   };
 
   private readonly flushOnVisibilityChange = (): void => {
@@ -61,6 +69,7 @@ export class WorkspaceDbService implements OnDestroy {
     this.kv = this.db.table<KvRow, string>('kv');
 
     if (typeof window !== 'undefined') {
+      window.addEventListener('pagehide', this.releaseOnPageHide);
       window.addEventListener('pagehide', this.flushOnPageHide);
       window.addEventListener('beforeunload', this.flushOnPageHide);
     }
@@ -72,6 +81,7 @@ export class WorkspaceDbService implements OnDestroy {
   /** Loads IndexedDB once, falling back to the raw legacy localStorage value. */
   async init(): Promise<WorkspaceValue | null> {
     if (this.initialized) return this.cache;
+    await this.acquireWriteLock();
 
     try {
       const row = await this.kv.get(WORKSPACE_DATA_KEY);
@@ -81,14 +91,18 @@ export class WorkspaceDbService implements OnDestroy {
       } else {
         const legacy = this.readLegacyValue();
         if (legacy.kind === 'value') {
-          this.cache = legacy.value;
-          try {
-            await this.kv.put({ key: WORKSPACE_DATA_KEY, value: legacy.value });
-            this.legacyMigrationState.set('migrated');
-          } catch {
-            this.legacyMigrationState.set('persistence-error');
-            this.legacyMigrationError.set('Workspace migration could not be persisted');
-            throw new Error('Workspace migration could not be persisted');
+            this.cache = legacy.value;
+          if (this.canWrite()) {
+            try {
+              await this.kv.put({ key: WORKSPACE_DATA_KEY, value: legacy.value });
+              this.legacyMigrationState.set('migrated');
+            } catch {
+              this.legacyMigrationState.set('persistence-error');
+              this.legacyMigrationError.set('Workspace migration could not be persisted');
+              throw new Error('Workspace migration could not be persisted');
+            }
+          } else {
+            this.legacyMigrationState.set('no-legacy-data');
           }
         } else {
           this.legacyMigrationState.set(legacy.kind);
@@ -112,11 +126,17 @@ export class WorkspaceDbService implements OnDestroy {
     return this.cache;
   }
 
-  setSync(value: WorkspaceValue): void {
+  canWrite(): boolean {
+    return this.writeAccess() === 'writer';
+  }
+
+  setSync(value: WorkspaceValue): boolean {
+    if (!this.canWrite()) return false;
     this.cache = value;
     this.persistenceError.set(null);
     this.persistPending = true;
     this.schedulePersist();
+    return true;
   }
 
   /** Flushes the latest cache value, with only one IndexedDB write in flight. */
@@ -147,6 +167,7 @@ export class WorkspaceDbService implements OnDestroy {
   }
 
   async setBackupDirectoryHandle(handle: FileSystemDirectoryHandle | null): Promise<void> {
+    if (!this.canWrite()) return;
     try {
       if (handle) {
         await this.kv.put({ key: BACKUP_DIR_HANDLE_KEY, value: handle });
@@ -163,12 +184,52 @@ export class WorkspaceDbService implements OnDestroy {
     if (this.persistTimer) clearTimeout(this.persistTimer);
     if (typeof window !== 'undefined') {
       window.removeEventListener('pagehide', this.flushOnPageHide);
+      window.removeEventListener('pagehide', this.releaseOnPageHide);
       window.removeEventListener('beforeunload', this.flushOnPageHide);
     }
     if (typeof document !== 'undefined') {
       document.removeEventListener('visibilitychange', this.flushOnVisibilityChange);
     }
-    this.db.close();
+    void this.flush().catch(() => undefined).finally(() => {
+    void this.flush().catch(() => undefined).finally(() => {
+      this.releaseWriteLock?.();
+      this.db.close();
+    });
+    });
+  }
+
+  private async acquireWriteLock(): Promise<void> {
+    if (this.writeLockReady) return this.writeLockReady;
+
+    this.writeLockReady = new Promise<void>((resolve) => {
+      let settled = false;
+      const acquired = (): void => {
+        if (settled) return;
+        settled = true;
+        resolve();
+      };
+
+      if (typeof navigator === 'undefined' || !navigator.locks) {
+        this.writeAccess.set('read-only');
+        this.writeAccessError.set('Exclusive browser locks are unavailable');
+        acquired();
+        return;
+      }
+
+      const hold = new Promise<void>((release) => { this.releaseWriteLock = release; });
+      void navigator.locks.request('workspace:data-write', { mode: 'exclusive', ifAvailable: true }, async (lock) => {
+        this.writeAccess.set(lock ? 'writer' : 'read-only');
+        if (!lock) this.writeAccessError.set('Another Workspace window owns the write lock');
+        acquired();
+        if (lock) await hold;
+      }).catch(() => {
+        this.writeAccess.set('read-only');
+        this.writeAccessError.set('Could not acquire the Workspace write lock');
+        acquired();
+      });
+    });
+
+    return this.writeLockReady;
   }
 
   private readLegacyValue():

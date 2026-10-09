@@ -162,6 +162,8 @@ export class WorkspaceStoreService {
   readonly error = this.errorState.asReadonly();
   readonly loading = computed(() => this.statusState() === 'loading');
   readonly ready = computed(() => this.statusState() === 'ready');
+  readonly writeAccess = this.db.writeAccess;
+  readonly writeAccessError = this.db.writeAccessError;
 
   async init(): Promise<WorkspaceData | null> {
     if (this.statusState() === 'loading' && this.initPromise) return this.initPromise;
@@ -176,7 +178,7 @@ export class WorkspaceStoreService {
   /** Runs one explicit mutation and persists the complete opaque root. */
   update(mutator: (draft: WorkspaceData) => void): WorkspaceData | null {
     const current = this.dataState();
-    if (!current || this.statusState() !== 'ready') return null;
+    if (!current || this.statusState() !== 'ready' || !this.db.canWrite()) return null;
 
     const draft = clone(current);
     mutator(draft);
@@ -188,7 +190,7 @@ export class WorkspaceStoreService {
 
   /** Replaces the opaque root after an import has been validated. */
   replace(value: WorkspaceData): WorkspaceData | null {
-    if (this.statusState() !== 'ready') return null;
+    if (this.statusState() !== 'ready' || !this.db.canWrite()) return null;
     const next = clone(value);
     assertWorkspaceData(next);
     this.dataState.set(next);

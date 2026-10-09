@@ -15,6 +15,7 @@ describe('SettingsComponent', () => {
   let store: {
     data: ReturnType<typeof data.asReadonly>;
     status: ReturnType<typeof signal<'ready'>>;
+    writeAccess: ReturnType<typeof signal<'writer' | 'read-only'>>;
     ready: () => boolean;
     init: () => Promise<WorkspaceData | null>;
     updateSettings: (changes: Record<string, unknown>) => WorkspaceData;
@@ -27,6 +28,7 @@ describe('SettingsComponent', () => {
     store = {
       data: data.asReadonly(),
       status: signal<'ready'>('ready'),
+      writeAccess: signal<'writer' | 'read-only'>('writer'),
       ready: () => true,
       init: async () => data(),
       updateSettings: (changes) => {

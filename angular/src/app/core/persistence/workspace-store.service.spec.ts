@@ -63,6 +63,15 @@ describe('WorkspaceStoreService', () => {
     expect((row.value as WorkspaceData)['futureSection']).toEqual({ keep: true });
   });
 
+  it('rejects mutations before changing the cache when this window is read-only', async () => {
+    await store.init();
+    const before = structuredClone(store.data());
+    vi.spyOn(dbService, 'canWrite').mockReturnValue(false);
+
+    expect(store.update((draft) => { draft.settings.siteName = 'Should not persist'; })).toBeNull();
+    expect(store.data()).toEqual(before);
+  });
+
   it('fills missing legacy root sections without dropping extra fields', async () => {
     dbService.ngOnDestroy();
     await Dexie.delete(WORKSPACE_DB_NAME);

@@ -88,6 +88,10 @@ export class SettingsComponent {
   protected setFrequency(event: Event): void { this.frequency.set(Math.max(0, Number((event.target as HTMLSelectElement).value) || 0)); }
 
   protected saveSettings(): void {
+    if (this.store.writeAccess() !== 'writer') {
+      this.feedback.showToast('Lecture seule : une autre fenêtre détient le verrou d’écriture Workspace', 'error');
+      return;
+    }
     const updated = this.store.updateSettings({
       userName: this.userName().trim(),
       siteName: this.siteName().trim() || 'Workspace',

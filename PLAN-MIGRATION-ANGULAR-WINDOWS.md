@@ -1,4 +1,4 @@
-# Plan de migration vers Angular et de démarrage Windows
+# Plan de migration vers Angular et d'utilisation Windows
 
 **Branche :** `plan/angular-migration-windows`<br>
 **Projet :** Workspace<br>
@@ -17,15 +17,13 @@ La migration recommandée est progressive :
 4. migrer les fonctionnalités une par une, avec un seul propriétaire d'écriture par fonctionnalité ;
 5. conserver les anciennes URL, les exports JSON et les données chiffrées ;
 6. déployer d'abord Angular sous un chemin isolé, puis effectuer le basculement final ;
-7. lancer au démarrage de Windows une URL GitHub Pages à l'ouverture de session, et non `ng serve`.
+7. ouvrir manuellement l'URL GitHub Pages dans le navigateur habituel ; aucun démarrage automatique Windows n'est requis.
 
-La solution Windows par défaut est donc :
+Le mode d'utilisation retenu est donc :
 
 ```text
 Build Angular de production sur GitHub Pages
-        -> tâche du Planificateur de tâches Windows
-        -> déclenchement à l'ouverture de session
-        -> ouverture de l'URL HTTPS dans le navigateur choisi
+        -> ouverture manuelle de l'URL HTTPS dans le navigateur habituel
 ```
 
 Cette solution ne demande ni Node.js, ni Python, ni serveur local sur le poste au moment du démarrage. Elle nécessite une connexion Internet et l'acceptation de stocker les données dans l'origine navigateur de GitHub Pages.
@@ -127,7 +125,7 @@ Le thème existe actuellement à la fois dans `settings.theme` et dans `localSto
 - conserver les anciennes URL et les anciens exports JSON ;
 - améliorer la testabilité avec des services, des types et des tests automatisés ;
 - faire produire à la CI un artefact Angular vérifié ;
-- ouvrir automatiquement l'application à l'ouverture de session Windows ;
+- ouvrir l'application manuellement depuis son URL HTTPS ;
 - disposer d'une procédure d'installation, de vérification et de désinstallation reproductible.
 
 ### 3.2 Hors périmètre initial
@@ -164,7 +162,7 @@ Les décisions suivantes constituent le périmètre de référence pour commence
 | Déploiement final | artefact Angular dédié publié par GitHub Pages | ne pas publier tout le dépôt par inadvertance |
 | Gestion d'état complexe | report de NgRx | aucune synchronisation distante ne le justifie aujourd'hui |
 | Format de sauvegarde de référence | JSON complet actuel | c'est le format le plus complet et le plus adapté au round-trip |
-| Démarrage Windows | tâche à l'ouverture de session, compte utilisateur courant, navigateur par défaut | évite `SYSTEM`, les privilèges élevés et le verrouillage à un profil imposé |
+| Démarrage Windows | aucun démarrage automatique ; ouverture manuelle de l'URL dans le navigateur habituel | évite une tâche planifiée inutile et laisse le choix du moment d'ouverture |
 | Coexistence legacy/Angular | jusqu'à la recette finale, puis période d'observation minimale de 7 jours | permet un rollback sans maintenir deux propriétaires d'une même fonctionnalité indéfiniment |
 | Écriture pendant coexistence | une seule version possède l'écriture pour chaque fonctionnalité ; édition simultanée legacy/Angular non supportée | évite l'écrasement de caches complets sans ajouter de synchronisation prématurée |
 | GitHub Pages pour les données | accepté pour l'application personnelle sous HTTPS, avec données uniquement dans le navigateur | le code client est public et ne constitue pas une frontière de sécurité ; aucun backend ne reçoit les données |
@@ -180,7 +178,7 @@ Les décisions suivantes constituent le périmètre de référence pour commence
 | Hash routing | URLs Angular avec `#` | conserver les anciennes URL HTML et changer la cible Windows |
 | Base `workspace` inchangée | écritures initiales dans une valeur complète `kv["data"]` | revenir à l'application legacy sans migration destructive |
 | Une version propriétaire des écritures | pas d'édition simultanée legacy/Angular | désactiver les routes Angular concernées et reprendre sur legacy |
-| Navigateur par défaut Windows | le profil actif du compte utilisateur est utilisé | supprimer la tâche et ouvrir manuellement l'ancienne URL |
+| Ouverture manuelle | le profil choisi par l'utilisateur est utilisé | ouvrir manuellement l'URL legacy pendant la coexistence |
 | Mode hors ligne reporté | pas de serveur local ni de build installé sur le PC au premier déploiement | ouvrir le chantier TAN-55 avec export/import entre origines |
 
 ### Décisions reportées et issues associées
@@ -191,7 +189,7 @@ Les sujets non nécessaires au premier parcours sont explicitement reportés dan
 - **Notifications lorsque l'application est fermée :** [TAN-49](https://linear.app/tanguy-sudo/issue/TAN-49/us-encadrer-les-notifications-locales-et-leurs-fallbacks).
 - **Audit des dépendances, CSP, sécurité et accessibilité :** [TAN-51](https://linear.app/tanguy-sudo/issue/TAN-51/us-realiser-laudit-securite-et-accessibilite-angular).
 - **Propriétaire des écritures et fin de coexistence :** [TAN-58](https://linear.app/tanguy-sudo/issue/TAN-58/us-organiser-la-coexistence-et-le-proprietaire-des-ecritures).
-- **Installation Windows et choix opérationnels du Task Scheduler :** [TAN-60](https://linear.app/tanguy-sudo/issue/TAN-60/us-preparer-le-demarrage-windows-via-task-scheduler).
+- **Démarrage automatique Windows :** [TAN-60](https://linear.app/tanguy-sudo/issue/TAN-60/us-preparer-le-demarrage-windows-via-task-scheduler) est abandonnée ; l'ouverture manuelle suffit au besoin.
 
 ## 5. Architecture Angular cible minimale
 
@@ -617,12 +615,15 @@ L'import Angular doit :
 
 **Coexistence :**
 
-- chaque fonctionnalité a un propriétaire explicite, Angular ou legacy ;
-- les deux versions n'écrivent pas simultanément la même base dans une même session ;
+- un verrou Web Locks exclusif `workspace:data-write` attribue l'écriture à un seul onglet de l'origine, Angular ou legacy ;
+- les autres onglets détectent le conflit, affichent un avertissement et refusent toute écriture avant mutation du cache ;
+- si Web Locks est absent ou ne peut être acquis, l'application fonctionne en lecture seule ;
+- le verrou est global, car les deux versions remplacent toute la racine `kv.data` ;
+- les onglets chargés avec un ancien script legacy doivent être rechargés après déploiement pour participer au verrou ;
 - les liens legacy sont convertis vers les routes Angular lorsqu'une fonctionnalité est migrée ;
 - les pages non migrées restent accessibles ;
 - les exports JSON sont utilisés comme filet de retour arrière ;
-- le comportement multi-onglet reste documenté comme limité tant qu'un coordinateur n'est pas livré.
+- une seule fenêtre Workspace peut donc être utilisée en écriture à la fois ; aucun merge multi-onglet n'est effectué.
 
 **Bascule :**
 
@@ -630,7 +631,7 @@ L'import Angular doit :
 2. importer une copie de la fixture et exécuter la matrice de non-régression ;
 3. publier Angular sous le chemin de transition ;
 4. faire tester toutes les anciennes URL ;
-5. mettre à jour les liens legacy et la tâche Windows ;
+5. mettre à jour les liens legacy ;
 6. conserver les anciennes pages pendant une période d'observation ;
 7. publier l'artifact final Angular à la racine lorsque le rollback est encore possible ;
 8. transformer les anciennes URL `.html` en redirections ou wrappers compatibles ;
@@ -677,34 +678,11 @@ Le workflow devra évoluer progressivement :
 
 Le chemin réel de l'artefact doit être confirmé après création du workspace Angular. Tant que le dépôt contient les pages legacy à la racine, l'artifact de transition peut contenir les deux applications. Après bascule, il doit contenir le build Angular et uniquement les wrappers nécessaires aux anciennes URL.
 
-## 8. Démarrage automatique Windows
+## 8. Ouverture manuelle dans le navigateur
 
-### 8.1 Limite importante : démarrage du PC versus ouverture de session
+Après connexion à Windows, l'utilisateur ouvre manuellement l'URL HTTPS GitHub Pages dans son navigateur habituel et le profil souhaité. Aucun script, tâche planifiée, privilège élevé ou processus `ng serve` n'est requis.
 
-Une application web ouverte dans Edge ou Chrome nécessite une session Windows interactive. La tâche ne doit donc pas être conçue comme un service système lancé avant connexion.
-
-Le déclencheur correct est **À l'ouverture de session de l'utilisateur**, avec éventuellement un délai de 10 à 30 secondes. Cela correspond au besoin utilisateur dans un environnement graphique et évite l'exécution sous `SYSTEM`.
-
-### 8.2 Solution recommandée : GitHub Pages + navigateur
-
-Après le déploiement final Angular :
-
-1. confirmer l'URL HTTPS publique ;
-2. choisir Edge ou Chrome et le profil navigateur utilisé habituellement ;
-3. créer une tâche nommée par exemple `Workspace - Ouverture` ;
-4. sélectionner le compte Windows courant ;
-5. choisir **Exécuter uniquement si l'utilisateur est connecté** ;
-6. désactiver les privilèges élevés ;
-7. ajouter un déclencheur **À l'ouverture de session** avec délai de 15 secondes ;
-8. ajouter une action qui ouvre l'URL avec le navigateur par défaut, par exemple `explorer.exe` avec l'URL en argument ;
-9. laisser le répertoire de démarrage vide ;
-10. activer l'exécution à la demande et l'historique ;
-11. tester la tâche manuellement ;
-12. redémarrer Windows et vérifier que le même profil navigateur et la même origine sont utilisés.
-
-La tâche ne doit contenir aucun mot de passe, token ou secret. Elle ne doit pas exécuter `npm install`, `npx`, `ng serve` ni un script récupéré sur Internet.
-
-### 8.3 Pourquoi ne pas lancer `ng serve`
+### Pourquoi ne pas lancer `ng serve`
 
 `ng serve` est un serveur de développement :
 
@@ -716,7 +694,7 @@ La tâche ne doit contenir aucun mot de passe, token ou secret. Elle ne doit pas
 
 Le navigateur doit ouvrir un build `ng build` de production déjà publié.
 
-### 8.4 Variante hors ligne : build local et serveur loopback
+### Variante hors ligne : build local et serveur loopback
 
 Si l'application doit fonctionner sans Internet, prévoir une distribution locale distincte :
 
@@ -742,7 +720,7 @@ Le lanceur devra :
 
 Le dépôt documente déjà Python avec `python -m http.server 8080`. Cette solution peut servir de variante personnelle si Python est installé, mais elle doit être vérifiée sur le poste cible. Pour une distribution destinée à plusieurs postes, il faudra fournir un serveur statique approuvé ou un installeur, ce qui devient un chantier distinct.
 
-### 8.5 Origine et données IndexedDB
+### Origine et données IndexedDB
 
 Les origines suivantes ne partagent pas automatiquement leurs données :
 
@@ -763,18 +741,14 @@ Avant de passer de GitHub Pages à un serveur local, ou inversement :
 
 Ne pas alterner `localhost` et `127.0.0.1`, ni changer de port sans raison. L'API File System Access nécessite un contexte sécurisé ; HTTPS est le cas nominal et `127.0.0.1` est généralement traité comme contexte local sécurisé par les navigateurs Chromium.
 
-### 8.6 Installation et désinstallation à livrer plus tard
+### Installation et désinstallation
 
-Quand le code sera migré, fournir deux scripts versionnés uniquement si le mode local est retenu :
+Le mode GitHub Pages ne nécessite aucune installation : il suffit d'ouvrir l'URL dans le navigateur. Fournir des scripts d'installation et de désinstallation uniquement si le mode local hors ligne est retenu.
 
-- `ops/windows/install-workspace-task.ps1` ;
-- `ops/windows/uninstall-workspace-task.ps1`.
-
-Le mode GitHub Pages peut être installé manuellement sans script dans un premier temps. Si un script est ajouté, il doit :
+Si un script d'installation du mode local est ajouté, il doit :
 
 - utiliser le compte courant ;
 - ne pas demander de privilèges administrateur sans nécessité ;
-- enregistrer le nom exact de la tâche ;
 - utiliser des chemins absolus et correctement quotés ;
 - vérifier l'URL ou le fichier avant l'enregistrement ;
 - permettre une désinstallation sans supprimer les données du navigateur ;
@@ -793,7 +767,6 @@ Le projet contient des données RH, des notes et un coffre local. La migration d
 - rappeler que GitHub Pages rend le code client public ;
 - rappeler que le coffre ne chiffre pas toutes les données Workspace ;
 - protéger les fichiers JSON exportés, qui peuvent contenir des informations sensibles ;
-- faire tourner la tâche Windows sans privilèges élevés ;
 - ne jamais ouvrir un serveur local sur le réseau.
 
 
@@ -807,7 +780,6 @@ Le projet contient des données RH, des notes et un coffre local. La migration d
 | CDN indisponible ou compromis | auto-hébergement ou versionnement avec intégrité |
 | quota IndexedDB | message utilisateur, export préventif et tests proches de la limite |
 | permissions navigateur refusées | fallback téléchargement, presse-papier et notifications facultatives |
-| tâche Windows lancée sous mauvais compte | tâche interactive liée au compte utilisateur courant |
 
 
 ### 10.1 Tests unitaires
@@ -863,7 +835,7 @@ Avec un profil navigateur persistant :
 - récurrence et planification ;
 - affichage mobile et raccourcis clavier ;
 - fermeture puis réouverture du navigateur ;
-- tâche Windows exécutée manuellement puis après redémarrage.
+- ouverture manuelle de l'URL avec le profil navigateur attendu après connexion et redémarrage.
 
 ### 10.4 Tests sécurité
 
@@ -874,7 +846,6 @@ Avec un profil navigateur persistant :
 - fichiers trop gros ou noms de fichiers avec chemins relatifs ;
 - absence de secret en clair dans les exports non prévus, logs et erreurs ;
 - lecture d'une route de projet sans coffre déverrouillé ;
-- vérification qu'une tâche Windows ne contient aucun secret.
 
 ## 11. Critères d'acceptation finaux
 
@@ -906,13 +877,9 @@ Avec un profil navigateur persistant :
 
 ### Windows
 
-- la tâche s'exécute avec le compte attendu ;
-- elle se déclenche à l'ouverture de session, avec un délai raisonnable ;
-- elle ouvre le bon profil/origine navigateur ;
-- aucune élévation n'est nécessaire ;
-- un redémarrage ouvre l'application sans lancer Node.js ;
-- la désinstallation retire la tâche sans supprimer les données ni sauvegardes ;
-- les erreurs d'URL, de port ou de serveur sont visibles dans l'historique ou les logs prévus.
+- l'utilisateur peut ouvrir manuellement l'URL HTTPS avec le profil navigateur souhaité ;
+- un redémarrage de Windows ne change pas l'origine ni les données du profil navigateur ;
+- aucune installation, tâche planifiée, élévation ou exécution de Node.js n'est nécessaire pour le mode GitHub Pages.
 
 ## 12. Rollback et gestion des incidents
 
@@ -922,7 +889,7 @@ Avant chaque phase avec écriture dans la base :
 2. noter la version du build utilisé ;
 3. vérifier que l'export est réimportable dans la version précédente ;
 4. ne pas supprimer les pages legacy ;
-5. prévoir le retour de la tâche Windows vers l'ancienne URL.
+5. conserver l'URL legacy accessible pour un retour manuel.
 
 En cas de problème :
 
@@ -935,7 +902,7 @@ En cas de problème :
 
 ## 13. Découpage de travail recommandé pour les agents
 
-Les analyses préparatoires ont déjà été séparées en deux axes : migration applicative et démarrage Windows. Pour l'implémentation future, répartir les travaux ainsi, avec des contrats explicites :
+Les analyses préparatoires ont déjà été séparées en deux axes : migration applicative et utilisation Windows. Pour l'implémentation future, répartir les travaux ainsi, avec des contrats explicites :
 
 | Agent ou lot | Responsabilité | Dépendance |
 |---|---|---|
@@ -945,7 +912,7 @@ Les analyses préparatoires ont déjà été séparées en deux axes : migration
 | Lot 4 - fonctionnalités verticales | journal, RH, snippets puis projets/tâches | shell + services |
 | Lot 5 - coffre et fichiers | Web Crypto, import/export de fichiers et permissions | contrat de données |
 | Lot 6 - CI/CD | build, tests, artifact GitHub Pages, smoke tests | socle Angular |
-| Lot 7 - Windows | scripts d'installation/désinstallation et test Task Scheduler | URL/build final |
+| Lot 7 - Utilisation Windows | valider ouverture manuelle, profil et persistance navigateur | URL/build final |
 | Lot 8 - non-régression | parcours navigateur, compatibilité legacy et rollback | fonctionnalité migrée |
 
 Règles de collaboration :
@@ -978,13 +945,13 @@ L'ordre le plus sûr et le moins coûteux est :
 14. porter tableau de bord ;
 15. tester la coexistence et les anciennes URL ;
 16. publier Angular avec artifact dédié ;
-17. installer et tester la tâche Windows ;
+17. valider l'ouverture manuelle dans le profil navigateur retenu et la persistance après redémarrage ;
 18. observer, puis retirer progressivement le legacy.
 
 ## 15. Conclusion
 
 La migration est faisable sans réécrire immédiatement tout le projet, à condition de traiter IndexedDB, les URL et le coffre comme des contrats de compatibilité. Le risque principal n'est pas le passage des templates HTML vers Angular : c'est une perte ou une écrasement de données pendant la coexistence, suivi par les routes GitHub Pages et le rendu de contenu importé.
 
-Le chemin recommandé est donc : **Angular standalone + services typés + Dexie compatible + hash routing initial + migration verticale + GitHub Pages + tâche Windows à l'ouverture de session**.
+Le chemin recommandé est donc : **Angular standalone + services typés + Dexie compatible + hash routing initial + migration verticale + GitHub Pages + ouverture manuelle dans le navigateur**.
 
-La variante locale hors ligne doit rester optionnelle. Elle nécessite un serveur statique distribué et une migration d'origine navigateur, alors que la version GitHub Pages peut être ouverte automatiquement sans processus local permanent.
+La variante locale hors ligne doit rester optionnelle. Elle nécessite un serveur statique distribué et une migration d'origine navigateur, alors que la version GitHub Pages s'ouvre directement dans le navigateur sans processus local permanent.
