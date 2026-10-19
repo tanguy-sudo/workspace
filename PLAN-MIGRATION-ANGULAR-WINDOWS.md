@@ -679,7 +679,7 @@ Le workflow devra évoluer progressivement :
 7. ne pas publier `node_modules`, fichiers de développement ou scripts internes ;
 8. ajouter un smoke test de l'accueil et d'une route profonde.
 
-Le chemin réel de l'artefact doit être confirmé après création du workspace Angular. Tant que le dépôt contient les pages legacy à la racine, l'artifact de transition peut contenir les deux applications. Après bascule, il doit contenir le build Angular et uniquement les wrappers nécessaires aux anciennes URL.
+Le chemin réel de l'artefact doit être confirmé après création du workspace Angular. Tant que le dépôt contient les pages legacy à la racine, l'artifact de transition peut contenir les deux applications. Après bascule (TAN-61), il contient le build Angular sous `app/` et uniquement les redirections générées pour les anciennes URL `.html`.
 
 ## 8. Ouverture manuelle dans le navigateur
 

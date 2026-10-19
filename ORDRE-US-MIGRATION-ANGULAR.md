@@ -216,6 +216,8 @@
 
 **TAN-59 préparée :** `workflow_dispatch` propose le rollback Pages vers le snapshot legacy dédié `legacy-rollback-tan58`. Les modes `legacy` et `transition` passent leur validation GitHub Actions sur la branche `tan-59-rollback-legacy`. Aucun de ces runs n'a modifié le site public. Le rollback réel et le retour au mode transition restent à tester après fusion sur `main`.
 
+**TAN-61 bascule (branche `tan-61-recette-bascule-angular`) :** en mode `transition`, la racine GitHub Pages ne sert plus les pages legacy mais des redirections vers les routes Angular (`.github/scripts/build-legacy-redirects.py`, validé par CI et par un essai Chromium : `todos.html?status=done`, `project.html?id=...&folder=...`, `rh.html?folder=...`, `index.html`). L'artifact ne publie plus que Angular et ces redirections. À la fusion, Angular devient la cible par défaut. Restent manuels avant de clore TAN-61 : TAN-56 (profil habituel + redémarrage Windows), essai public du rollback (`legacy`) puis retour `transition`, et 7 jours d'observation avant tout retrait des sources legacy.
+
 **Retrait legacy :** différé après la recette TAN-61 et au moins 7 jours d'observation sans incident. TAN-59 prépare le rollback ; le retrait des sources legacy reste conditionné à TAN-61 et à cette période d'observation.
 
 ## Suivi des décisions et écarts

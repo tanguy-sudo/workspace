@@ -15,8 +15,13 @@ def require_file(path: Path, label: str) -> None:
 
 
 def main() -> None:
-    require_file(SITE / "index.html", "legacy home")
-    require_file(SITE / "todos.html", "legacy todos page")
+    for page in ("index.html", "todos.html", "project.html"):
+        require_file(SITE / page, f"legacy redirect {page}")
+        if "/workspace/app/#/" not in (SITE / page).read_text(encoding="utf-8"):
+            raise AssertionError(f"{page} does not redirect to Angular")
+    for published_legacy in ("js", "css", "assets"):
+        if (SITE / published_legacy).exists():
+            raise AssertionError(f"legacy directory still published: {published_legacy}")
     index = ANGULAR / "index.html"
     require_file(index, "Angular transition entry point")
 
@@ -37,7 +42,7 @@ def main() -> None:
     if "Content-Security-Policy" not in html:
         raise AssertionError("Angular transition entry point has no Content-Security-Policy")
 
-    print("Angular transition artifact valid; legacy entry points preserved.")
+    print("Angular artifact valid; legacy URLs redirect to Angular.")
 
 
 if __name__ == "__main__":

@@ -103,15 +103,14 @@ Puis ouvrir `http://localhost:8080/index.html`.
 
 ## Transition Angular
 
-Pendant la migration, le build Angular est publié sous
-`/workspace/app/`. La version legacy reste disponible à la racine, notamment
-via `index.html`, `todos.html` et les autres pages HTML existantes. Le workflow
-GitHub Pages construit Angular puis copie uniquement son artifact de production
-dans `app/`; le code source Angular, `node_modules` et les fixtures ne sont pas
-publiés.
-
-La route Angular `/export` conserve les exports JSON, Markdown, CSV et ZIP
-pendant que `export.html` reste disponible pour le rollback legacy.
+Angular est l'application de production, publiée sous `/workspace/app/`
+(routage par hash). Les anciennes URL (`index.html`, `todos.html`,
+`project.html?id=...`, etc.) restent valides : le workflow GitHub Pages les
+remplace par de petites pages qui redirigent vers la route Angular équivalente
+(`.github/scripts/build-legacy-redirects.py`, même mapping que
+`LegacyRouteService`). L'artifact publié ne contient que le build Angular et ces
+redirections ; les sources legacy restent dans le dépôt pour le rollback.
+L'origine reste `tanguy-sudo.github.io`, donc IndexedDB est partagé.
 
 ### Rollback GitHub Pages
 
@@ -119,7 +118,7 @@ Depuis l'onglet Actions, lancer `CI/CD` avec `workflow_dispatch`, choisir le
 mode `legacy` sur la branche `main` et vérifier le champ `legacy_ref` avant de confirmer. Il doit
 pointer vers une branche, un tag ou un commit contenant le site legacy complet et le verrou de coexistence TAN-58
 (par défaut `legacy-rollback-tan58`). Ce déploiement remplace le site public par le snapshot legacy ;
-pour revenir à Angular, relancer le workflow en mode `transition`. Un push sur
+pour revenir à Angular (et aux redirections), relancer le workflow en mode `transition`. Un push sur
 `main` publie aussi automatiquement le mode `transition` après validation CI.
 
 Ne retirer les pages legacy de `main` qu'après la recette TAN-61 et la période
