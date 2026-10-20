@@ -93,6 +93,11 @@ jobs:
         if: env.PAGES_MODE == 'transition'
         run: python3 .github/scripts/validate-fixtures.py
 
+      - name: Check legacy URL redirects
+        if: env.PAGES_MODE == 'transition'
+        run: python3 .github/scripts/build-legacy-redirects.py --check
+
+
       - name: Install end-to-end test dependencies
         if: env.PAGES_MODE == 'transition'
         run: python3 -m pip install -r e2e/requirements.txt
@@ -204,20 +209,9 @@ jobs:
           rm -rf _site
           mkdir _site
           if [[ "$PAGES_MODE" == "transition" ]]; then
-            rsync -a \
-              --exclude='.git/' \
-              --exclude='.github/' \
-              --exclude='fixtures/' \
-              --exclude='node_modules/' \
-              --exclude='dist/' \
-              --exclude='build/' \
-              --exclude='_site/' \
-              --exclude='e2e/' \
-              --exclude='workspace-*.json' \
-              --exclude='angular/' \
-              ./ _site/
             mkdir -p _site/app
             rsync -a angular/dist/workspace/app/browser/ _site/app/
+            python3 .github/scripts/build-legacy-redirects.py
           else
             cp _legacy_source/*.html _site/
             cp -r _legacy_source/assets _legacy_source/css _legacy_source/js _site/

@@ -187,16 +187,16 @@
 
 ### Ordre
 
-38. - [ ] [TAN-56 - Tester l'origine navigateur et la persistance au redémarrage Windows](https://linear.app/tanguy-sudo/issue/TAN-56/us-tester-lorigine-navigateur-et-la-persistance-au-redemarrage-windows)
+38. - [x] [TAN-56 - Tester l'origine navigateur et la persistance au redémarrage Windows](https://linear.app/tanguy-sudo/issue/TAN-56/us-tester-lorigine-navigateur-et-la-persistance-au-redemarrage-windows)
 39. - [x] [TAN-58 - Organiser la coexistence et le propriétaire des écritures](https://linear.app/tanguy-sudo/issue/TAN-58/us-organiser-la-coexistence-et-le-proprietaire-des-ecritures)
 40. - [x] [TAN-59 - Préparer le rollback et retirer progressivement les pages legacy](https://linear.app/tanguy-sudo/issue/TAN-59/us-preparer-le-rollback-et-retirer-progressivement-les-pages-legacy)
 41. - [ ] [TAN-61 - Réaliser la recette finale et basculer Angular en production](https://linear.app/tanguy-sudo/issue/TAN-61/us-realiser-la-recette-finale-et-basculer-angular-en-production)
 
 ### Validation M7
 
-- [ ] L'application s'ouvre manuellement sur l'origine et dans le profil navigateur attendus.
+- [x] L'application s'ouvre manuellement sur l'origine et dans le profil navigateur attendus (Chrome, profil habituel, `https://tanguy-sudo.github.io/workspace/app/#/home`).
 - [x] Les données IndexedDB persistent après fermeture complète et réouverture du navigateur sur l'origine HTTPS de production (Chromium, profil temporaire isolé).
-- [ ] La persistance est confirmée après un redémarrage réel de Windows avec le profil navigateur habituel.
+- [x] La persistance est confirmée après un redémarrage réel de Windows avec le profil navigateur habituel (vérifié manuellement : données présentes dans Chrome après redémarrage).
 - [ ] Le rollback vers legacy a été testé.
 - [ ] Angular devient la cible par défaut.
 - [ ] Le retrait des pages legacy est validé ou reporté explicitement.
@@ -215,6 +215,8 @@
 **Limite de déploiement :** les onglets ouverts avec un ancien JavaScript legacy qui ne connaît pas ce verrou doivent être rechargés après le déploiement ; ils ne peuvent pas être coordonnés rétroactivement.
 
 **TAN-59 préparée :** `workflow_dispatch` propose le rollback Pages vers le snapshot legacy dédié `legacy-rollback-tan58`. Les modes `legacy` et `transition` passent leur validation GitHub Actions sur la branche `tan-59-rollback-legacy`. Aucun de ces runs n'a modifié le site public. Le rollback réel et le retour au mode transition restent à tester après fusion sur `main`.
+
+**TAN-61 bascule (branche `tan-61-recette-bascule-angular`) :** en mode `transition`, la racine GitHub Pages ne sert plus les pages legacy mais des redirections vers les routes Angular (`.github/scripts/build-legacy-redirects.py`, validé par CI et par un essai Chromium : `todos.html?status=done`, `project.html?id=...&folder=...`, `rh.html?folder=...`, `index.html`). L'artifact ne publie plus que Angular et ces redirections. À la fusion, Angular devient la cible par défaut. TAN-56 est validée (persistance Chrome après redémarrage Windows). Restent manuels avant de clore TAN-61 : essai public du rollback (`legacy`) puis retour `transition`, et 7 jours d'observation avant tout retrait des sources legacy.
 
 **Retrait legacy :** différé après la recette TAN-61 et au moins 7 jours d'observation sans incident. TAN-59 prépare le rollback ; le retrait des sources legacy reste conditionné à TAN-61 et à cette période d'observation.
 
