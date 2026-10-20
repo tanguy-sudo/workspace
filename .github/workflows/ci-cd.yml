@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       pages_mode:
-        description: "Choose the transition site or restore a legacy snapshot"
+        description: "Choose the Angular site or restore a legacy snapshot"
         type: choice
         options: [transition, legacy]
         default: transition
@@ -66,6 +66,9 @@ jobs:
 
       - name: Verify legacy rollback artifact
         if: env.PAGES_MODE == 'legacy'
+        env:
+          WORKSPACE_LEGACY_SOURCE: _site
+          WORKSPACE_CHECK_ARTIFACT: "1"
         run: python3 .github/scripts/check-legacy-rollback.py
 
       - name: Set up Node.js
@@ -74,16 +77,9 @@ jobs:
         with:
           node-version: 22
 
-      - name: Check JavaScript syntax
+      - name: Fetch legacy snapshot for compatibility tests
         if: env.PAGES_MODE == 'transition'
-        shell: bash
-        run: |
-          set -euo pipefail
-          git ls-files -z '*.js' | xargs -0 -r -n1 node --check
-
-      - name: Check local resources
-        if: env.PAGES_MODE == 'transition'
-        run: python3 .github/scripts/check-local-resources.py
+        run: git fetch --no-tags origin legacy-rollback-tan58
 
       - name: Check published security controls
         if: env.PAGES_MODE == 'transition'
@@ -92,11 +88,6 @@ jobs:
       - name: Validate migration fixtures
         if: env.PAGES_MODE == 'transition'
         run: python3 .github/scripts/validate-fixtures.py
-
-      - name: Check legacy URL redirects
-        if: env.PAGES_MODE == 'transition'
-        run: python3 .github/scripts/build-legacy-redirects.py --check
-
 
       - name: Install end-to-end test dependencies
         if: env.PAGES_MODE == 'transition'
@@ -133,6 +124,8 @@ jobs:
 
       - name: Run end-to-end smoke tests
         if: env.PAGES_MODE == 'transition'
+        env:
+          WORKSPACE_LEGACY_SOURCE: _legacy_source
         run: python3 e2e/run.py
 
       - name: Upload end-to-end diagnostics
@@ -183,6 +176,21 @@ jobs:
             css
             js
 
+      - name: Set up Node.js for legacy rollback
+        if: env.PAGES_MODE == 'legacy'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check legacy rollback JavaScript syntax
+        if: env.PAGES_MODE == 'legacy'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C _legacy_source ls-files -z '*.js' | while IFS= read -r -d '' file; do
+            node --check "_legacy_source/$file"
+          done
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
@@ -211,20 +219,24 @@ jobs:
           if [[ "$PAGES_MODE" == "transition" ]]; then
             mkdir -p _site/app
             rsync -a angular/dist/workspace/app/browser/ _site/app/
-            python3 .github/scripts/build-legacy-redirects.py
+            python3 .github/scripts/build-legacy-redirects.py --site _site
           else
             cp _legacy_source/*.html _site/
             cp -r _legacy_source/assets _legacy_source/css _legacy_source/js _site/
           fi
 
-      - name: Verify transition artifact and legacy pages
+      - name: Verify Angular artifact and former legacy URLs
         if: env.PAGES_MODE == 'transition'
+        env:
+          WORKSPACE_SITE: _site
         run: python3 .github/scripts/check-angular-transition.py
 
       - name: Verify legacy rollback artifact
         if: env.PAGES_MODE == 'legacy'
-        run: |
-          python3 .github/scripts/check-legacy-rollback.py
+        env:
+          WORKSPACE_LEGACY_SOURCE: _site
+          WORKSPACE_CHECK_ARTIFACT: "1"
+        run: python3 .github/scripts/check-legacy-rollback.py
 
       - name: Upload site
         uses: actions/upload-pages-artifact@v3

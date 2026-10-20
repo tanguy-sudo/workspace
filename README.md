@@ -1,30 +1,15 @@
 # Workspace
 
-Application de productivite locale cote navigateur: pas de serveur applicatif, pas de build obligatoire et pas d'envoi des donnees Workspace vers un backend. Les pages de code utilisent toutefois Highlight.js et sa feuille de style depuis cdnjs.
+Workspace est une application Angular statique pour navigateur. Elle n'a pas de serveur applicatif et n'envoie pas les donnees vers un backend ; elles restent dans IndexedDB du profil navigateur.
 
 ## Resume
 
-- Stack: HTML/CSS/JavaScript vanilla + IndexedDB (Dexie)
+- Stack: Angular + TypeScript + IndexedDB (Dexie)
 - Persistance: base `workspace` (table `kv`) avec cache memoire et flush automatique
 - Cible: usage quotidien perso/equipe (taches, projets, RH, snippets, journal)
 - Confidentialite: donnees stockees localement dans le navigateur
 
 Le [Wiki GitHub](https://github.com/tanguy-sudo/workspace/wiki) fournit un demarrage rapide complementaire.
-
-## Pages principales
-
-| Page | Description |
-|------|-------------|
-| `index.html` | Tableau de bord (rappels, activite, sante de l'organisation, revue hebdomadaire) |
-| `todos.html` | Gestion des taches (vues, filtres, rappels, recurrence, estimation, dependances) |
-| `projects.html` | Liste et hierarchie des projets |
-| `project.html` | Detail d'un projet (dossiers, items, drag and drop, taches liees, plein ecran) |
-| `snippets.html` | Bibliotheque de snippets (dossiers, recherche, langage, tags, favoris) |
-| `rh.html` | Notes et documents RH en arborescence, avec tags |
-| `journal.html` | Journal date (Markdown, humeur, tags, recherche locale) |
-| `smart-planning.html` | Planification par temps, contexte, date, projet et mode |
-| `settings.html` | Parametres du site, sauvegardes et coffre de mots de passe |
-| `export.html` | Export par section, sauvegarde complete et import JSON |
 
 ## Fonctionnalites cle
 
@@ -52,9 +37,9 @@ Le [Wiki GitHub](https://github.com/tanguy-sudo/workspace/wiki) fournit un demar
 - Items de type lien, memo, info, code et mot de passe
 - Vue plein ecran pour les items (dont code et mot de passe)
 - Coffre secret optionnel (mot de passe maitre):
-	- chiffrement AES-GCM des identifiants/mots de passe
-	- derive de cle PBKDF2
-	- etat deverrouille stocke en session
+  - chiffrement AES-GCM des identifiants/mots de passe
+  - derive de cle PBKDF2
+  - etat deverrouille stocke en session
 
 ### Snippets systeme
 
@@ -64,7 +49,7 @@ Les modeles par defaut sont initialises automatiquement au demarrage.
 
 - Sauvegarde JSON configurable, verifiee au chargement de chaque page lorsque l'intervalle est echu
 - Pas de timer de sauvegarde actif en arriere-plan entre deux chargements de page
-- Frequence configurable dans `settings.html`
+- Frequence configurable dans Parametres
 - Dossier prefere selectionnable via l'API File System Access pour les sauvegardes manuelles (quand supportee)
 - Sauvegarde automatique et fallback via telechargement classique du navigateur
 
@@ -77,29 +62,25 @@ Les modeles par defaut sont initialises automatiquement au demarrage.
 
 ## Raccourcis clavier utiles
 
-| Raccourci | Action |
-|-----------|--------|
+| Raccourci                | Action                                                                                     |
+| ------------------------ | ------------------------------------------------------------------------------------------ |
 | `Ctrl+Espace` / `Ctrl+K` | Ouvrir la recherche globale; `Ctrl+K` sert aussi a inserer un lien dans l'editeur Markdown |
-| `Ctrl+N` | Creer un nouvel element (selon la page) |
-| `N` | Creer un nouvel element (hors champs saisie) |
-| `Escape` | Fermer modale / palette |
-| `?` ou `,` | Afficher l'aide des raccourcis |
-| `g` + lettre | Navigation rapide (`h`, `t`, `s`, `j`, `p`, `r`, `e`, `n`) |
+| `Ctrl+N`                 | Creer un nouvel element (selon la page)                                                    |
+| `N`                      | Creer un nouvel element (hors champs saisie)                                               |
+| `Escape`                 | Fermer modale / palette                                                                    |
+| `?` ou `,`               | Afficher l'aide des raccourcis                                                             |
+| `g` + lettre             | Navigation rapide (`h`, `t`, `s`, `j`, `p`, `r`, `e`, `n`)                                 |
 
 ## Demarrage rapide
 
-Option 1 (simple): ouvrir `index.html` dans le navigateur.
-
-Option 2 (recommande pour certains navigateurs): lancer un serveur statique local, puis ouvrir `index.html`.
-
-Exemple PowerShell:
+Depuis `angular/`, lancer le serveur de developpement Angular :
 
 ```powershell
-# Depuis la racine du projet
-python -m http.server 8080
+npm ci
+npm start
 ```
 
-Puis ouvrir `http://localhost:8080/index.html`.
+Puis ouvrir l'URL affichee par Angular CLI.
 
 ## Transition Angular
 
@@ -108,9 +89,11 @@ Angular est l'application de production, publiée sous `/workspace/app/`
 `project.html?id=...`, etc.) restent valides : le workflow GitHub Pages les
 remplace par de petites pages qui redirigent vers la route Angular équivalente
 (`.github/scripts/build-legacy-redirects.py`, même mapping que
-`LegacyRouteService`). L'artifact publié ne contient que le build Angular et ces
-redirections ; les sources legacy restent dans le dépôt pour le rollback.
-L'origine reste `tanguy-sudo.github.io`, donc IndexedDB est partagé.
+`LegacyRouteService`). Les pages applicatives, les scripts et les feuilles de
+style legacy sont retires de `main`; les styles encore utilises par Angular sont
+maintenus dans `angular/src/styles/`. Les sources legacy sont conservees sur la branche
+`legacy-rollback-tan58`, seule source du rollback. L'origine reste
+`tanguy-sudo.github.io`, donc IndexedDB est partage.
 
 ### Rollback GitHub Pages
 
@@ -121,38 +104,24 @@ pointer vers une branche, un tag ou un commit contenant le site legacy complet e
 pour revenir à Angular (et aux redirections), relancer le workflow en mode `transition`. Un push sur
 `main` publie aussi automatiquement le mode `transition` après validation CI.
 
-Ne retirer les pages legacy de `main` qu'après la recette TAN-61 et la période
-d'observation documentée d'au moins 7 jours. Garder le commit legacy référencé par
-`legacy_ref` jusqu'à ce que le rollback ait été essayé et que les exports/imports
-aient été validés sur la version cible. Les snapshots plus anciens que TAN-58
+Ne pas supprimer la branche `legacy-rollback-tan58` : elle est la source du
+rollback. Les snapshots plus anciens que TAN-58
 peuvent écraser des données si un onglet Angular est resté ouvert ; ne les utiliser
 qu'après fermeture de toutes les fenêtres Workspace.
 
 ## Structure du projet
 
 ```text
-assets/
-  vendor/dexie.min.js
-css/
-	base.css
-	components.css
-	layout.css
-	pages/
-js/
-	db.js
-	storage.js
-	password-vault.js
-	global-search.js
-	drag-drop.js
-	pages/
-*.html
+angular/
+  src/app/
+  src/styles/
+fixtures/
+e2e/
 ```
 
 Pour plus de details techniques (ordre de chargement, modules, patterns), voir `ARCHITECTURE.md`.
 
 ## Notes techniques
 
-- `package.json` est minimal et ne pilote pas le runtime de l'application
-- Les tests Angular, les checks legacy et le smoke navigateur sont configures pendant la transition
-- Le coeur applicatif fonctionne sans transpilation
-- Highlight.js est charge depuis cdnjs uniquement sur `project.html` et `snippets.html`
+- `angular/package-lock.json` verrouille les dependances de build et de test
+- Les tests Angular et le smoke navigateur valident l'application publiee

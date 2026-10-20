@@ -11,6 +11,7 @@ import sys
 import threading
 import time
 import traceback
+import os
 from contextlib import suppress
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -40,17 +41,18 @@ def build_site() -> Path:
 
     site = ROOT / '_site'
     shutil.rmtree(site, ignore_errors=True)
+    (site / 'workspace').mkdir(parents=True)
+    subprocess.run(
+        [sys.executable, str(ROOT / '.github' / 'scripts' / 'build-legacy-redirects.py'), '--site', str(site / 'workspace')],
+        check=True,
+    )
     (site / 'workspace' / 'app').mkdir(parents=True)
     shutil.copytree(
         ANGULAR / 'dist' / 'workspace' / 'app' / 'browser',
         site / 'workspace' / 'app',
         dirs_exist_ok=True,
     )
-    for source in ROOT.glob('*.html'):
-        shutil.copy2(source, site / source.name)
     shutil.copy2(ROOT / 'e2e' / 'seed.html', site / '__tan-48-seed.html')
-    for directory in ('assets', 'css', 'js'):
-        shutil.copytree(ROOT / directory, site / directory, dirs_exist_ok=True)
     return site
 
 
@@ -489,39 +491,27 @@ def run_responsive_and_shortcuts(page: Page) -> None:
     page.set_viewport_size({'width': 1280, 'height': 900})
 
 
-def run_legacy_smoke(page: Page) -> None:
-    page.goto(f'{BASE_URL}/index.html', wait_until='domcontentloaded')
-    expect(page.locator('body')).to_contain_text('Workspace')
-    for path, heading in (
-        ('todos.html', 'Tâches'),
-        ('projects.html', 'Projets'),
-        ('journal.html', 'Journal'),
-        ('smart-planning.html', 'Planification'),
-        ('settings.html', 'Paramètres'),
-        ('export.html', 'Export'),
+def run_legacy_redirect_smoke(page: Page) -> None:
+    for path, route in (
+        ('index.html', '/home'),
+        ('todos.html?status=done', '/todos?status=done'),
+        ('projects.html?parent=p1', '/projects?parent=p1'),
+        ('project.html?id=p%2F1&folder=f1', '/project/p%2F1?path=f1'),
+        ('project.html', '/projects'),
+        ('snippets.html?folder=f1', '/snippets?path=f1'),
+        ('rh.html?folder=f1', '/rh?path=f1'),
+        ('journal.html', '/journal'),
+        ('smart-planning.html', '/smart-planning'),
+        ('settings.html', '/settings'),
+        ('export.html', '/export'),
     ):
-        page.goto(f'{BASE_URL}/{path}', wait_until='domcontentloaded')
-        expect(page.locator('body')).to_contain_text(heading)
+        page.goto(f'{BASE_URL}/workspace/{path}', wait_until='domcontentloaded')
+        expect(page).to_have_url(re.compile(re.escape(f'/workspace/app/#{route}')))
+        expect(page.locator('app-root')).to_be_attached()
 
-
-def run_coexistence_lock(context: Any, writer_page: Page) -> None:
-    seed_fixture(writer_page, 'workspace-full.json')
-    writer_page.goto(app_route('/settings'), wait_until='domcontentloaded')
-    readonly_page = context.new_page()
-    try:
-        readonly_page.goto(f'{BASE_URL}/settings.html', wait_until='domcontentloaded')
-        notice = readonly_page.locator('#workspace-write-access-warning')
-        expect(notice).to_be_visible()
-        expect(notice).to_contain_text('lecture seule')
-        legacy_before = readonly_page.evaluate('JSON.stringify(WorkspaceDB.getSync())')
-        readonly_page.locator('#site-name').fill('E2E écriture interdite')
-        readonly_page.get_by_role('button', name=re.compile('Enregistrer')).click()
-        expect(notice).to_be_visible()
-        assert readonly_page.evaluate('JSON.stringify(WorkspaceDB.getSync())') == legacy_before
-        workspace = read_workspace(writer_page)
-        assert workspace['settings']['siteName'] == 'Workspace Fixture'
-    finally:
-        readonly_page.close()
+    for path in ('js/db.js', 'css/base.css', 'assets/vendor/dexie.min.js'):
+        response = page.goto(f'{BASE_URL}/workspace/{path}', wait_until='domcontentloaded')
+        assert response and response.status == 404, f'{path} must not be published'
 
 
 def launch_context(playwright: Any, profile: Path, diagnostics: list[str]) -> Any:
@@ -610,8 +600,7 @@ def run_suite() -> None:
             run_dnd_and_selection(page)
             run_notification_fallback(page)
             run_responsive_and_shortcuts(page)
-            run_legacy_smoke(page)
-            run_coexistence_lock(context, page)
+            run_legacy_redirect_smoke(page)
             actionable = [message for message in diagnostics if not message.startswith('Failed to load resource')]
             if actionable:
                 raise AssertionError('Browser diagnostics: ' + ' | '.join(redact_text(message) for message in actionable))

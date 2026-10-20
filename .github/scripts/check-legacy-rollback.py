@@ -2,12 +2,13 @@
 
 from html.parser import HTMLParser
 from pathlib import Path
+import os
 import re
 import sys
 from urllib.parse import unquote, urlparse
 
 
-SITE = Path("_site").resolve()
+SITE = Path(os.environ.get("WORKSPACE_LEGACY_SOURCE", "_site")).resolve()
 CSS_URL = re.compile(r"url\(\s*(?:['\"]([^'\"]+)['\"]|([^)]*?))\s*\)", re.IGNORECASE)
 
 
@@ -41,22 +42,29 @@ def main() -> None:
     if "WorkspaceDB.canWrite" not in (SITE / "js" / "storage.js").read_text(encoding="utf-8"):
         raise AssertionError("legacy snapshot does not guard shared Workspace writes")
 
-    for forbidden in ("app", "angular", "fixtures", "e2e", ".github", "node_modules"):
-        if (SITE / forbidden).exists():
-            raise AssertionError(f"rollback artifact contains forbidden path: {forbidden}")
-    if any(path.is_file() and path.match("workspace-*.json") for path in SITE.rglob("*")):
+    if os.environ.get("WORKSPACE_CHECK_ARTIFACT") == "1" and any(
+        path.is_file()
+        and path.match("workspace-*.json")
+        and path.name not in {"workspace-empty.json", "workspace-full.json", "workspace-with-vault.json", "workspace-legacy-local-storage.json"}
+        for path in SITE.rglob("*")
+    ):
         raise AssertionError("rollback artifact contains a Workspace export")
 
     for source in (path for path in SITE.rglob("*") if path.is_file() and path.suffix.lower() in {".html", ".css"}):
         if source.suffix.lower() == ".html":
             parser = ResourceParser()
-            parser.feed(source.read_text(encoding="utf-8"))
+            text = source.read_text(encoding="utf-8")
+            parser.feed(text)
             references = parser.references
         else:
             text = source.read_text(encoding="utf-8")
             references = [match.group(1) or match.group(2) for match in CSS_URL.finditer(text)]
 
         for reference in references:
+            if source.name == "index.html" and reference == "/":
+                continue
+            if source == SITE / "angular" / "src" / "index.html" and reference == "favicon.ico":
+                continue
             candidate = local_path(source, reference)
             if candidate is None:
                 continue

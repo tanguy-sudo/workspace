@@ -35,8 +35,8 @@
               }
             ],
             "styles": [
-              "../css/base.css",
-              "../css/markdown-editor.css",
+              "src/styles/base.css",
+              "src/styles/markdown-editor.css",
               "src/styles.scss"
             ]
           },
