@@ -197,12 +197,12 @@
 - [x] L'application s'ouvre manuellement sur l'origine et dans le profil navigateur attendus (Chrome, profil habituel, `https://tanguy-sudo.github.io/workspace/app/#/home`).
 - [x] Les données IndexedDB persistent après fermeture complète et réouverture du navigateur sur l'origine HTTPS de production (Chromium, profil temporaire isolé).
 - [x] La persistance est confirmée après un redémarrage réel de Windows avec le profil navigateur habituel (vérifié manuellement : données présentes dans Chrome après redémarrage).
-- [ ] Le rollback vers legacy a été testé.
-- [ ] Angular devient la cible par défaut.
-- [ ] Le retrait des pages legacy est validé ou reporté explicitement.
+- [x] Le rollback vers legacy a été testé (2026-10-20 : legacy servi sans erreur JS, `index.html`, `todos.html`, `export.html`, `js/` et `css/` en 200).
+- [x] Angular devient la cible par défaut (PR #3 : la racine redirige vers les routes Angular).
+- [x] Le retrait des pages legacy est reporté explicitement : après 7 jours d'observation sans incident (au plus tôt le 2026-10-27).
 - [x] Une seule fenêtre Workspace peut écrire : verrou Web Locks partagé entre Angular et legacy, conflit couvert par tests unitaires et E2E.
 - [x] Le snapshot legacy de rollback est conservé et son artifact se valide localement.
-- [ ] Le mode rollback est exécuté sur GitHub Pages, puis le retour au mode transition est vérifié.
+- [x] Le mode rollback est exécuté sur GitHub Pages, puis le retour au mode transition est vérifié (runs 39397229938 `legacy` puis 39397359615 `transition` ; redirections vers Angular revenues, `js/db.js` en 404).
 
 **Décision :** TAN-60 (démarrage automatique via Task Scheduler) est abandonnée ; l'ouverture manuelle de l'URL répond au besoin.
 
@@ -216,7 +216,7 @@
 
 **TAN-59 préparée :** `workflow_dispatch` propose le rollback Pages vers le snapshot legacy dédié `legacy-rollback-tan58`. Les modes `legacy` et `transition` passent leur validation GitHub Actions sur la branche `tan-59-rollback-legacy`. Aucun de ces runs n'a modifié le site public. Le rollback réel et le retour au mode transition restent à tester après fusion sur `main`.
 
-**TAN-61 bascule (branche `tan-61-recette-bascule-angular`) :** en mode `transition`, la racine GitHub Pages ne sert plus les pages legacy mais des redirections vers les routes Angular (`.github/scripts/build-legacy-redirects.py`, validé par CI et par un essai Chromium : `todos.html?status=done`, `project.html?id=...&folder=...`, `rh.html?folder=...`, `index.html`). L'artifact ne publie plus que Angular et ces redirections. À la fusion, Angular devient la cible par défaut. TAN-56 est validée (persistance Chrome après redémarrage Windows). Restent manuels avant de clore TAN-61 : essai public du rollback (`legacy`) puis retour `transition`, et 7 jours d'observation avant tout retrait des sources legacy.
+**TAN-61 bascule (branche `tan-61-recette-bascule-angular`) :** en mode `transition`, la racine GitHub Pages ne sert plus les pages legacy mais des redirections vers les routes Angular (`.github/scripts/build-legacy-redirects.py`, validé par CI et par un essai Chromium : `todos.html?status=done`, `project.html?id=...&folder=...`, `rh.html?folder=...`, `index.html`). L'artifact ne publie plus que Angular et ces redirections. À la fusion, Angular devient la cible par défaut. TAN-56 est validée (persistance Chrome après redémarrage Windows). Restent avant de clore TAN-61 : 7 jours d'observation sans incident (à partir du 2026-10-20), puis décision de retrait des sources legacy. Le rollback public a été testé avec succès le 2026-10-20.
 
 **Retrait legacy :** différé après la recette TAN-61 et au moins 7 jours d'observation sans incident. TAN-59 prépare le rollback ; le retrait des sources legacy reste conditionné à TAN-61 et à cette période d'observation.
 
