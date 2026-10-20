@@ -1,11 +1,12 @@
-"""Check the isolated Angular transition artifact and legacy entry points."""
+"""Check the Angular-only Pages artifact and compatibility redirects."""
 
 from pathlib import Path
+import os
 import sys
 
 
 ROOT = Path(__file__).resolve().parents[2]
-SITE = ROOT / "_site"
+SITE = Path(os.environ.get("WORKSPACE_SITE", ROOT / "_site"))
 ANGULAR = SITE / "app"
 
 
@@ -15,13 +16,13 @@ def require_file(path: Path, label: str) -> None:
 
 
 def main() -> None:
-    for page in ("index.html", "todos.html", "project.html"):
+    for page in ("index.html", "todos.html", "project.html", "snippets.html", "rh.html", "export.html"):
         require_file(SITE / page, f"legacy redirect {page}")
         if "/workspace/app/#/" not in (SITE / page).read_text(encoding="utf-8"):
             raise AssertionError(f"{page} does not redirect to Angular")
-    for published_legacy in ("js", "css", "assets"):
+    for published_legacy in ("js", "css"):
         if (SITE / published_legacy).exists():
-            raise AssertionError(f"legacy directory still published: {published_legacy}")
+            raise AssertionError(f"legacy directory unexpectedly published: {published_legacy}")
     index = ANGULAR / "index.html"
     require_file(index, "Angular transition entry point")
 
@@ -42,7 +43,7 @@ def main() -> None:
     if "Content-Security-Policy" not in html:
         raise AssertionError("Angular transition entry point has no Content-Security-Policy")
 
-    print("Angular artifact valid; legacy URLs redirect to Angular.")
+    print("Angular artifact valid; compatibility redirects are present and legacy sources are absent.")
 
 
 if __name__ == "__main__":

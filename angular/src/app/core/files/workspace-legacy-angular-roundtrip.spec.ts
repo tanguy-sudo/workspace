@@ -1,6 +1,7 @@
 import Dexie from 'dexie';
 import { JSDOM } from 'jsdom';
 import type { BeforeParseWindow } from 'jsdom';
+import { execFileSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { TestBed } from '@angular/core/testing';
@@ -59,7 +60,13 @@ async function readPersisted(): Promise<WorkspaceData> {
 }
 
 async function loadLegacyRuntime(writeLockAvailable = true): Promise<LegacyRoundTripApi> {
-  const source = async (...parts: string[]): Promise<string> => readFile(resolve(process.cwd(), '..', ...parts), 'utf8');
+  const source = async (...parts: string[]): Promise<string> => {
+    try {
+      return await readFile(resolve(process.cwd(), '../_legacy_source', ...parts), 'utf8');
+    } catch {
+      return execFileSync('git', ['show', `origin/legacy-rollback-tan58:${parts.join('/')}`], { encoding: 'utf8' });
+    }
+  };
   const [dbSource, safeStorageSource, storageSource, commonUtilsSource, convertersSource, importSource, exportSource] = await Promise.all([
     source('js', 'db.js'),
     source('js', 'safe-storage.js'),

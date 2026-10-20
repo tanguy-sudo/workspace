@@ -106,11 +106,11 @@ Les champs inconnus doivent être conservés lors d'une lecture puis d'une écri
 
 Les clés suivantes doivent être centralisées dans un service Angular, tout en conservant leur nom pendant la transition :
 
-| Stockage | Clés ou usages |
-|---|---|
-| `localStorage` | `workspace-theme`, `workspace-accent`, `workspace-last-backup`, `workspace-smart-plan`, préférences de vues et de dossiers, rappels déjà notifiés, demande de permission de notification, tailles de modales, `workspace_data` legacy |
-| `sessionStorage` | `workspace-vault-key-v1`, création de journal demandée depuis la recherche, ancien focus de tâche |
-| IndexedDB | données Workspace et handle de dossier de sauvegarde |
+| Stockage         | Clés ou usages                                                                                                                                                                                                                        |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `localStorage`   | `workspace-theme`, `workspace-accent`, `workspace-last-backup`, `workspace-smart-plan`, préférences de vues et de dossiers, rappels déjà notifiés, demande de permission de notification, tailles de modales, `workspace_data` legacy |
+| `sessionStorage` | `workspace-vault-key-v1`, création de journal demandée depuis la recherche, ancien focus de tâche                                                                                                                                     |
+| IndexedDB        | données Workspace et handle de dossier de sauvegarde                                                                                                                                                                                  |
 
 Le thème existe actuellement à la fois dans `settings.theme` et dans `localStorage["workspace-theme"]`. Pendant la coexistence, `settings.theme` est la valeur canonique dès que la base est disponible ; `workspace-theme` reste le fallback de démarrage anticipé des pages legacy. La suppression de cette duplication est une tâche séparée, après validation.
 
@@ -149,37 +149,37 @@ Ces sujets pourront faire l'objet de décisions séparées une fois la migration
 
 Les décisions suivantes constituent le périmètre de référence pour commencer la migration. Elles privilégient le minimum d'infrastructure et la compatibilité avec le dépôt actuel.
 
-| Sujet | Choix recommandé | Pourquoi |
-|---|---|---|
-| Architecture Angular | composants standalone, TypeScript strict, services Angular et Signals | socle moderne sans ajouter un store inutile |
-| Runtime applicatif | application client-side statique, sans backend, SSR ou serveur Node en production | GitHub Pages suffit pour distribuer le build |
-| État partagé | services typés + Signals au départ | le projet reste local et mono-utilisateur |
-| Persistance | Dexie, base `workspace`, table `kv`, clé `data` | compatibilité directe avec les données existantes |
-| Routage initial | `HashLocationStrategy` pendant la coexistence et sur GitHub Pages | évite les 404 des routes profondes sans réécriture serveur |
-| URL de production | `https://tanguy-sudo.github.io/workspace/` | URL vérifiée le 2026-08-19, HTTPS activé et GitHub Pages configuré par workflow |
-| `base href` final | `/workspace/` | correspond au sous-chemin du dépôt GitHub Pages |
-| Déploiement de transition | Angular sous `https://tanguy-sudo.github.io/workspace/app/` | conserve les pages legacy à la racine et facilite le rollback |
-| Déploiement final | artefact Angular dédié publié par GitHub Pages | ne pas publier tout le dépôt par inadvertance |
-| Gestion d'état complexe | report de NgRx | aucune synchronisation distante ne le justifie aujourd'hui |
-| Format de sauvegarde de référence | JSON complet actuel | c'est le format le plus complet et le plus adapté au round-trip |
-| Démarrage Windows | aucun démarrage automatique ; ouverture manuelle de l'URL dans le navigateur habituel | évite une tâche planifiée inutile et laisse le choix du moment d'ouverture |
-| Coexistence legacy/Angular | jusqu'à la recette finale, puis période d'observation minimale de 7 jours | permet un rollback sans maintenir deux propriétaires d'une même fonctionnalité indéfiniment |
-| Écriture pendant coexistence | une seule version possède l'écriture pour chaque fonctionnalité ; édition simultanée legacy/Angular non supportée | évite l'écrasement de caches complets sans ajouter de synchronisation prématurée |
-| GitHub Pages pour les données | accepté pour l'application personnelle sous HTTPS, avec données uniquement dans le navigateur | le code client est public et ne constitue pas une frontière de sécurité ; aucun backend ne reçoit les données |
-| Mode hors ligne | non prévu ; distribution GitHub Pages uniquement | évite de gérer une seconde origine, un build local et une procédure d'installation |
-| Notifications | notifications best effort lorsque l'application est ouverte ; pas de service worker initial | le service worker est un chantier distinct et le comportement actuel est conservé |
-| Ressources tierces | audit puis contrôle/auto-hébergement avant la publication finale | réduit la dépendance aux CDN et relève de [TAN-51](https://linear.app/tanguy-sudo/issue/TAN-51/us-realiser-laudit-securite-et-accessibilite-angular) |
+| Sujet                             | Choix recommandé                                                                                                  | Pourquoi                                                                                                                                             |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture Angular              | composants standalone, TypeScript strict, services Angular et Signals                                             | socle moderne sans ajouter un store inutile                                                                                                          |
+| Runtime applicatif                | application client-side statique, sans backend, SSR ou serveur Node en production                                 | GitHub Pages suffit pour distribuer le build                                                                                                         |
+| État partagé                      | services typés + Signals au départ                                                                                | le projet reste local et mono-utilisateur                                                                                                            |
+| Persistance                       | Dexie, base `workspace`, table `kv`, clé `data`                                                                   | compatibilité directe avec les données existantes                                                                                                    |
+| Routage initial                   | `HashLocationStrategy` pendant la coexistence et sur GitHub Pages                                                 | évite les 404 des routes profondes sans réécriture serveur                                                                                           |
+| URL de production                 | `https://tanguy-sudo.github.io/workspace/`                                                                        | URL vérifiée le 2026-08-19, HTTPS activé et GitHub Pages configuré par workflow                                                                      |
+| `base href` final                 | `/workspace/`                                                                                                     | correspond au sous-chemin du dépôt GitHub Pages                                                                                                      |
+| Déploiement de transition         | Angular sous `https://tanguy-sudo.github.io/workspace/app/`                                                       | conserve les pages legacy à la racine et facilite le rollback                                                                                        |
+| Déploiement final                 | artefact Angular dédié publié par GitHub Pages                                                                    | ne pas publier tout le dépôt par inadvertance                                                                                                        |
+| Gestion d'état complexe           | report de NgRx                                                                                                    | aucune synchronisation distante ne le justifie aujourd'hui                                                                                           |
+| Format de sauvegarde de référence | JSON complet actuel                                                                                               | c'est le format le plus complet et le plus adapté au round-trip                                                                                      |
+| Démarrage Windows                 | aucun démarrage automatique ; ouverture manuelle de l'URL dans le navigateur habituel                             | évite une tâche planifiée inutile et laisse le choix du moment d'ouverture                                                                           |
+| Coexistence legacy/Angular        | jusqu'à la recette finale, puis période d'observation minimale de 7 jours                                         | permet un rollback sans maintenir deux propriétaires d'une même fonctionnalité indéfiniment                                                          |
+| Écriture pendant coexistence      | une seule version possède l'écriture pour chaque fonctionnalité ; édition simultanée legacy/Angular non supportée | évite l'écrasement de caches complets sans ajouter de synchronisation prématurée                                                                     |
+| GitHub Pages pour les données     | accepté pour l'application personnelle sous HTTPS, avec données uniquement dans le navigateur                     | le code client est public et ne constitue pas une frontière de sécurité ; aucun backend ne reçoit les données                                        |
+| Mode hors ligne                   | non prévu ; distribution GitHub Pages uniquement                                                                  | évite de gérer une seconde origine, un build local et une procédure d'installation                                                                   |
+| Notifications                     | notifications best effort lorsque l'application est ouverte ; pas de service worker initial                       | le service worker est un chantier distinct et le comportement actuel est conservé                                                                    |
+| Ressources tierces                | audit puis contrôle/auto-hébergement avant la publication finale                                                  | réduit la dépendance aux CDN et relève de [TAN-51](https://linear.app/tanguy-sudo/issue/TAN-51/us-realiser-laudit-securite-et-accessibilite-angular) |
 
 ### Conséquences et rollback
 
-| Décision | Conséquence acceptée | Rollback |
-|---|---|---|
-| GitHub Pages comme cible nominale | connexion Internet nécessaire et code client public | revenir à la version legacy publiée à la racine |
-| Hash routing | URLs Angular avec `#` | conserver les anciennes URL HTML et changer la cible Windows |
-| Base `workspace` inchangée | écritures initiales dans une valeur complète `kv["data"]` | revenir à l'application legacy sans migration destructive |
-| Une version propriétaire des écritures | pas d'édition simultanée legacy/Angular | désactiver les routes Angular concernées et reprendre sur legacy |
-| Ouverture manuelle | le profil choisi par l'utilisateur est utilisé | ouvrir manuellement l'URL legacy pendant la coexistence |
-| Pas de mode hors ligne | connexion Internet nécessaire ; aucune origine locale ni installation maintenue | les exports JSON restent le moyen manuel de transférer des données si le besoin change |
+| Décision                               | Conséquence acceptée                                                            | Rollback                                                                               |
+| -------------------------------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| GitHub Pages comme cible nominale      | connexion Internet nécessaire et code client public                             | revenir à la version legacy publiée à la racine                                        |
+| Hash routing                           | URLs Angular avec `#`                                                           | conserver les anciennes URL HTML et changer la cible Windows                           |
+| Base `workspace` inchangée             | écritures initiales dans une valeur complète `kv["data"]`                       | revenir à l'application legacy sans migration destructive                              |
+| Une version propriétaire des écritures | pas d'édition simultanée legacy/Angular                                         | désactiver les routes Angular concernées et reprendre sur legacy                       |
+| Ouverture manuelle                     | le profil choisi par l'utilisateur est utilisé                                  | ouvrir manuellement l'URL legacy pendant la coexistence                                |
+| Pas de mode hors ligne                 | connexion Internet nécessaire ; aucune origine locale ni installation maintenue | les exports JSON restent le moyen manuel de transférer des données si le besoin change |
 
 ### Décisions reportées et issues associées
 
@@ -636,12 +636,12 @@ L'import Angular doit :
 7. publier l'artifact final Angular à la racine lorsque le rollback est encore possible ;
 8. transformer les anciennes URL `.html` en redirections ou wrappers compatibles ;
 9. conserver le commit legacy de référence et l'action de rollback `workflow_dispatch` ;
-10. retirer progressivement les routes/pages legacy seulement après TAN-61 et au moins 7 jours d'observation sans incident ;
-11. conserver une archive versionnée du dernier build legacy et tester réellement le rollback avant de supprimer les sources legacy.
+10. supprimer les sources legacy de `main` après décision de déroger à la période d'observation ;
+11. conserver la branche `legacy-rollback-tan58` comme archive source et référence du rollback GitHub Pages.
 
 **Critère de bascule :** aucune fonctionnalité critique, donnée ou URL bloquante ne reste sans test documenté.
 
-**Rollback Pages :** le workflow `CI/CD` accepte un lancement manuel depuis `main` avec `pages_mode=legacy` et un `legacy_ref` contrôlé. Le défaut `legacy-rollback-tan58` conserve le snapshot legacy avec le verrou TAN-58. Le job valide puis publie ce snapshot sans code Angular ; relancer en mode `transition` restaure le site de transition (tout push sur `main` le fait également). Les snapshots antérieurs au verrou ne doivent être utilisés qu'après fermeture de toutes les fenêtres Workspace. Ne jamais supprimer la référence de rollback avant d'avoir exécuté et vérifié le rollback sur l'environnement public.
+**Rollback Pages :** le workflow `CI/CD` accepte un lancement manuel depuis `main` avec `pages_mode=legacy` et un `legacy_ref` contrôlé. Le défaut `legacy-rollback-tan58` conserve le snapshot legacy avec le verrou TAN-58. Le job valide puis publie ce snapshot sans code Angular ; relancer en mode `transition` restaure le site Angular avec les redirections (tout push sur `main` le fait également). Les sources ne sont plus dans `main`; ne jamais supprimer la branche snapshot. Les snapshots antérieurs au verrou ne doivent être utilisés qu'après fermeture de toutes les fenêtres Workspace.
 
 ## 7. Routage et GitHub Pages
 
@@ -701,7 +701,6 @@ Le navigateur doit ouvrir un build `ng build` de production déjà publié.
 
 Les données sont conservées pour l'origine HTTPS GitHub Pages et le profil navigateur habituel. Une autre origine ou un autre profil ne partage pas ces données. Le produit ne fournit ni build local hors ligne, ni serveur loopback, ni installateur.
 
-
 Le projet contient des données RH, des notes et un coffre local. La migration doit traiter les points suivants comme des exigences, pas comme des améliorations facultatives :
 
 - ne jamais publier les données IndexedDB dans le dépôt ou les logs ;
@@ -716,18 +715,16 @@ Le projet contient des données RH, des notes et un coffre local. La migration d
 - protéger les fichiers JSON exportés, qui peuvent contenir des informations sensibles ;
 - ne jamais ouvrir un serveur local sur le réseau.
 
-
-| Risque | Mesure minimale |
-|---|---|
-| écrasement par deux onglets | un seul onglet éditeur documenté pendant la coexistence ; coordination multi-onglets uniquement si le besoin est confirmé |
-| perte lors d'un import | validation complète avant écriture et sauvegarde préalable avant remplacement |
-| rupture du coffre | fixtures cryptographiques et conservation exacte du format |
-| XSS par contenu importé | interpolation Angular, sanitation maîtrisée et sandbox des previews |
-| route profonde en 404 | hash routing initial ou fallback testé |
-| CDN indisponible ou compromis | auto-hébergement ou versionnement avec intégrité |
-| quota IndexedDB | message utilisateur, export préventif et tests proches de la limite |
-| permissions navigateur refusées | fallback téléchargement, presse-papier et notifications facultatives |
-
+| Risque                          | Mesure minimale                                                                                                           |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| écrasement par deux onglets     | un seul onglet éditeur documenté pendant la coexistence ; coordination multi-onglets uniquement si le besoin est confirmé |
+| perte lors d'un import          | validation complète avant écriture et sauvegarde préalable avant remplacement                                             |
+| rupture du coffre               | fixtures cryptographiques et conservation exacte du format                                                                |
+| XSS par contenu importé         | interpolation Angular, sanitation maîtrisée et sandbox des previews                                                       |
+| route profonde en 404           | hash routing initial ou fallback testé                                                                                    |
+| CDN indisponible ou compromis   | auto-hébergement ou versionnement avec intégrité                                                                          |
+| quota IndexedDB                 | message utilisateur, export préventif et tests proches de la limite                                                       |
+| permissions navigateur refusées | fallback téléchargement, presse-papier et notifications facultatives                                                      |
 
 ### 10.1 Tests unitaires
 
@@ -851,16 +848,16 @@ En cas de problème :
 
 Les analyses préparatoires ont déjà été séparées en deux axes : migration applicative et utilisation Windows. Pour l'implémentation future, répartir les travaux ainsi, avec des contrats explicites :
 
-| Agent ou lot | Responsabilité | Dépendance |
-|---|---|---|
-| Lot 1 - contrat de données | fixtures, types, adapter Dexie et migration legacy | aucune |
-| Lot 2 - shell Angular | bootstrap, layout, thème, routeur et composants communs | socle Angular |
-| Lot 3 - services métier | portage des fonctions pures de `storage.js` | contrat de données |
-| Lot 4 - fonctionnalités verticales | journal, RH, snippets puis projets/tâches | shell + services |
-| Lot 5 - coffre et fichiers | Web Crypto, import/export de fichiers et permissions | contrat de données |
-| Lot 6 - CI/CD | build, tests, artifact GitHub Pages, smoke tests | socle Angular |
-| Lot 7 - Utilisation Windows | valider ouverture manuelle, profil et persistance navigateur | URL/build final |
-| Lot 8 - non-régression | parcours navigateur, compatibilité legacy et rollback | fonctionnalité migrée |
+| Agent ou lot                       | Responsabilité                                               | Dépendance            |
+| ---------------------------------- | ------------------------------------------------------------ | --------------------- |
+| Lot 1 - contrat de données         | fixtures, types, adapter Dexie et migration legacy           | aucune                |
+| Lot 2 - shell Angular              | bootstrap, layout, thème, routeur et composants communs      | socle Angular         |
+| Lot 3 - services métier            | portage des fonctions pures de `storage.js`                  | contrat de données    |
+| Lot 4 - fonctionnalités verticales | journal, RH, snippets puis projets/tâches                    | shell + services      |
+| Lot 5 - coffre et fichiers         | Web Crypto, import/export de fichiers et permissions         | contrat de données    |
+| Lot 6 - CI/CD                      | build, tests, artifact GitHub Pages, smoke tests             | socle Angular         |
+| Lot 7 - Utilisation Windows        | valider ouverture manuelle, profil et persistance navigateur | URL/build final       |
+| Lot 8 - non-régression             | parcours navigateur, compatibilité legacy et rollback        | fonctionnalité migrée |
 
 Règles de collaboration :
 

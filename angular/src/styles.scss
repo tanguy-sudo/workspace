@@ -1,10 +1,6 @@
 /* ── styles.scss ──────────────────────────────────────────
-   Le socle (reset, tokens --sp/--r/--t/--ease, 13 thèmes,
-   système glass, styles de formulaire, scrollbar, ::selection,
-   animations) vient de ../css/base.css, chargé AVANT ce fichier
+   Le socle global est dans base.css, chargé avant ce fichier
    via angular.json > architect.build.options.styles.
-   Source unique partagée avec le projet de base : ne pas
-   redupliquer ces règles ici.
 
    Ce fichier ne contient que ce qui est propre à l'app Angular.
    ───────────────────────────────────────────────────────── */

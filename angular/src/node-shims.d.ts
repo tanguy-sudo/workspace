@@ -6,4 +6,8 @@ declare module 'node:path' {
   export function resolve(...paths: string[]): string;
 }
 
+declare module 'node:child_process' {
+  export function execFileSync(file: string, args: string[], options: { encoding: 'utf8' }): string;
+}
+
 declare const process: { cwd(): string };
