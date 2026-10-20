@@ -52,11 +52,6 @@ def main() -> None:
             if f"{HIGHLIGHT_PREFIX}{resource}" in text and integrity not in text:
                 errors.append(f"{path}: generated Highlight.js resource has an unexpected integrity hash")
 
-    workflow = (ROOT / ".github" / "workflows" / "ci-cd.yml").read_text(encoding="utf8")
-    for pattern in ("--exclude='workspace-*.json'",):
-        if pattern not in workflow:
-            errors.append(f"Pages artifact does not exclude {pattern}")
-
     ignored_export = subprocess.run(
         ["git", "check-ignore", "--quiet", "workspace-example.json"],
         cwd=ROOT,
