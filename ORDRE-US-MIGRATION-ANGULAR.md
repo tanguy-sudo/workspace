@@ -22,7 +22,7 @@
 - [x] M4 - Migration fonctionnelle
 - [ ] M5 - Import/export et qualité
 - [ ] M6 - Déploiement GitHub Pages
-- [ ] M7 - Windows et bascule
+- [x] M7 - Windows et bascule
 
 ## M0 - Cadrage et baseline
 
@@ -190,7 +190,7 @@
 38. - [x] [TAN-56 - Tester l'origine navigateur et la persistance au redémarrage Windows](https://linear.app/tanguy-sudo/issue/TAN-56/us-tester-lorigine-navigateur-et-la-persistance-au-redemarrage-windows)
 39. - [x] [TAN-58 - Organiser la coexistence et le propriétaire des écritures](https://linear.app/tanguy-sudo/issue/TAN-58/us-organiser-la-coexistence-et-le-proprietaire-des-ecritures)
 40. - [x] [TAN-59 - Préparer le rollback et retirer progressivement les pages legacy](https://linear.app/tanguy-sudo/issue/TAN-59/us-preparer-le-rollback-et-retirer-progressivement-les-pages-legacy)
-41. - [ ] [TAN-61 - Réaliser la recette finale et basculer Angular en production](https://linear.app/tanguy-sudo/issue/TAN-61/us-realiser-la-recette-finale-et-basculer-angular-en-production)
+41. - [x] [TAN-61 - Réaliser la recette finale et basculer Angular en production](https://linear.app/tanguy-sudo/issue/TAN-61/us-realiser-la-recette-finale-et-basculer-angular-en-production)
 
 ### Validation M7
 
@@ -212,13 +212,13 @@
 
 **TAN-58 validée :** verrou Web Locks exclusif par origine sur la racine IndexedDB partagée ; le premier onglet est écrivain, les autres versions Angular/legacy sont en lecture seule avec avertissement. Sans support Web Locks, l'application reste en lecture seule. Pas de coordination multi-onglet des modifications : fermer les autres onglets Workspace avant d'éditer.
 
-**Limite de déploiement :** les onglets ouverts avec un ancien JavaScript legacy qui ne connaît pas ce verrou doivent être rechargés après le déploiement ; ils ne peuvent pas être coordonnés rétroactivement.
+**Limite de déploiement historique :** les onglets ouverts avec un ancien JavaScript legacy qui ne connaît pas ce verrou devaient être rechargés après déploiement ; ils ne pouvaient pas être coordonnés rétroactivement. Les sources legacy sont désormais archivées sur la branche snapshot.
 
 **TAN-59 validée :** `workflow_dispatch` publie le snapshot legacy dédié `legacy-rollback-tan58`, testé sur Pages puis remplacé par Angular. La branche snapshot reste la source du rollback après retrait des sources legacy de `main`.
 
-**TAN-61 validée fonctionnellement :** Angular est en production par défaut ; le test public du rollback puis retour Angular a réussi. L'utilisateur a accepté de déroger aux 7 jours d'observation ; le retrait des sources est préparé sur `tan-62-remove-legacy-sources`. La case TAN-61 reste ouverte jusqu'au merge de cette suppression. `legacy-rollback-tan58` est conservée.
+**TAN-61 clôturée le 2026-10-20 :** Angular est en production par défaut ; la recette après redémarrage Windows, le rollback public vers legacy, puis le retour à Angular ont réussi. À la demande de l'utilisateur, le retrait des sources a été fait sans attendre les 7 jours d'observation, via la PR #5. CI et déploiement réussis. La branche `legacy-rollback-tan58` est conservée comme source de rollback.
 
-**Retrait legacy :** autorisé avant la fin des 7 jours à la demande de l'utilisateur. Le snapshot `legacy-rollback-tan58` doit être préservé ; les anciennes URL restent des redirections Angular générées en CI.
+**Retrait legacy :** terminé sur `main` par la PR #5. Le snapshot `legacy-rollback-tan58` reste préservé ; les anciennes URL restent des redirections Angular générées en CI.
 
 ## Suivi des décisions et écarts
 
