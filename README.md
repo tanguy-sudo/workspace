@@ -82,18 +82,14 @@ npm start
 
 Puis ouvrir l'URL affichee par Angular CLI.
 
-## Transition Angular
+## Application et URL
 
-Angular est l'application de production, publiée sous `/workspace/app/`
-(routage par hash). Les anciennes URL (`index.html`, `todos.html`,
-`project.html?id=...`, etc.) restent valides : le workflow GitHub Pages les
-remplace par de petites pages qui redirigent vers la route Angular équivalente
-(`.github/scripts/build-legacy-redirects.py`, même mapping que
-`LegacyRouteService`). Les pages applicatives, les scripts et les feuilles de
-style legacy sont retires de `main`; les styles encore utilises par Angular sont
-maintenus dans `angular/src/styles/`. Les sources legacy sont conservees sur la branche
-`legacy-rollback-tan58`, seule source du rollback. L'origine reste
-`tanguy-sudo.github.io`, donc IndexedDB est partage.
+Angular est l'application de production, publiée à la racine GitHub Pages via
+`/workspace/app/`, avec routage par hash. Les anciennes URL (`index.html`,
+`todos.html`, `project.html?id=...`, etc.) redirigent vers la route Angular
+équivalente. Les sources legacy ont été retirées de `main` ; le snapshot
+`legacy-rollback-tan58` reste la source du rollback. L'application conserve la
+même origine HTTPS, donc les données IndexedDB existantes restent accessibles.
 
 ### Rollback GitHub Pages
 
@@ -109,7 +105,7 @@ rollback. Les snapshots plus anciens que TAN-58
 peuvent écraser des données si un onglet Angular est resté ouvert ; ne les utiliser
 qu'après fermeture de toutes les fenêtres Workspace.
 
-## Structure du projet
+## Structure du dépôt
 
 ```text
 angular/
@@ -119,9 +115,12 @@ fixtures/
 e2e/
 ```
 
-Pour plus de details techniques (ordre de chargement, modules, patterns), voir `ARCHITECTURE.md`.
+Pour le développement Angular, les commandes de build et les tests, voir
+[`angular/README.md`](angular/README.md). Pour les contrats internes, voir
+`ARCHITECTURE.md` et `DATA-CONTRACT.md`.
 
 ## Notes techniques
 
-- `angular/package-lock.json` verrouille les dependances de build et de test
-- Les tests Angular et le smoke navigateur valident l'application publiee
+- `angular/package-lock.json` verrouille les dependances de build et de test ;
+  un override maintient Vite sur une version corrigée côté dépendance transitive.
+- La CI vérifie les builds, tests, sécurité, redirections et parcours navigateur.
