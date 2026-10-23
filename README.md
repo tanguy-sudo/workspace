@@ -9,13 +9,13 @@ Workspace est une application Angular statique pour navigateur. Elle n'a pas de 
 - Cible: usage quotidien perso/equipe (taches, projets, RH, snippets, journal)
 - Confidentialite: donnees stockees localement dans le navigateur
 
-Le [Wiki GitHub](https://github.com/tanguy-sudo/workspace/wiki) fournit un demarrage rapide complementaire.
+Le [Wiki GitHub](https://github.com/tanguy-sudo/workspace/wiki) documente les fonctionnalites, les raccourcis, l'architecture, le developpement et le deploiement.
 
 ## Fonctionnalites cle
 
 ### Recherche globale
 
-- Palette via `Ctrl+Espace` (ou `Ctrl+K`)
+- Palette via `Ctrl+K` (ou `Ctrl+Espace`)
 - Filtres supportes: `type:`, `tag:`, `priority:`, `status:`, `context:`, `lang:`, `in:`, `folder:` et recherche exacte `"..."`
 - Les resultats couvrent les projets, les items de projets, les dossiers, les fiches RH, les taches et les snippets
 - Les resultats naviguent vers la page cible avec focus automatique sur l'element
@@ -27,7 +27,8 @@ Le [Wiki GitHub](https://github.com/tanguy-sudo/workspace/wiki) fournit un demar
 - Priorites personnalisables, vues sauvegardees, contexte, tags et rattachement projet
 - Champ `Rattache a` (ex: personne ayant signale une anomalie)
 - Dependances entre taches
-- Recurrence: quotidienne, hebdomadaire (jours choisis), mensuelle (nieme jour de semaine)
+- Recurrence: quotidienne, hebdomadaire (jours choisis), mensuelle (nieme jour de semaine ou premier jour du mois)
+- Piece jointe ou capture d'ecran par tache (4 Mio max)
 - Temps estime acceptant des expressions arithmetiques (ex: `60*5`, `(30+15)*2`)
 - Rappels date+heure
 - Revue hebdomadaire et planification intelligente
@@ -35,7 +36,7 @@ Le [Wiki GitHub](https://github.com/tanguy-sudo/workspace/wiki) fournit un demar
 ### Projets et secrets
 
 - Items de type lien, memo, info, code et mot de passe
-- Vue plein ecran pour les items (dont code et mot de passe)
+- Bouton Plein ecran: ouvre l'item (dont code et mot de passe) comme une page dans un nouvel onglet
 - Coffre secret optionnel (mot de passe maitre):
   - chiffrement AES-GCM des identifiants/mots de passe
   - derive de cle PBKDF2
@@ -64,9 +65,8 @@ Les modeles par defaut sont initialises automatiquement au demarrage.
 
 | Raccourci                | Action                                                                                     |
 | ------------------------ | ------------------------------------------------------------------------------------------ |
-| `Ctrl+Espace` / `Ctrl+K` | Ouvrir la recherche globale; `Ctrl+K` sert aussi a inserer un lien dans l'editeur Markdown |
-| `Ctrl+N`                 | Creer un nouvel element (selon la page)                                                    |
-| `N`                      | Creer un nouvel element (hors champs saisie)                                               |
+| `Ctrl+K` / `Ctrl+Espace` | Ouvrir la recherche globale; `Ctrl+K` sert aussi a inserer un lien dans l'editeur Markdown |
+| `n`                      | Creer un nouvel element selon la page: tache, snippet, projet, item, document RH, entree de journal, rappel. Ignore dans un champ de saisie ou si une fenetre est ouverte |
 | `Escape`                 | Fermer modale / palette                                                                    |
 | `?` ou `,`               | Afficher l'aide des raccourcis                                                             |
 | `g` + lettre             | Navigation rapide (`h`, `t`, `s`, `j`, `p`, `r`, `e`, `n`)                                 |
