@@ -142,10 +142,15 @@ export interface TodoMonthlyRecurrence extends UnknownFields {
   weekday: number;
 }
 
+export interface TodoMonthlyFirstDayRecurrence extends UnknownFields {
+  type: 'monthly_first_day';
+}
+
 export type TodoRecurrence =
   | TodoDailyRecurrence
   | TodoWeeklyRecurrence
-  | TodoMonthlyRecurrence;
+  | TodoMonthlyRecurrence
+  | TodoMonthlyFirstDayRecurrence;
 
 export interface Todo extends UnknownFields {
   id: string;

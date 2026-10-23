@@ -609,6 +609,7 @@ export function normalizeTodoRecurrence(value: unknown): TodoRecurrence | null {
   const recurrence = value as Record<string, unknown>;
   const type = String(recurrence['type'] ?? 'none');
   if (type === 'daily') return { type: 'daily' };
+  if (type === 'monthly_first_day') return { type: 'monthly_first_day' };
   if (type === 'weekly') {
     const weeklyDays = [...new Set(Array.isArray(recurrence['weeklyDays'])
       ? recurrence['weeklyDays'].map(Number).filter((day) => Number.isInteger(day) && day >= 1 && day <= 7)
@@ -652,6 +653,10 @@ export function computeNextDateFromRecurrence(
       if (normalized.weeklyDays.includes(isoWeekday(candidate))) return localIsoDate(candidate);
     }
     return null;
+  }
+  if (normalized.type === 'monthly_first_day') {
+    const nextMonth = new Date(anchor.getFullYear(), anchor.getMonth() + 1, 1);
+    return localIsoDate(nextMonth);
   }
   for (let offset = 0; offset < 18; offset += 1) {
     const month = anchor.getMonth() + offset;

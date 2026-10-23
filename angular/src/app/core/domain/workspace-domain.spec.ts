@@ -133,6 +133,8 @@ describe('Workspace pure domain functions', () => {
     expect(computeNextDateFromRecurrence('2026-02-02', { type: 'weekly', weeklyDays: [5] })).toBe('2026-02-06');
     expect(computeNextDateFromRecurrence('2026-12-31', { type: 'weekly', weeklyDays: [1] })).toBe('2027-01-04');
     expect(computeNextDateFromRecurrence('2026-01-30', { type: 'monthly_nth_weekday', nth: -1, weekday: 5 })).toBe('2026-02-27');
+    expect(computeNextDateFromRecurrence('2026-01-01', { type: 'monthly_first_day' })).toBe('2026-02-01');
+    expect(computeNextDateFromRecurrence('2026-12-31', { type: 'monthly_first_day' })).toBe('2027-01-01');
     expect(normalizeTodoRecurrence({ type: 'weekly', weeklyDays: [5, 5, 0] })).toEqual({ type: 'weekly', weeklyDays: [5] });
   });
 
