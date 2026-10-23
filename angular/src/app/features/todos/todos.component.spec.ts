@@ -7,6 +7,7 @@ import { routes } from '../../app.routes';
 import { WorkspaceStoreService } from '../../core/persistence/workspace-store.service';
 import { StoragePreferencesService } from '../../core/persistence/storage-preferences.service';
 import { FeedbackService } from '../../shared/feedback/feedback.service';
+import { FileAccessService } from '../../core/files/file-access.service';
 import { TodosComponent } from './todos.component';
 import type { WorkspaceData } from '../../core/persistence/workspace-data';
 
@@ -21,6 +22,7 @@ describe('TodosComponent', () => {
   };
   let preferences: { get: ReturnType<typeof vi.fn>; set: ReturnType<typeof vi.fn>; remove: ReturnType<typeof vi.fn> };
   let feedback: { confirm: ReturnType<typeof vi.fn>; showToast: ReturnType<typeof vi.fn> };
+  let files: { readAttachment: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
     data = signal<WorkspaceData | null>(structuredClone(fixture.data) as WorkspaceData);
@@ -38,6 +40,7 @@ describe('TodosComponent', () => {
     };
     preferences = { get: vi.fn((_key: string, fallback: string | null = null) => fallback), set: vi.fn(() => true), remove: vi.fn(() => true) };
     feedback = { confirm: vi.fn(async () => true), showToast: vi.fn() };
+    files = { readAttachment: vi.fn(async (file: File) => ({ name: file.name, mime: file.type, size: file.size, base64: 'data:image/png;base64,fixture' })) };
     TestBed.configureTestingModule({
       imports: [TodosComponent],
       providers: [
@@ -46,6 +49,7 @@ describe('TodosComponent', () => {
         { provide: WorkspaceStoreService, useValue: store },
         { provide: StoragePreferencesService, useValue: preferences },
         { provide: FeedbackService, useValue: feedback },
+        { provide: FileAccessService, useValue: files },
       ],
     });
   });
@@ -70,7 +74,7 @@ describe('TodosComponent', () => {
     await component.whenStable();
 
     component.componentInstance['todoDraft'] = {
-      title: 'Tâche récurrente', description: '**Détails**', priorityId: 'important', status: 'todo', estimatedTime: '60*5',
+      title: 'Tâche récurrente', description: '**Détails**', file: null, priorityId: 'important', status: 'todo', estimatedTime: '60*5',
       dueDate: '2026-02-02', reminderAt: '2026-02-02T09:00', pinned: true, projectId: 'project-alpha', context: '', attachedTo: '',
       recurrenceType: 'daily', recurrenceWeekdays: [], recurrenceNth: 2, recurrenceWeekday: 1, dependencies: ['todo-daily'], tags: 'a, b, a',
     };
@@ -91,6 +95,22 @@ describe('TodosComponent', () => {
 
     await component.componentInstance['removeTodo'](next!);
     expect(data()!.trash.at(-1)).toMatchObject({ id: next!.id, _trashType: 'todo' });
+  });
+
+  it('attaches a file to a task and preserves it when editing', async () => {
+    const component = TestBed.createComponent(TodosComponent);
+    component.detectChanges();
+    await component.whenStable();
+    component.componentInstance['todoDraft'] = { ...component.componentInstance['todoDraft'], title: 'Capture', context: '@bureau' };
+    component.componentInstance['dialog'].set('todo');
+    const file = new File(['image'], 'capture.png', { type: 'image/png' });
+    await component.componentInstance['selectAttachment']({ target: { files: [file] } } as unknown as Event);
+    await component.componentInstance['submitTodo']();
+
+    const created = data()!.todos.find((todo) => todo.title === 'Capture')!;
+    expect(created.file).toMatchObject({ name: 'capture.png', mime: 'image/png' });
+    component.componentInstance['openEditTodo'](created);
+    expect(component.componentInstance['todoDraft'].file).toEqual(created.file);
   });
 
   it('saves and reopens a view, manages priorities and rejects invalid estimates', async () => {

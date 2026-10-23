@@ -97,7 +97,8 @@
               </button>
             </div>
           </div>
-          @if (todo.description) { <app-safe-markdown class="todo-description" [markdown]="descriptionPreview(todo.description)" /> }
+           @if (todo.description) { <app-safe-markdown class="todo-description" [markdown]="descriptionPreview(todo.description)" /> }
+          @if (todo.file; as file) { <a class="todo-attachment" [href]="file.base64" [download]="file.name">📎 {{ file.name }}</a> }
           <div class="todo-meta">
             @if (priorityFor(todo.priorityId); as priority) { <span class="priority-chip" [style.--priority-color]="safePriorityColor(priority.color)">{{ priority.label }}</span> }
             @if (todo.estimatedTime) { <span class="meta-chip">{{ formatMinutes(todo.estimatedTime) }}</span> }
@@ -121,7 +122,8 @@
           <h2 id="todo-dialog-title">{{ editingTodoId() ? 'Modifier la tâche' : 'Nouvelle tâche' }}</h2>
           <form (ngSubmit)="submitTodo()">
             <label class="field"><span>Titre *</span><input name="title" maxlength="120" required [(ngModel)]="todoDraft.title" /></label>
-             <label class="field"><span>Description Markdown</span><app-markdown-editor name="description" [(ngModel)]="todoDraft.description" [minHeight]="160" /></label>
+              <label class="field"><span>Description Markdown</span><app-markdown-editor name="description" [(ngModel)]="todoDraft.description" [minHeight]="160" /></label>
+            <label class="field"><span>Pièce jointe ou capture (4 Mo maximum)</span><input name="todo-file" type="file" accept="image/*,.pdf,.txt,.doc,.docx,.xls,.xlsx" (change)="selectAttachment($event)" />@if (todoDraft.file; as file) { <small>{{ file.name }} · {{ file.size }} octets <button class="danger-icon" type="button" (click)="todoDraft.file = null">Retirer</button></small> }</label>
             <div class="field-grid">
               <label class="field"><span>Priorité</span><select name="priority" [(ngModel)]="todoDraft.priorityId">@for (priority of priorities(); track priority.id) { <option [value]="priority.id">{{ priority.label }}</option> }</select></label>
               <label class="field"><span>Statut</span><select name="status" [(ngModel)]="todoDraft.status">@for (status of statuses; track status.id) { <option [value]="status.id">{{ status.label }}</option> }</select></label>

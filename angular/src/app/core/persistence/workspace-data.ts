@@ -151,6 +151,7 @@ export interface Todo extends UnknownFields {
   id: string;
   title: string;
   description?: string;
+  file?: WorkspaceFile | null;
   note?: string;
   status: string;
   priorityId?: string;
