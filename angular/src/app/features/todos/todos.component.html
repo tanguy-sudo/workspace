@@ -15,7 +15,7 @@
           <button class="secondary-button" type="button" (click)="openViews()">Vues</button>
           <button class="secondary-button" type="button" (click)="openTemplates()">Modèles</button>
           <button class="secondary-button danger-outline" type="button" (click)="purgeCompleted()">Purger terminées</button>
-          <button class="primary-button" type="button" (click)="openNewTodo()">+ Nouvelle tâche</button>
+          <button class="primary-button" type="button" data-shortcut-new (click)="openNewTodo()">+ Nouvelle tâche</button>
         </div>
       </header>
 

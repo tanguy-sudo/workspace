@@ -11,7 +11,7 @@
             <span class="sr-only">Rechercher un projet</span>
             <input type="search" [value]="search()" (input)="setSearch($event)" placeholder="Rechercher..." />
           </label>
-           <button class="primary-button" type="button" (click)="openCreateProject()">+ Nouveau</button>
+           <button class="primary-button" type="button" data-shortcut-new (click)="openCreateProject()">+ Nouveau</button>
         </div>
       </header>
 

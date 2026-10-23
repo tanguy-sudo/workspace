@@ -40,6 +40,26 @@ describe('App', () => {
     input.remove();
   });
 
+  it('clicks the page create button on n, except when a dialog is open', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const button = document.createElement('button');
+    button.setAttribute('data-shortcut-new', '');
+    const clicked = vi.fn();
+    button.addEventListener('click', clicked);
+    document.body.appendChild(button);
+    fixture.componentInstance['onShortcut'](new KeyboardEvent('keydown', { key: 'n' }));
+    expect(clicked).toHaveBeenCalledTimes(1);
+
+    const dialog = document.createElement('div');
+    dialog.setAttribute('role', 'dialog');
+    document.body.appendChild(dialog);
+    fixture.componentInstance['onShortcut'](new KeyboardEvent('keydown', { key: 'n' }));
+    expect(clicked).toHaveBeenCalledTimes(1);
+    dialog.remove();
+    button.remove();
+  });
+
   it('opens the legacy-style theme and accent picker', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();

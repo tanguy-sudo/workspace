@@ -169,6 +169,10 @@ export class App implements OnInit {
       this.shortcutsHelp.update((open) => !open);
       return;
     }
+    if (event.key === 'n' && !this.gMode && !event.altKey && !document.querySelector('[role="dialog"]')) {
+      const create = document.querySelector<HTMLButtonElement>('[data-shortcut-new]:not(:disabled)');
+      if (create) { event.preventDefault(); create.click(); return; }
+    }
     if (event.key === 'g') {
       event.preventDefault();
       this.gMode = true;

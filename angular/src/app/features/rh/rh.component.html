@@ -1,7 +1,7 @@
 <section class="rh-page" aria-labelledby="rh-title">
       <header class="rh-header">
          <div><h1 id="rh-title">RH</h1><p class="rh-meta">{{ documentCount() }} document{{ documentCount() > 1 ? 's' : '' }} · données locales</p></div>
-         <div class="rh-actions"><button class="secondary-button" type="button" [class.active-button]="selectionMode()" (click)="toggleSelectionMode()">{{ selectionMode() ? 'Annuler' : 'Sélectionner' }}</button><button class="secondary-button" type="button" (click)="openCreateFolder()">+ Dossier</button><button class="primary-button" type="button" (click)="openCreateDocument()">+ Document</button></div>
+         <div class="rh-actions"><button class="secondary-button" type="button" [class.active-button]="selectionMode()" (click)="toggleSelectionMode()">{{ selectionMode() ? 'Annuler' : 'Sélectionner' }}</button><button class="secondary-button" type="button" (click)="openCreateFolder()">+ Dossier</button><button class="primary-button" type="button" data-shortcut-new (click)="openCreateDocument()">+ Document</button></div>
       </header>
 
        <div class="rh-toolbar"><input type="search" [value]="search()" (input)="setSearch($event)" placeholder="Rechercher dans le dossier courant..." aria-label="Rechercher dans RH" /><button type="button" (click)="goParent()" [disabled]="path().length <= 1">Remonter</button><button type="button" (click)="restoreLatest()" [disabled]="!deletedRh().length">Restaurer dernier</button></div>
