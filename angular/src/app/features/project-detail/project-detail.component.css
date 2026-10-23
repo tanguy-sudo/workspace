@@ -100,16 +100,17 @@ h1 { margin: 0; font-size: clamp(2rem, 6vw, 4.4rem); letter-spacing: -.06em; }
 .field input[type='color'] { height: 2.2rem; padding: 3px; }
 .field input[type='file'] { margin-top: 2px; }
 .field small { color: var(--text-3); font-size: .68rem; }
-.viewer, .fullscreen-viewer { position: relative; display: grid; grid-template-rows: auto 1fr; overflow: hidden; border: 1px solid var(--border-hi); border-radius: var(--r-xl); background: var(--bg-2); }
+.viewer { position: relative; display: grid; grid-template-rows: auto 1fr; overflow: hidden; border: 1px solid var(--border-hi); border-radius: var(--r-xl); background: var(--bg-2); }
 .viewer { width: min(60rem, 100%); max-height: calc(100dvh - 2rem); }
-.fullscreen-viewer { width: min(70rem, 100%); height: min(90dvh, 55rem); }
-.viewer header, .fullscreen-viewer header { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border); color: var(--text); }
-.viewer header button, .fullscreen-viewer header button { padding: 6px var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg-2); color: var(--text-2); font-size: .78rem; }
-.viewer header button:hover, .fullscreen-viewer header button:hover { border-color: var(--border-hi); background: var(--bg-3); color: var(--text); }
+.item-page { display: grid; gap: var(--sp-2); width: min(60rem, 100%); margin: 0 auto; padding: var(--sp-5) 0 var(--sp-8); }
+.item-page h1 { margin: 0; font-size: 1.4rem; font-weight: 500; letter-spacing: -.02em; }
+.viewer header, .item-page header { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border); color: var(--text); }
+.viewer header button, .item-page header button { padding: 6px var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg-2); color: var(--text-2); font-size: .78rem; }
+.viewer header button:hover, .item-page header button:hover { border-color: var(--border-hi); background: var(--bg-3); color: var(--text); }
 .viewer img { display: block; max-width: 100%; max-height: calc(100dvh - 7rem); margin: auto; object-fit: contain; }
 .viewer iframe { width: min(58rem, 90vw); height: min(75vh, 48rem); border: 0; background: white; }
-.fullscreen-viewer header div { display: flex; align-items: center; gap: var(--sp-3); }
-.fullscreen-viewer header span { color: var(--text-3); font: .72rem var(--font-mono); letter-spacing: .05em; text-transform: uppercase; }
+.item-page header div { display: flex; align-items: center; gap: var(--sp-3); }
+.item-page header span { color: var(--text-3); font: .72rem var(--font-mono); letter-spacing: .05em; text-transform: uppercase; }
 .fullscreen-content { overflow: auto; padding: clamp(1rem, 4vw, 2rem); color: var(--text); line-height: 1.6; }
 .fullscreen-content app-safe-markdown { display: block; margin-top: var(--sp-4); }
 

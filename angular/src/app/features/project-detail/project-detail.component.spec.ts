@@ -192,7 +192,7 @@ describe('ProjectDetailComponent', () => {
     expect(component.componentInstance['selectedIds']()).toContain('item-alpha-code');
   });
 
-  it('opens an item fullscreen in a new tab and restores it from its focus URL', async () => {
+  it('opens an item as a full page in a new tab and restores it from its URL', async () => {
     const open = vi.spyOn(window, 'open').mockReturnValue(null);
     const component = TestBed.createComponent(ProjectDetailComponent);
     component.detectChanges();
@@ -200,11 +200,17 @@ describe('ProjectDetailComponent', () => {
     const item = data()!.projects.flatMap((project) => project.children).flatMap((node) => node.nodeType === 'folder' ? node.children : [node]).find((node) => node.id === 'item-alpha-info') as ProjectItem;
 
     await component.componentInstance['openFullscreen'](item);
-    expect(open).toHaveBeenCalledWith(expect.stringContaining(`focus=${item.id}`), '_blank', 'noopener,noreferrer');
+    expect(open).toHaveBeenCalledWith(expect.stringContaining(`fullscreen=1`), '_blank', 'noopener,noreferrer');
+
+    routeQuery.next(convertToParamMap({ focus: item.id, kind: 'item', fullscreen: '1' }));
+    component.detectChanges();
+    expect(component.componentInstance['fullscreenItem']()?.id).toBe(item.id);
+    expect(component.nativeElement.querySelector('.item-page h1')?.textContent).toContain(item.title);
+    expect(component.nativeElement.querySelector('.fullscreen-viewer, .project-header')).toBeNull();
 
     routeQuery.next(convertToParamMap({ focus: item.id, kind: 'item' }));
     component.detectChanges();
-    expect(component.componentInstance['fullscreenItem']()?.id).toBe(item.id);
+    expect(component.componentInstance['fullscreenItem']()).toBeNull();
     open.mockRestore();
   });
 });
