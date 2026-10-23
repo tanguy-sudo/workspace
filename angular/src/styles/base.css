@@ -473,6 +473,11 @@ select:focus {
   outline-offset: 2px;
   border-radius: var(--r-sm);
 }
+/* Conteneurs focalisés par programme (main, fenêtres de dialogue) : pas de cadre
+   autour de tout l'écran quand on utilise les raccourcis clavier. */
+[tabindex='-1']:focus-visible {
+  outline: none;
+}
 /* Éviter le double ring sur les inputs qui ont déjà box-shadow */
 input:focus-visible,
 textarea:focus-visible,
