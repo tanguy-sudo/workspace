@@ -155,18 +155,18 @@ interface TaskStats {
 const REMINDER_TABS: Array<{ id: DashboardReminderTab; label: string }> = [
   { id: 'today', label: "Aujourd'hui" },
   { id: 'overdue', label: 'En retard' },
-  { id: 'pinned', label: 'Epingles' },
-  { id: 'upcoming', label: 'A venir' },
+  { id: 'pinned', label: 'Épinglés' },
+  { id: 'upcoming', label: 'À venir' },
 ];
 
 const SHORTCUTS: Array<{ path: string[]; icon: string; name: string; sub: string }> = [
   { path: ['/rh'], icon: 'RH', name: 'RH', sub: 'Fiches et dossiers' },
-  { path: ['/projects'], icon: 'P', name: 'Projets', sub: 'Liens, memos, code' },
-  { path: ['/todos'], icon: 'T', name: 'Taches', sub: 'Todo et priorites' },
-  { path: ['/snippets'], icon: '</>', name: 'Snippets', sub: 'Code reutilisable' },
+  { path: ['/projects'], icon: 'P', name: 'Projets', sub: 'Liens, mémos, code' },
+  { path: ['/todos'], icon: 'T', name: 'Tâches', sub: 'Todo et priorités' },
+  { path: ['/snippets'], icon: '</>', name: 'Snippets', sub: 'Code réutilisable' },
   { path: ['/journal'], icon: 'J', name: 'Journal', sub: 'Notes du jour' },
   { path: ['/smart-planning'], icon: 'S', name: 'Planification', sub: 'Optimise ton temps' },
-  { path: ['/export'], icon: '↓', name: 'Export', sub: 'Telecharger' },
+  { path: ['/export'], icon: '↓', name: 'Export', sub: 'Télécharger' },
 ];
 
 function newId(prefix: string): string {
@@ -244,20 +244,20 @@ function buildHealthStats(data: WorkspaceData, now: number): HealthStats {
 
 function buildReviewItems(stats: HealthStats): ReviewItem[] {
   const items: ReviewItem[] = [];
-  if (stats.activeTodosWithoutProject) items.push({ title: `Classer ${stats.activeTodosWithoutProject} tache${stats.activeTodosWithoutProject > 1 ? 's' : ''} sans projet`, detail: 'Affecte-les a un projet ou garde une vraie inbox courte.', path: ['/todos'], queryParams: { project: 'none' } });
-  if (stats.projectsWithoutCategory) items.push({ title: `Qualifier ${stats.projectsWithoutCategory} projet${stats.projectsWithoutCategory > 1 ? 's' : ''} sans categorie`, detail: 'Une categorie par projet suffit pour rendre les vues coherentes.', path: ['/projects'] });
-  if (stats.waitingInfoTodos) items.push({ title: `Relancer ${stats.waitingInfoTodos} tache${stats.waitingInfoTodos > 1 ? 's' : ''} en attente d'info`, detail: 'Decide si la prochaine action est une relance, une note ou une cloture.', path: ['/todos'], queryParams: { status: 'waitinginfo' } });
-  if (stats.staleProjects) items.push({ title: `Reevaluer ${stats.staleProjects} projet${stats.staleProjects > 1 ? 's' : ''} dormant${stats.staleProjects > 1 ? 's' : ''}`, detail: "Archive, relance ou reorganise les projets qui n'avancent plus.", path: ['/projects'] });
-  if (stats.taglessContent) items.push({ title: `Tagger ${stats.taglessContent} contenu${stats.taglessContent > 1 ? 's' : ''} non qualifie${stats.taglessContent > 1 ? 's' : ''}`, detail: 'Commence par quelques tags stables: acces, batch, doc, compte, prod.', path: ['/snippets'] });
-  return items.length ? items : [{ title: 'Aucun point bloquant cette semaine', detail: 'Le workspace est propre. Fais juste un passage rapide sur les taches actives.', path: ['/todos'], ok: true }];
+  if (stats.activeTodosWithoutProject) items.push({ title: `Classer ${stats.activeTodosWithoutProject} tâche${stats.activeTodosWithoutProject > 1 ? 's' : ''} sans projet`, detail: 'Affecte-les a un projet ou garde une vraie inbox courte.', path: ['/todos'], queryParams: { project: 'none' } });
+  if (stats.projectsWithoutCategory) items.push({ title: `Qualifier ${stats.projectsWithoutCategory} projet${stats.projectsWithoutCategory > 1 ? 's' : ''} sans catégorie`, detail: 'Une catégorie par projet suffit pour rendre les vues cohérentes.', path: ['/projects'] });
+  if (stats.waitingInfoTodos) items.push({ title: `Relancer ${stats.waitingInfoTodos} tâche${stats.waitingInfoTodos > 1 ? 's' : ''} en attente d'info`, detail: 'Decide si la prochaine action est une relance, une note ou une cloture.', path: ['/todos'], queryParams: { status: 'waitinginfo' } });
+  if (stats.staleProjects) items.push({ title: `Réévaluer ${stats.staleProjects} projet${stats.staleProjects > 1 ? 's' : ''} dormant${stats.staleProjects > 1 ? 's' : ''}`, detail: "Archive, relance ou réorganise les projets qui n'avancent plus.", path: ['/projects'] });
+  if (stats.taglessContent) items.push({ title: `Tagger ${stats.taglessContent} contenu${stats.taglessContent > 1 ? 's' : ''} non qualifie${stats.taglessContent > 1 ? 's' : ''}`, detail: 'Commence par quelques tags stables: accès, batch, doc, compte, prod.', path: ['/snippets'] });
+  return items.length ? items : [{ title: 'Aucun point bloquant cette semaine', detail: 'Le workspace est propre. Fais juste un passage rapide sur les tâches actives.', path: ['/todos'], ok: true }];
 }
 
 function activityTypeLabel(type: string): string {
-  return { todo: 'Tache', snippet: 'Snippet', rh: 'Document RH', project: 'Projet', journal: 'Journal' }[type] || type;
+  return { todo: 'Tâche', snippet: 'Snippet', rh: 'Document RH', project: 'Projet', journal: 'Journal' }[type] || type;
 }
 
 function activityActionLabel(action: string): string {
-  return { create: 'Cree', update: 'Modifie', delete: 'Supprime' }[action] || action;
+  return { create: 'Créé', update: 'Modifié', delete: 'Supprimé' }[action] || action;
 }
 
 @Component({
@@ -277,7 +277,7 @@ export class DashboardComponent {
   protected readonly recentExpanded = signal(false);
   protected reminderDraft: ReminderDraft = emptyReminderDraft();
 
-  protected readonly userName = computed(() => this.data()?.settings.userName?.trim() || 'Utilisateur');
+  protected readonly userName = computed(() => this.data()?.settings.userName?.trim() || '');
   protected readonly siteName = computed(() => this.data()?.settings.siteName?.trim() || 'Workspace');
   protected readonly priorities = computed(() => this.data()?.settings.todoPriorities ?? []);
   protected readonly activeProjects = computed(() => (this.data()?.projects ?? []).filter((project) => project['archived'] !== true));
@@ -294,11 +294,11 @@ export class DashboardComponent {
   protected readonly healthCards = computed<HealthCard[]>(() => {
     const stats = this.healthStats();
     const cards: HealthCard[] = [
-      { id: 'inbox', count: stats.activeTodosWithoutProject, label: 'taches sans projet', hint: "Traite l'inbox avant qu'elle grossisse.", tone: stats.activeTodosWithoutProject ? 'warn' : 'ok', path: ['/todos'], queryParams: { project: 'none' } },
-      { id: 'categories', count: stats.projectsWithoutCategory, label: 'projets sans categorie', hint: 'Ajoute une categorie pour fiabiliser le classement.', tone: stats.projectsWithoutCategory ? 'warn' : 'ok', path: ['/projects'], queryParams: {} },
-      { id: 'waiting', count: stats.waitingInfoTodos, label: "taches en attente d'info", hint: "Relance ou note l'information manquante.", tone: stats.waitingInfoTodos ? 'warn' : 'ok', path: ['/todos'], queryParams: { status: 'waitinginfo' } },
-      { id: 'stale', count: stats.staleProjects, label: 'projets dormants (> 21 j)', hint: "Verifie s'ils sont encore actifs ou a archiver.", tone: stats.staleProjects ? 'warn' : 'ok', path: ['/projects'], queryParams: {} },
-      { id: 'tags', count: stats.taglessContent, label: 'contenus sans tag', hint: 'Ajoute quelques tags transverses pour accelerer la recherche.', tone: stats.taglessContent ? 'warn' : 'ok', path: ['/snippets'], queryParams: {} },
+      { id: 'inbox', count: stats.activeTodosWithoutProject, label: 'tâches sans projet', hint: "Traite l'inbox avant qu'elle grossisse.", tone: stats.activeTodosWithoutProject ? 'warn' : 'ok', path: ['/todos'], queryParams: { project: 'none' } },
+      { id: 'categories', count: stats.projectsWithoutCategory, label: 'projets sans catégorie', hint: 'Ajoute une catégorie pour fiabiliser le classement.', tone: stats.projectsWithoutCategory ? 'warn' : 'ok', path: ['/projects'], queryParams: {} },
+      { id: 'waiting', count: stats.waitingInfoTodos, label: "tâches en attente d'info", hint: "Relance ou note l'information manquante.", tone: stats.waitingInfoTodos ? 'warn' : 'ok', path: ['/todos'], queryParams: { status: 'waitinginfo' } },
+      { id: 'stale', count: stats.staleProjects, label: 'projets dormants (> 21 j)', hint: "Vérifie s'ils sont encore actifs ou à archiver.", tone: stats.staleProjects ? 'warn' : 'ok', path: ['/projects'], queryParams: {} },
+      { id: 'tags', count: stats.taglessContent, label: 'contenus sans tag', hint: 'Ajoute quelques tags transverses pour accélérer la recherche.', tone: stats.taglessContent ? 'warn' : 'ok', path: ['/snippets'], queryParams: {} },
     ];
     return cards;
   });
@@ -325,7 +325,7 @@ export class DashboardComponent {
     if (buckets.today.length) stats.push({ count: buckets.today.length, label: "pour aujourd'hui", tone: 'accent' });
     stats.push({ count: this.activeProjects().length, label: this.activeProjects().length > 1 ? 'projets actifs' : 'projet actif', tone: '' });
     const journalCount = this.data()?.journal.length ?? 0;
-    if (journalCount) stats.push({ count: journalCount, label: 'entrees journal', tone: '' });
+    if (journalCount) stats.push({ count: journalCount, label: 'entrées journal', tone: '' });
     return stats;
   });
   protected readonly shortcuts = computed(() => {
@@ -336,7 +336,7 @@ export class DashboardComponent {
     return SHORTCUTS.map((shortcut) => {
       let badge: number | string | null = null;
       if (shortcut.name === 'Projets' && this.activeProjects().length) badge = this.activeProjects().length;
-      if (shortcut.name === 'Taches') badge = overdue ? `${overdue} retard` : today ? `${today} auj.` : activeTodos || null;
+      if (shortcut.name === 'Tâches') badge = overdue ? `${overdue} retard` : today ? `${today} auj.` : activeTodos || null;
       if (shortcut.name === 'Snippets' && data?.snippets.length) badge = data.snippets.length;
       if (shortcut.name === 'Journal' && data?.journal.length) badge = data.journal.length;
       return { ...shortcut, badge };
@@ -373,7 +373,7 @@ export class DashboardComponent {
   }
 
   protected reviewStatus(): string {
-    return this.reviewDone() ? `Revue marquee comme faite pour ${dashboardWeekKey(new Date(this.now()))}` : `Revue a faire pour ${dashboardWeekKey(new Date(this.now()))}`;
+    return this.reviewDone() ? `Revue marquee comme faite pour ${dashboardWeekKey(new Date(this.now()))}` : `Revue à faire pour ${dashboardWeekKey(new Date(this.now()))}`;
   }
 
   protected openSearch(): void { this.search.open(); }
@@ -384,9 +384,9 @@ export class DashboardComponent {
 
   protected reminderEmptyMessage(): string {
     return {
-      today: "Aucune tache prevue aujourd'hui. Profitez-en !",
-      overdue: 'Aucune tache en retard.',
-      pinned: "Aucune tache epinglee. Cochez l'etoile sur une tache pour la fixer ici.",
+      today: "Aucune tâche prévue aujourd'hui. Profitez-en !",
+      overdue: 'Aucune tâche en retard.',
+      pinned: "Aucune tâche épinglée. Cochez l'étoile sur une tâche pour la fixer ici.",
       upcoming: 'Aucun rappel programme dans les 7 prochains jours.',
     }[this.reminderTab()];
   }
@@ -449,9 +449,9 @@ export class DashboardComponent {
       createdAt,
       updatedAt: createdAt,
     };
-    if (!this.mutate((data) => createTodo(data, todo), { type: 'todo', action: 'create', label: `Tache « ${title} »`, id: todo.id, icon: 'check' })) return;
+    if (!this.mutate((data) => createTodo(data, todo), { type: 'todo', action: 'create', label: `Tâche « ${title} »`, id: todo.id, icon: 'check' })) return;
     this.closeReminder();
-    this.feedback.showToast('Rappel cree', 'success');
+    this.feedback.showToast('Rappel créé', 'success');
   }
 
   protected completeReminder(todo: Todo): void {
@@ -459,13 +459,13 @@ export class DashboardComponent {
     if (!data) return;
     const next = completeTodo(data, todo.id, dashboardLocalDate(new Date(this.now())), newId('todo'));
     if (!next) return;
-    this.store.update((draft) => Object.assign(draft, trackActivity(next, { type: 'todo', action: 'update', label: `Tache « ${todo.title} »`, id: todo.id, icon: 'check' })));
-    this.feedback.showToast('Tache terminee', 'success');
+    this.store.update((draft) => Object.assign(draft, trackActivity(next, { type: 'todo', action: 'update', label: `Tâche « ${todo.title} »`, id: todo.id, icon: 'check' })));
+    this.feedback.showToast('Tâche terminée', 'success');
   }
 
   protected togglePin(todo: Todo): void {
-    if (this.mutate((data) => updateTodo(data, todo.id, { pinned: todo.pinned !== true, updatedAt: this.now() }), { type: 'todo', action: 'update', label: `Tache « ${todo.title} »`, id: todo.id, icon: 'check' })) {
-      this.feedback.showToast(todo.pinned ? 'Tache desepinglee' : 'Tache epinglee', 'success');
+    if (this.mutate((data) => updateTodo(data, todo.id, { pinned: todo.pinned !== true, updatedAt: this.now() }), { type: 'todo', action: 'update', label: `Tâche « ${todo.title} »`, id: todo.id, icon: 'check' })) {
+      this.feedback.showToast(todo.pinned ? 'Tâche désépinglée' : 'Tâche épinglée', 'success');
     }
   }
 
@@ -490,7 +490,7 @@ export class DashboardComponent {
       priorityId: this.priorities().find((priority) => priority.id === 'important')?.id || this.priorities()[0]?.id || 'important', context: 'review', attachedTo: '', estimatedTime: 0,
       dependencies: [], tags: ['review', 'organisation'], dueDate: '', reminderAt: '', recurrence: null, pinned: false, projectId: '', createdAt: this.now(), updatedAt: this.now(),
     };
-    if (this.mutate((current) => createTodo(current, todo), { type: 'todo', action: 'create', label: `Tache « ${title} »`, id: todo.id, icon: 'check' })) this.feedback.showToast('Tache de revue creee', 'success');
+    if (this.mutate((current) => createTodo(current, todo), { type: 'todo', action: 'create', label: `Tâche « ${title} »`, id: todo.id, icon: 'check' })) this.feedback.showToast('Tâche de revue créée', 'success');
   }
 
   protected recentTarget(item: RecentVisit): Project | RhNode | null {
@@ -510,7 +510,7 @@ export class DashboardComponent {
 
   protected timeAgo(timestamp: number): string { return formatTimeAgo(timestamp, this.now()); }
 
-  protected missingRecent(): void { this.feedback.showToast('Cet element a ete supprime', 'error'); }
+  protected missingRecent(): void { this.feedback.showToast('Cet élément a été supprimé', 'error'); }
 
   protected activityActionLabel(action: string): string { return activityActionLabel(action); }
   protected activityTypeLabel(type: string): string { return activityTypeLabel(type); }

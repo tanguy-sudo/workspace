@@ -154,7 +154,7 @@ export class TreeComponent {
       this.dnd.cancel();
       this.keyboardTargetId.set(null);
       this.keyboardPosition.set('after');
-      this.announcement.set('Deplacement annule.');
+      this.announcement.set('Déplacement annulé.');
       return;
     }
     const moveFocus = (nextIndex: number): void => {
@@ -178,7 +178,7 @@ export class TreeComponent {
         const source = this.sourceNode();
         if (target && source && this.canDropAt(source, target, 'inside')) {
           this.keyboardPosition.set('inside');
-          this.announcement.set(`Cible selectionnee : ${this.displayLabel(target)}, dedans.`);
+          this.announcement.set(`Cible sélectionnée : ${this.displayLabel(target)}, dedans.`);
         }
         return;
       }
@@ -197,7 +197,7 @@ export class TreeComponent {
       this.dnd.startKeyboardMove();
       this.keyboardTargetId.set(null);
       this.keyboardPosition.set('after');
-      this.announcement.set('Selectionnez une cible avec les fleches puis appuyez sur Entree.');
+      this.announcement.set('Sélectionnez une cible avec les flèches puis appuyez sur Entrée.');
       return;
     }
     if (event.key === 'Enter' && this.dnd.keyboardMoving()) {

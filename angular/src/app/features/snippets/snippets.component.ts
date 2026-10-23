@@ -247,7 +247,7 @@ export class SnippetsComponent {
     const folder: SnippetFolder = { id: newId(), nodeType: 'folder', name: name.trim(), children: [], createdAt: Date.now() };
     this.store.update((draft) => { const parent = folderAt(draft.snippetFolders, this.currentFolderId()); if (parent) { parent.children.push(folder); draft.snippetMixedOrder[folderKey(this.currentFolderId())] = [...getSnippetMixedEntries(draft, this.currentFolderId()).map((entry) => entry.token), `f:${folder.id}`]; } });
     this.closeCreateDialog();
-    this.feedback.showToast('Dossier cree', 'success');
+    this.feedback.showToast('Dossier créé', 'success');
   }
 
   protected submitCreateSnippet(): void {
@@ -258,7 +258,7 @@ export class SnippetsComponent {
     const snippet: Snippet = { id: newId(), title, code: this.snippetDraft.code, language: this.snippetDraft.language.trim() || 'plaintext', tags: this.snippetDraft.tags.split(',').map((tag) => tag.trim()).filter(Boolean), favorite: false, folderId };
     this.store.update((draft) => Object.assign(draft, addSnippet(draft, snippet)));
     this.closeCreateDialog();
-    this.feedback.showToast('Snippet cree', 'success');
+    this.feedback.showToast('Snippet créé', 'success');
   }
 
   protected toggleFavorite(snippet: Snippet): void { this.store.update((draft) => { const next = updateSnippet(draft, snippet.id, { favorite: !snippet.favorite }); if (next) Object.assign(draft, next); }); }
@@ -273,7 +273,7 @@ export class SnippetsComponent {
   }
 
   protected async removeSnippet(snippet: Snippet): Promise<void> {
-    if (!await this.feedback.confirm({ title: `Supprimer ${snippet.title} ?`, message: 'Le snippet sera deplace dans la corbeille.', destructive: true })) return;
+    if (!await this.feedback.confirm({ title: `Supprimer ${snippet.title} ?`, message: 'Le snippet sera déplacé dans la corbeille.', destructive: true })) return;
     this.store.update((draft) => { const next = deleteSnippet(draft, snippet.id); if (next) Object.assign(draft, next); });
   }
 

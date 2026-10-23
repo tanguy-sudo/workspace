@@ -13,6 +13,11 @@ h2 { margin: 0; }
 .view-summary { font-size: .8rem; line-height: 1.45; }
 .header-actions, .filter-group, .todo-meta, .todo-tags, .weekday-picker { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 .header-actions { justify-content: flex-end; }
+.view-switch { display: inline-flex; }
+.view-switch button { border-radius: 0; }
+.view-switch button + button { margin-left: -1px; }
+.view-switch button:first-child { border-radius: var(--r-md) 0 0 var(--r-md); }
+.view-switch button:last-child { border-radius: 0 var(--r-md) var(--r-md) 0; }
 .active-button, .active-filter { border-color: var(--accent) !important; background: var(--accent-dim) !important; color: var(--accent) !important; }
 .danger-button, .danger-outline { padding: 8px 14px; border: 1px solid color-mix(in srgb, var(--danger) 40%, transparent); border-radius: var(--r-md); background: transparent; color: var(--danger); font-size: .82rem; font-weight: 500; transition: border-color var(--t-fast), background var(--t-fast); }
 .danger-button:hover:not(:disabled), .danger-outline:hover:not(:disabled) { border-color: var(--danger); background: var(--danger-dim); }

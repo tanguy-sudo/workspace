@@ -30,7 +30,7 @@ const THEMES = [
 const NAV_ITEMS = [
   { path: '/home', label: 'Tableau de bord' },
   { path: '/rh', label: 'RH' },
-  { path: '/projects', label: 'Projects' },
+  { path: '/projects', label: 'Projets' },
   { path: '/todos', label: 'Tâches' },
   { path: '/snippets', label: 'Snippets' },
   { path: '/journal', label: 'Journal' },

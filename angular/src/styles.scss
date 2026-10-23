@@ -358,3 +358,62 @@ app-safe-markdown.todo-description .safe-markdown a { color: var(--link-color); 
     scroll-behavior: auto !important;
   }
 }
+
+/* ══ EN-TÊTES DE PAGE ═════════════════════════════════════
+   Même gabarit partout : titre à gauche (sans retour à la ligne
+   forcé), actions à droite et alignées en bas. */
+.todos-header,
+.snippets-header,
+.projects-header,
+.rh-header,
+.journal-header,
+.export-header,
+.planning-header,
+.settings-header {
+  align-items: flex-end;
+  flex-wrap: nowrap;
+}
+
+.todos-header > :first-child,
+.snippets-header > :first-child,
+.projects-header > :first-child,
+.rh-header > :first-child,
+.journal-header > :first-child,
+.export-header > :first-child,
+.planning-header > :first-child,
+.settings-header > :first-child {
+  flex: 0 0 auto;
+}
+
+.header-actions,
+.rh-actions,
+.snippets-header .actions,
+.projects-header .actions {
+  flex: 1 1 0;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
+@media (max-width: 720px) {
+  .header-actions,
+  .rh-actions,
+  .snippets-header .actions,
+  .projects-header .actions {
+    flex: 0 1 auto;
+    justify-content: flex-start;
+  }
+}
+
+/* Amorce affichée quand une zone n'a pas encore de contenu. */
+.empty-hint {
+  margin: var(--sp-6) 0;
+  color: var(--text-2);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.empty .primary-button,
+.empty-state .primary-button {
+  margin-top: var(--sp-3);
+}

@@ -218,7 +218,7 @@ export class RhComponent {
       });
       if (updated) {
         this.closeCreateDialog();
-        this.feedback.showToast(documentId ? 'Document mis a jour' : 'Document cree', 'success');
+        this.feedback.showToast(documentId ? 'Document mis a jour' : 'Document créé', 'success');
       }
       return;
     }
@@ -227,7 +227,7 @@ export class RhComponent {
     const node: RhNode = { id: id(), nodeType: 'folder', name, children: [], createdAt: Date.now() };
     if (this.store.update((draft) => { const next = addRhNode(draft, this.currentFolder().id, node); if (next) Object.assign(draft, next); })) {
       this.closeCreateDialog();
-      this.feedback.showToast('Dossier cree', 'success');
+      this.feedback.showToast('Dossier créé', 'success');
     }
   }
 
@@ -261,11 +261,11 @@ export class RhComponent {
   protected toggleNodePin(node: TreeNode): void { this.store.update((draft) => { const next = updateRhNode(draft, node.id, { pinned: node['pinned'] !== true }); if (next) Object.assign(draft, next); }); }
 
   protected async remove(node: RhNode): Promise<void> {
-    const accepted = await this.feedback.confirm({ title: `Supprimer ${nodeLabel(node)} ?`, message: 'L’element sera deplace dans la corbeille.', destructive: true });
+    const accepted = await this.feedback.confirm({ title: `Supprimer ${nodeLabel(node)} ?`, message: 'L’élément sera déplacé dans la corbeille.', destructive: true });
     if (!accepted) return;
     this.store.update((draft) => { const next = deleteRhNode(draft, node.id); if (next) Object.assign(draft, next); });
     this.selectedId.set(null);
-    this.feedback.showToast('Element deplace dans la corbeille', 'success');
+    this.feedback.showToast('Élément déplacé dans la corbeille', 'success');
   }
 
   protected async deleteSelected(): Promise<void> {
@@ -294,7 +294,7 @@ export class RhComponent {
     const latest = this.deletedRh().at(-1);
     if (!latest) return;
     this.store.update((draft) => { const next = restoreFromTrash(draft, latest.id); if (next) Object.assign(draft, next); });
-    this.feedback.showToast('Element RH restaure', 'success');
+    this.feedback.showToast('Élément RH restauré', 'success');
   }
 
   protected safeDocumentUrl(url: string | undefined): string | null { return safeUrl(url); }
@@ -337,7 +337,7 @@ export class RhComponent {
   protected download(file: WorkspaceFile): void {
     const binary = atob(file.base64.split(',')[1] ?? '');
     const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
-    void this.files.saveBlob(new Blob([bytes], { type: file.mime }), file.name).then((result) => { if (!result.saved && !result.cancelled) this.feedback.showToast('Telechargement impossible', 'error'); });
+    void this.files.saveBlob(new Blob([bytes], { type: file.mime }), file.name).then((result) => { if (!result.saved && !result.cancelled) this.feedback.showToast('Téléchargement impossible', 'error'); });
   }
 
   @HostListener('document:keydown', ['$event'])

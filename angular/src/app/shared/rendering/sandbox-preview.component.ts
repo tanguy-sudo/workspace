@@ -11,7 +11,7 @@ export class SandboxPreviewComponent implements AfterViewChecked {
   @ViewChild('frame') private frame?: ElementRef<HTMLIFrameElement>;
   readonly source = input('');
   readonly language = input<'html' | 'css'>('html');
-  readonly title = input('Apercu securise');
+  readonly title = input('Aperçu sécurisé');
   protected readonly document = computed(() => buildSandboxPreview(this.source(), this.language()));
   private appliedDocument = '';
 

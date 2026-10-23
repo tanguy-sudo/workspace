@@ -1,13 +1,12 @@
 <section class="journal-page" aria-labelledby="journal-title">
       <header class="journal-header">
         <div>
-          <p class="eyebrow">WORKSPACE / ANGULAR</p>
           <h1 id="journal-title">Journal</h1>
-          <p class="journal-meta">{{ entries().length }} entree{{ entries().length > 1 ? 's' : '' }} · pensees, notes et humeur du jour</p>
+          <p class="journal-meta">{{ entries().length }} entrée{{ entries().length > 1 ? 's' : '' }} · pensees, notes et humeur du jour</p>
         </div>
         <div class="header-actions">
           <button class="secondary-button" type="button" (click)="openTemplates()">Modèles</button>
-          <button class="primary-button" type="button" (click)="createEntry()">+ Nouvelle entree</button>
+          <button class="primary-button" type="button" (click)="createEntry()">+ Nouvelle entrée</button>
         </div>
       </header>
 
@@ -22,10 +21,10 @@
         <p class="journal-status">Chargement du journal...</p>
       } @else {
         <div class="journal-layout">
-          <aside class="journal-sidebar" aria-label="Entrees du journal">
-            <div class="sidebar-heading"><span>Entrees</span><span>{{ visibleEntries().length }}</span></div>
+          <aside class="journal-sidebar" aria-label="Entrées du journal">
+            <div class="sidebar-heading"><span>Entrées</span><span>{{ visibleEntries().length }}</span></div>
             @if (!visibleEntries().length) {
-              <p class="empty-sidebar">{{ search() ? 'Aucune entree ne correspond.' : 'Aucune entree pour le moment.' }}</p>
+              <p class="empty-sidebar">{{ search() ? 'Aucune entrée ne correspond.' : 'Aucune entrée pour le moment.' }}</p>
             } @else {
               @for (entry of visibleEntries(); track entry.id) {
                 <div class="entry-list-row">
@@ -34,10 +33,10 @@
                       <strong>{{ formatDay(entry.createdAt) }}</strong>
                       <small>{{ formatMonth(entry.createdAt) }}</small>
                     </span>
-                    <span class="entry-copy"><strong>{{ entry.title || ('Entree du ' + formatDate(entry.createdAt)) }}</strong><small>{{ contentPreview(entry.content) }}</small></span>
+                    <span class="entry-copy"><strong>{{ entry.title || ('Entrée du ' + formatDate(entry.createdAt)) }}</strong><small>{{ contentPreview(entry.content) }}</small></span>
                     @if (entry.mood) { <span class="mood-dot" [attr.title]="moodLabel(entry.mood)">{{ moodMark(entry.mood) }}</span> }
                   </button>
-                  <button class="entry-delete-button" type="button" [attr.aria-label]="'Supprimer ' + (entry.title || 'cette entree')" [attr.title]="'Supprimer ' + (entry.title || 'cette entree')" (click)="$event.stopPropagation(); removeEntryById(entry.id)">
+                  <button class="entry-delete-button" type="button" [attr.aria-label]="'Supprimer ' + (entry.title || 'cette entrée')" [attr.title]="'Supprimer ' + (entry.title || 'cette entrée')" (click)="$event.stopPropagation(); removeEntryById(entry.id)">
                     <svg viewBox="0 0 16 16" aria-hidden="true"><polyline points="2,4 3,4 14,4" /><path d="M13 4l-.7 9a1 1 0 0 1-1 1H4.7a1 1 0 0 1-1-1L3 4" /><path d="M6 4V3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1" /></svg>
                   </button>
                 </div>
@@ -49,7 +48,7 @@
             @if (selectedEntry(); as entry) {
               <div class="editor-heading">
                 <div>
-                  <input class="title-input" type="text" maxlength="120" [value]="draftTitle()" (input)="setTitle($event)" placeholder="Titre de l'entree (optionnel)..." aria-label="Titre de l'entree" />
+                  <input class="title-input" type="text" maxlength="120" [value]="draftTitle()" (input)="setTitle($event)" placeholder="Titre de l'entrée (optionnel)..." aria-label="Titre de l'entrée" />
                   <p class="date-line">{{ formatDate(entry.createdAt) }} · {{ formatTime(entry.createdAt) }} @if (entry.updatedAt && entry.createdAt && entry.updatedAt > entry.createdAt + 5000) { · modifiee le {{ formatDate(entry.updatedAt) }} }</p>
                 </div>
                 <span class="save-state" [class.saving]="saveState() === 'saving'">{{ saveState() === 'saving' ? 'Enregistrement...' : saveState() === 'saved' ? 'Enregistre' : '' }}</span>
@@ -66,7 +65,7 @@
                 <input type="text" [value]="draftTags()" (input)="setTags($event)" placeholder="famille, travail, idee" />
               </label>
 
-               <app-markdown-editor [ngModel]="draftContent()" (ngModelChange)="setContent($event)" [minHeight]="320" placeholder="Ecris librement ce que tu as en tete..." />
+               <app-markdown-editor [ngModel]="draftContent()" (ngModelChange)="setContent($event)" [minHeight]="320" placeholder="Écris librement ce que tu as en tête..." />
 
               <footer class="editor-actions">
                 <button class="danger-button" type="button" (click)="removeEntry()">Supprimer</button>
@@ -80,8 +79,8 @@
               <div class="journal-empty">
                 <p class="empty-icon" aria-hidden="true">J</p>
                 <h2>Votre journal de bord</h2>
-                <p>Un espace personnel pour consigner ce que vous voulez. Les entrees restent stockees dans le navigateur.</p>
-                <button class="primary-button" type="button" (click)="createEntry()">Ecrire ma premiere entree</button>
+                <p>Un espace personnel pour consigner ce que vous voulez. Les entrées restent stockées dans le navigateur.</p>
+                <button class="primary-button" type="button" (click)="createEntry()">Écrire ma première entrée</button>
               </div>
             }
           </article>

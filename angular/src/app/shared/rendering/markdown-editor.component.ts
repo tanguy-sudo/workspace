@@ -23,7 +23,7 @@ const TOOLBAR: ToolbarItem[] = [
   { separator: true },
   { command: 'unordered', label: '-', title: 'Liste a puces' },
   { command: 'ordered', label: '1.', title: 'Liste numerotee' },
-  { command: 'task', label: '[]', title: 'Tache' },
+  { command: 'task', label: '[]', title: 'Tâche' },
   { separator: true },
   { command: 'quote', label: '>', title: 'Citation' },
   { command: 'code', label: '`', title: 'Code inline' },
@@ -37,7 +37,7 @@ const TOOLBAR: ToolbarItem[] = [
 const MODES: Array<{ id: EditorMode; label: string }> = [
   { id: 'edit', label: 'Edition' },
   { id: 'split', label: 'Cote a cote' },
-  { id: 'preview', label: 'Apercu' },
+  { id: 'preview', label: 'Aperçu' },
 ];
 
 @Component({

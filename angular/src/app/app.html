@@ -65,9 +65,23 @@
   <div class="shortcuts-overlay" role="presentation" (click)="shortcutsHelp.set(false)">
     <section class="dialog shortcuts-dialog" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title" appFocusTrap tabindex="-1" (click)="$event.stopPropagation()">
       <h2 id="shortcuts-title">Raccourcis clavier</h2>
-      <p><kbd>Ctrl K</kbd> recherche globale</p>
-      <p><kbd>g</kbd> puis <kbd>h/t/s/j/p/r/e/n</kbd> navigation</p>
-      <p><kbd>?</kbd> ou <kbd>,</kbd> afficher cette aide</p>
+      <h3>Général</h3>
+      <dl>
+        <dt><kbd>Ctrl</kbd> <kbd>K</kbd></dt><dd>Recherche globale</dd>
+        <dt><kbd>?</kbd> <kbd>,</kbd></dt><dd>Afficher / masquer cette aide</dd>
+        <dt><kbd>Échap</kbd></dt><dd>Fermer</dd>
+      </dl>
+      <h3>Navigation : <kbd>g</kbd> puis…</h3>
+      <dl>
+        <dt><kbd>h</kbd></dt><dd>Tableau de bord</dd>
+        <dt><kbd>t</kbd></dt><dd>Tâches</dd>
+        <dt><kbd>s</kbd></dt><dd>Snippets</dd>
+        <dt><kbd>j</kbd></dt><dd>Journal</dd>
+        <dt><kbd>p</kbd></dt><dd>Projets</dd>
+        <dt><kbd>r</kbd></dt><dd>RH</dd>
+        <dt><kbd>e</kbd></dt><dd>Export</dd>
+        <dt><kbd>n</kbd></dt><dd>Planification</dd>
+      </dl>
       <button type="button" (click)="shortcutsHelp.set(false)">Fermer</button>
     </section>
   </div>

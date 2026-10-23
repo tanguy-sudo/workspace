@@ -1,7 +1,6 @@
 <section class="projects-page" aria-labelledby="projects-title">
       <header class="projects-header">
         <div>
-          <p class="eyebrow">WORKSPACE / ANGULAR</p>
           <h1 id="projects-title">Projets</h1>
           <p class="projects-meta">{{ scopeProjects().length }} projet{{ scopeProjects().length > 1 ? 's' : '' }} dans cet espace</p>
         </div>
@@ -50,8 +49,8 @@
 
       <div class="projects-grid" [class.view-list]="viewMode() === 'list'" aria-live="polite">
         @for (project of filteredProjects(); track project.id) { <ng-container [ngTemplateOutlet]="projectCard" [ngTemplateOutletContext]="{ project }" /> }
-        @if (!filteredProjects().length) { <div class="empty-state"><h2>{{ parentId() ? 'Aucun sous-projet' : 'Aucun projet' }}</h2><p>Créez un projet pour commencer.</p></div> }
-         <button class="project-card new-card" type="button" (click)="openCreateProject()"><span class="new-card-plus">+</span><span>Nouveau projet</span></button>
+        @if (!filteredProjects().length) { <div class="empty-state"><h2>{{ parentId() ? 'Aucun sous-projet' : 'Aucun projet' }}</h2><p>Créez un projet pour commencer.</p><button class="primary-button" type="button" (click)="openCreateProject()">Nouveau projet</button></div> }
+         @if (filteredProjects().length) { <button class="project-card new-card" type="button" (click)="openCreateProject()"><span class="new-card-plus">+</span><span>Nouveau projet</span></button> }
       </div>
       }
     </section>
