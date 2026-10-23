@@ -85,7 +85,7 @@ export class TreeDndService {
     const targetName = String(target['name'] ?? target['title'] ?? target.id);
     const placement = event.position === 'inside'
       ? `dans ${targetName}`
-      : `${event.position === 'before' ? 'avant' : 'apres'} ${targetName}`;
-    return `${sourceName} deplace ${placement}`;
+      : `${event.position === 'before' ? 'avant' : 'après'} ${targetName}`;
+    return `${sourceName} déplacé ${placement}`;
   }
 }

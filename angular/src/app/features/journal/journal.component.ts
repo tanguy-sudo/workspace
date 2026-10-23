@@ -201,7 +201,7 @@ export class JournalComponent {
     if (!updated) return;
     this.search.set('');
     this.selectEntry(entry.id, false);
-    this.feedback.showToast('Nouvelle entree');
+    this.feedback.showToast('Nouvelle entrée');
   }
 
   protected setTitle(event: Event): void { this.draftTitle.set((event.target as HTMLInputElement).value); this.scheduleSave(); }
@@ -333,7 +333,7 @@ export class JournalComponent {
   protected async removeEntryById(id: string): Promise<void> {
     const entry = this.store.data()?.journal.find((candidate) => candidate.id === id);
     if (!entry) return;
-    const accepted = await this.feedback.confirm({ title: `Supprimer « ${entry.title || 'cette entree'} » ?`, message: 'Elle sera deplacee dans la corbeille.', destructive: true });
+    const accepted = await this.feedback.confirm({ title: `Supprimer « ${entry.title || 'cette entrée'} » ?`, message: 'Elle sera déplacée dans la corbeille.', destructive: true });
     if (!accepted) return;
     this.saveNow();
     const updated = this.store.update((draft) => {
@@ -345,7 +345,7 @@ export class JournalComponent {
       const nextId = sortedEntries(updated)[0]?.id ?? null;
       this.selectEntry(nextId, false);
     }
-    this.feedback.showToast('Entree deplacee dans la corbeille', 'success');
+    this.feedback.showToast('Entrée déplacée dans la corbeille', 'success');
   }
 
   protected async exportJournal(format: 'json' | 'markdown'): Promise<void> {
@@ -380,7 +380,7 @@ function todayStamp(): string {
 }
 
 function journalMarkdown(entries: JournalEntry[]): string {
-  if (!entries.length) return '_Aucune entree._';
+  if (!entries.length) return '_Aucune entrée._';
   return [
     '# Journal',
     '',

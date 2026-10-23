@@ -1,16 +1,17 @@
 <section class="todos-page" aria-labelledby="todos-title">
       <header class="todos-header">
         <div>
-          <p class="eyebrow">WORKSPACE / ANGULAR</p>
           <h1 id="todos-title">Tâches</h1>
           <p class="todos-meta">{{ activeCount() }} active{{ activeCount() > 1 ? 's' : '' }} · {{ filteredTodos().length }} dans la vue</p>
         </div>
         <div class="header-actions">
+          <div class="view-switch" role="group" aria-label="Affichage">
           <button class="secondary-button" type="button" [class.active-button]="viewMode() === 'columns'" (click)="setViewMode('columns')" aria-label="Vue colonnes">Colonnes</button>
           <button class="secondary-button" type="button" [class.active-button]="viewMode() === 'list'" (click)="setViewMode('list')" aria-label="Vue liste">Liste</button>
           <button class="secondary-button" type="button" [class.active-button]="viewMode() === 'priority'" (click)="setViewMode('priority')" aria-label="Vue priorités">Priorités</button>
+          </div>
           <button class="secondary-button" type="button" [class.active-button]="selectionMode()" (click)="toggleSelectionMode()">{{ selectionMode() ? 'Annuler' : 'Sélectionner' }}</button>
-          <button class="secondary-button" type="button" (click)="openPriorities()">Priorités</button>
+          <button class="secondary-button" type="button" (click)="openPriorities()">Gérer les priorités</button>
           <button class="secondary-button" type="button" (click)="openViews()">Vues</button>
           <button class="secondary-button" type="button" (click)="openTemplates()">Modèles</button>
           <button class="secondary-button danger-outline" type="button" (click)="purgeCompleted()">Purger terminées</button>

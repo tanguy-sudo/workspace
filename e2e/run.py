@@ -162,7 +162,7 @@ def run_scenario(page: Page, fixture_name: str) -> None:
 
     for label, heading in (
         ('RH', 'RH'),
-        ('Projects', 'Projets'),
+        ('Projets', 'Projets'),
         ('Tâches', 'Tâches'),
         ('Snippets', 'Snippets'),
         ('Journal', 'Journal'),
@@ -283,8 +283,8 @@ def run_filled_crud(page: Page) -> None:
     expect(page.locator('.toast', has_text=re.compile('supporte', re.IGNORECASE))).to_be_visible()
 
     page.goto(app_route('/journal'), wait_until='domcontentloaded')
-    page.get_by_role('button', name='+ Nouvelle entree', exact=True).click()
-    page.locator('input[aria-label="Titre de l\'entree"]').fill('E2E journal')
+    page.get_by_role('button', name='+ Nouvelle entrée', exact=True).click()
+    page.locator('input[aria-label="Titre de l\'entrée"]').fill('E2E journal')
     page.locator('textarea[aria-label="Contenu Markdown"]').fill('**Journal E2E**')
     page.get_by_role('button', name='Enregistrer maintenant', exact=True).click()
     expect(page.locator('.entry-list-item', has_text='E2E journal')).to_be_visible()

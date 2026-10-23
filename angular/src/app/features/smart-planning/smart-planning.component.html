@@ -1,7 +1,6 @@
 <section class="planning-page" aria-labelledby="planning-title">
       <header class="planning-header">
         <div>
-          <p class="eyebrow">WORKSPACE / ANGULAR</p>
           <h1 id="planning-title">Planification</h1>
           <p class="planning-meta">Optimise ton temps selon tes tâches</p>
         </div>
@@ -56,6 +55,8 @@
           </div>
         </div>
       </section>
+
+      @if (!resultVisible()) { <p class="empty-hint">Indique ton créneau disponible puis clique sur « Générer » : le plan proposé apparaîtra ici.</p> }
 
       <section id="plan-result" [hidden]="!resultVisible()" aria-live="polite">
           <div id="plan-summary" class="plan-summary">

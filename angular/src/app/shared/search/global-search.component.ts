@@ -20,13 +20,13 @@ type SearchItem = WorkspaceSearchResult | SearchAction;
 const ACTIONS: SearchAction[] = [
   { title: 'Tableau de bord', subtitle: 'Accueil', path: '/home' },
   { title: 'Projets', subtitle: 'Liste des projets', path: '/projects' },
-  { title: 'Taches', subtitle: 'Todo et priorites', path: '/todos' },
-  { title: 'Snippets', subtitle: 'Code reutilisable', path: '/snippets' },
+  { title: 'Tâches', subtitle: 'Todo et priorités', path: '/todos' },
+  { title: 'Snippets', subtitle: 'Code réutilisable', path: '/snippets' },
   { title: 'RH', subtitle: 'Fiches et dossiers', path: '/rh' },
   { title: 'Journal', subtitle: 'Journal personnel', path: '/journal' },
-  { title: 'Nouvelle entree de journal', subtitle: 'Ecrire dans le journal', path: '/journal', createJournal: true },
+  { title: 'Nouvelle entrée de journal', subtitle: 'Écrire dans le journal', path: '/journal', createJournal: true },
   { title: 'Export', subtitle: 'Sauvegarde locale', path: '/export' },
-  { title: 'Parametres', subtitle: 'Preferences', path: '/settings' },
+  { title: 'Paramètres', subtitle: 'Préférences', path: '/settings' },
 ];
 
 @Component({

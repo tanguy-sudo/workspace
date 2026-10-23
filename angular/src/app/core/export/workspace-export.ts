@@ -372,7 +372,7 @@ export function buildExportSections(data: WorkspaceData): WorkspaceExportSection
       markdown: journalToMarkdown(data.journal), zip: journalToZipFiles(data.journal),
     },
     {
-      id: 'rh', title: 'Notes RH', description: "Arborescence des dossiers et fiches RH.",
+      id: 'rh', title: 'RH', description: "Arborescence des dossiers et fiches RH.",
       filename: 'rh', count: `${treeItemCount(data.rh)} note(s)`, formats: ['json', 'md'], data: data.rh,
       markdown: treeToMarkdown(data.rh, 'Notes RH'),
     },

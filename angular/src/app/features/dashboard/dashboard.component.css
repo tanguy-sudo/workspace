@@ -77,6 +77,8 @@ h2 { margin: 0; font-size: 1rem; }
 .health-card strong { color: var(--text); font: 700 1.4rem var(--font-mono); }
 .health-card.warn { border-color: color-mix(in srgb, var(--accent) 30%, transparent); }
 .health-card.ok, .review-item.ok { border-color: color-mix(in srgb, var(--success) 25%, transparent); }
+.health-card.ok { opacity: .72; }
+.health-card.ok strong { color: var(--success); }
 .review-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 .review-list { display: flex; flex-direction: column; gap: var(--sp-3); }
 .recent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--sp-4); }

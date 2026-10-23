@@ -34,7 +34,7 @@ h1 { margin: 0; font-size: 1.7rem; font-weight: 300; letter-spacing: -.025em; li
 .project-card:hover, .project-card:focus-visible { border-color: var(--border-hi); transform: translateY(-3px); box-shadow: var(--glass-shadow-hover); }
 .project-card:hover::before, .project-card:focus-visible::before, .project-card.selected::before { opacity: 1; }
 .project-card.selected { border-color: var(--accent); }
-.project-card.new-card { display: grid; min-height: 9.5rem; place-items: center; align-content: center; gap: var(--sp-2); border-style: dashed; border-color: var(--border); background: none; box-shadow: none; color: var(--text-3); font-size: .875rem; transition: border-color var(--t-mid), color var(--t-mid), background var(--t-mid); }
+.project-card.new-card { display: grid; min-height: 9.5rem; place-items: center; align-content: center; gap: var(--sp-2); border-style: dashed; border-color: var(--border-hi); background: none; box-shadow: none; color: var(--text-2); font-size: .875rem; transition: border-color var(--t-mid), color var(--t-mid), background var(--t-mid); }
 .project-card.new-card:hover { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); transform: none; }
 .new-card-plus { font-size: 1.6rem; line-height: 1; }
 

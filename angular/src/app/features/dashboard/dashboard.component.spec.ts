@@ -68,7 +68,7 @@ describe('DashboardComponent', () => {
     await component.whenStable();
 
     expect(component.nativeElement.querySelector('#dashboard-title')).toBeTruthy();
-    expect(component.nativeElement.querySelector('.empty-message')?.textContent).toContain('Aucune tache');
+    expect(component.nativeElement.querySelector('.empty-message')?.textContent).toContain('Aucune tâche');
     expect(component.nativeElement.querySelector('#task-stats-title')).toBeNull();
     expect(component.nativeElement.querySelectorAll('.health-card')).toHaveLength(5);
     expect(component.nativeElement.querySelector('.review-item.ok')).toBeTruthy();
@@ -100,7 +100,7 @@ describe('DashboardComponent', () => {
     component.detectChanges();
     await component.whenStable();
 
-    const tasks = [...component.nativeElement.querySelectorAll('.shortcut-card')].find((card) => card.textContent?.includes('Taches')) as HTMLElement;
+    const tasks = [...component.nativeElement.querySelectorAll('.shortcut-card')].find((card) => card.textContent?.includes('Tâches')) as HTMLElement;
     expect(tasks?.querySelector('.shortcut-badge')?.classList.contains('danger')).toBe(true);
   });
 
@@ -125,7 +125,7 @@ describe('DashboardComponent', () => {
     component.componentInstance['completeReminder'](daily);
     expect(data()!.todos.find((todo) => todo.id === daily.id)?.status).toBe('done');
     expect(data()!.todos.some((todo) => todo.id !== daily.id && todo.title === daily.title)).toBe(true);
-    expect(feedback.showToast).toHaveBeenCalledWith('Tache terminee', 'success');
+    expect(feedback.showToast).toHaveBeenCalledWith('Tâche terminée', 'success');
   });
 
   it('updates the weekly review and navigates reminder focus to tasks', async () => {
@@ -156,6 +156,6 @@ describe('DashboardComponent', () => {
     component.componentInstance['openSearch']();
     expect(search.open).toHaveBeenCalledOnce();
     component.nativeElement.querySelector('.missing').click();
-    expect(feedback.showToast).toHaveBeenCalledWith('Cet element a ete supprime', 'error');
+    expect(feedback.showToast).toHaveBeenCalledWith('Cet élément a été supprimé', 'error');
   });
 });

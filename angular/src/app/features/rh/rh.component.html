@@ -1,6 +1,6 @@
 <section class="rh-page" aria-labelledby="rh-title">
       <header class="rh-header">
-         <div><p class="eyebrow">WORKSPACE / ANGULAR</p><h1 id="rh-title">RH</h1><p class="rh-meta">{{ documentCount() }} document{{ documentCount() > 1 ? 's' : '' }} · donnees locales</p></div>
+         <div><h1 id="rh-title">RH</h1><p class="rh-meta">{{ documentCount() }} document{{ documentCount() > 1 ? 's' : '' }} · données locales</p></div>
          <div class="rh-actions"><button class="secondary-button" type="button" [class.active-button]="selectionMode()" (click)="toggleSelectionMode()">{{ selectionMode() ? 'Annuler' : 'Sélectionner' }}</button><button class="secondary-button" type="button" (click)="openCreateFolder()">+ Dossier</button><button class="primary-button" type="button" (click)="openCreateDocument()">+ Document</button></div>
       </header>
 
@@ -12,19 +12,19 @@
       </nav>
 
       <div class="rh-layout">
-         <aside class="rh-tree-panel"><app-tree [nodes]="currentChildren()" [expandedIds]="expandedIds()" [selectionMode]="selectionMode()" [selectedIds]="selectedIds()" ariaLabel="Arborescence RH" (activated)="activateNode($event)" (selectionToggled)="toggleSelection($event)" (pinToggled)="toggleNodePin($event)" (dropped)="drop($event)" /></aside>
+         <aside class="rh-tree-panel">@if (!currentChildren().length) { <div class="empty-content"><h2>Dossier vide</h2><p>Créez un dossier ou un document avec les boutons ci-dessus.</p></div> }<app-tree [nodes]="currentChildren()" [expandedIds]="expandedIds()" [selectionMode]="selectionMode()" [selectedIds]="selectedIds()" ariaLabel="Arborescence RH" (activated)="activateNode($event)" (selectionToggled)="toggleSelection($event)" (pinToggled)="toggleNodePin($event)" (dropped)="drop($event)" /></aside>
         <section class="rh-content" aria-live="polite">
           @if (selectedDocument(); as document) {
             <article class="document-card" (click)="handleDocumentClick($event)">
-              <header class="document-heading"><div><h2>{{ document.title }}</h2><p>{{ document.date || 'Sans date' }} @if (document['pinned']) { · Epingle }</p></div><div class="document-actions"><button type="button" (click)="togglePin(document)">{{ document['pinned'] ? 'Desepingler' : 'Epingler' }}</button><button type="button" (click)="editDocument(document)">Modifier</button><button class="danger-button" type="button" (click)="remove(document)">Supprimer</button></div></header>
+              <header class="document-heading"><div><h2>{{ document.title }}</h2><p>{{ document.date || 'Sans date' }} @if (document['pinned']) { · Épinglé }</p></div><div class="document-actions"><button type="button" (click)="togglePin(document)">{{ document['pinned'] ? 'Désépingler' : 'Épingler' }}</button><button type="button" (click)="editDocument(document)">Modifier</button><button class="danger-button" type="button" (click)="remove(document)">Supprimer</button></div></header>
               @if (document.tags?.length) { <div class="tags">@for (tag of document.tags; track tag) { <span>#{{ tag }}</span> }</div> }
               @if (safeDocumentUrl(document.url); as url) { <a class="document-url" [href]="url" target="_blank" rel="noopener noreferrer">{{ url }}</a> }
               <app-safe-markdown [markdown]="document.note || ''" (wikiLink)="openWikiLink($event)" />
-              <label class="attachment-upload">Ajouter une piece jointe<input type="file" (change)="attachFileFromInput(document, $event)" /></label>
+              <label class="attachment-upload">Ajouter une pièce jointe<input type="file" (change)="attachFileFromInput(document, $event)" /></label>
               @if (document.file; as file) { <button class="attachment" type="button" (click)="download(file)">{{ file.name }} · {{ file.size }} octets</button> }
             </article>
           } @else {
-            <div class="empty-content"><h2>{{ currentFolder().name }}</h2><p>Selectionnez un document ou creez-en un.</p></div>
+            <div class="empty-content"><h2>{{ currentFolder().name }}</h2><p>Sélectionnez un document ou créez-en un.</p></div>
           }
         </section>
       </div>

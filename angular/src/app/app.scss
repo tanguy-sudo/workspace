@@ -218,10 +218,13 @@
 
 .shortcuts-overlay { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 1rem; background: rgb(0 0 0 / 60%); }
 .shortcuts-dialog { width: min(32rem, 100%); padding: 1.2rem; border: 1px solid var(--border-hi); border-radius: .75rem; background: var(--bg-2); box-shadow: var(--shadow-lg); }
-.shortcuts-dialog h2 { margin-top: 0; }
-.shortcuts-dialog p { color: var(--text-2); }
-.shortcuts-dialog kbd { padding: .15rem .35rem; border: 1px solid var(--border-hi); border-radius: .3rem; color: var(--text); font: .75rem var(--font-mono); }
-.shortcuts-dialog button { padding: .45rem .7rem; border: 1px solid var(--border-hi); border-radius: .4rem; background: var(--bg); color: var(--text); cursor: pointer; }
+.shortcuts-dialog h2 { margin: 0 0 var(--sp-4); font-size: 1.1rem; font-weight: 500; }
+.shortcuts-dialog h3 { margin: var(--sp-4) 0 var(--sp-2); color: var(--text-3); font-size: .72rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.shortcuts-dialog dl { display: grid; grid-template-columns: 7rem 1fr; gap: 6px var(--sp-3); align-items: center; margin: 0; }
+.shortcuts-dialog dt { display: flex; gap: 4px; }
+.shortcuts-dialog dd { margin: 0; color: var(--text); font-size: .88rem; }
+.shortcuts-dialog kbd { min-width: 1.6rem; padding: 2px 7px; border: 1px solid var(--border-hi); border-bottom-width: 2px; border-radius: .3rem; background: var(--bg-3); color: var(--text); font: .75rem var(--font-mono); text-align: center; }
+.shortcuts-dialog button { margin-top: var(--sp-5); padding: 8px 14px; border: 1px solid var(--border-hi); border-radius: var(--r-md); background: var(--bg-3); color: var(--text); font-size: .82rem; cursor: pointer; }
 
 /* Écrans larges : la colonne de contenu s'élargit (cf. .app-wrapper du projet de base). */
 @media (min-width: 1280px) {
