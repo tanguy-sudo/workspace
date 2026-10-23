@@ -277,3 +277,30 @@
 .md-rendered del {
   color: var(--text-2);
 }
+
+/* Tableaux dans le rendu des fiches (.safe-markdown) : même habillage que l'aperçu éditeur. */
+.safe-markdown table {
+  display: block;
+  max-width: 100%;
+  margin: 0.8em 0;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.88em;
+}
+.safe-markdown th,
+.safe-markdown td {
+  padding: 7px 12px;
+  border: 1px solid var(--border-hi);
+  text-align: left;
+  vertical-align: top;
+}
+.safe-markdown th {
+  background: color-mix(in srgb, var(--bg-3) 90%, var(--accent) 10%);
+  font-weight: 600;
+}
+.safe-markdown tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--bg-3) 45%, transparent);
+}
+.safe-markdown tbody tr:hover {
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-2) 88%);
+}
