@@ -255,6 +255,12 @@ export class ProjectDetailComponent implements OnDestroy {
         return;
       }
        const focus = query.get('focus');
+       if (focus) {
+         const focused = findProjectNode(project, focus);
+         if (focused?.nodeType === 'item') this.fullscreenItem.set(focused);
+       } else {
+         this.fullscreenItem.set(null);
+       }
        const focusPath = focus ? findProjectNodePath(project, focus) : null;
        const nextFocus = focusPath ? focus : null;
        const requested = query.get('path')?.split(',').filter(Boolean) ?? (query.get('folder') ? [query.get('folder') as string] : []);
@@ -663,10 +669,18 @@ export class ProjectDetailComponent implements OnDestroy {
       if (!await this.requestVaultUnlock('Déverrouiller cet item sécurisé')) return;
       if (item.secretEncrypted && !await this.loadSecret(item)) return;
     }
-    this.fullscreenItem.set(item);
+    const path = findProjectNodePath(this.project() as Project, item.id);
+    const route = this.router.serializeUrl(this.router.createUrlTree(['/project', this.projectId()], {
+      queryParams: { path: path?.slice(1, -1).join(',') || null, focus: item.id, kind: 'item' },
+    }));
+    const url = `${window.location.href.split('#')[0]}#${route}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 
-  protected closeFullscreen(): void { this.fullscreenItem.set(null); }
+  protected closeFullscreen(): void {
+    this.fullscreenItem.set(null);
+    void this.router.navigate([], { relativeTo: this.route, queryParams: { focus: null, kind: null }, replaceUrl: true });
+  }
 
   protected async copyItem(item: ProjectItem): Promise<void> {
     const secret = item.type === 'password' ? this.secretFor(item) : null;

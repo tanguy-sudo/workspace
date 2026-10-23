@@ -191,4 +191,20 @@ describe('ProjectDetailComponent', () => {
     item.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
     expect(component.componentInstance['selectedIds']()).toContain('item-alpha-code');
   });
+
+  it('opens an item fullscreen in a new tab and restores it from its focus URL', async () => {
+    const open = vi.spyOn(window, 'open').mockReturnValue(null);
+    const component = TestBed.createComponent(ProjectDetailComponent);
+    component.detectChanges();
+    await component.whenStable();
+    const item = data()!.projects.flatMap((project) => project.children).flatMap((node) => node.nodeType === 'folder' ? node.children : [node]).find((node) => node.id === 'item-alpha-info') as ProjectItem;
+
+    await component.componentInstance['openFullscreen'](item);
+    expect(open).toHaveBeenCalledWith(expect.stringContaining(`focus=${item.id}`), '_blank', 'noopener,noreferrer');
+
+    routeQuery.next(convertToParamMap({ focus: item.id, kind: 'item' }));
+    component.detectChanges();
+    expect(component.componentInstance['fullscreenItem']()?.id).toBe(item.id);
+    open.mockRestore();
+  });
 });
