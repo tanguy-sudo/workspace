@@ -126,3 +126,4 @@ fieldset legend { padding: 0 var(--sp-1); color: var(--text-2); font: .7rem var(
   .todo-card { grid-template-columns: auto minmax(0, 1fr); }
   .todo-actions { grid-column: 2; justify-content: flex-start; }
 }
+.todo-attachment { display: inline-block; margin-top: var(--sp-2); color: var(--link-color); font-size: .82rem; overflow-wrap: anywhere; }

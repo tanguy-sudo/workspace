@@ -25,8 +25,10 @@ import type {
   TodoSavedView,
   TodoViewFilters,
   WorkspaceData,
+  WorkspaceFile,
   WorkspaceTemplate,
 } from '../../core/persistence/workspace-data';
+import { FileAccessService } from '../../core/files/file-access.service';
 import { StoragePreferencesService, STORAGE_KEYS } from '../../core/persistence/storage-preferences.service';
 import { WorkspaceStoreService } from '../../core/persistence/workspace-store.service';
 import { FeedbackService } from '../../shared/feedback/feedback.service';
@@ -43,6 +45,7 @@ type TodoDialog = 'todo' | 'priorities' | 'views' | 'templates' | 'templateForm'
 interface TodoDraft {
   title: string;
   description: string;
+  file: WorkspaceFile | null;
   priorityId: string;
   status: TodoStatus;
   estimatedTime: string;
@@ -161,7 +164,7 @@ function newId(prefix: string): string {
 
 function emptyDraft(priorityId = 'normal'): TodoDraft {
   return {
-    title: '', description: '', priorityId, status: 'todo', estimatedTime: '', dueDate: '', reminderAt: '',
+    title: '', description: '', file: null, priorityId, status: 'todo', estimatedTime: '', dueDate: '', reminderAt: '',
     pinned: false, projectId: '', context: '', attachedTo: '', recurrenceType: 'none', recurrenceWeekdays: [],
     recurrenceNth: 2, recurrenceWeekday: 1, dependencies: [], tags: '',
   };
@@ -308,6 +311,7 @@ export class TodosComponent implements OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly feedback = inject(FeedbackService);
+  private readonly files = inject(FileAccessService);
   private readonly queryParams = toSignal(this.route.queryParamMap, { initialValue: this.route.snapshot.queryParamMap });
   private appliedRouteKey = '';
   private restoredSessionFocus = false;
@@ -506,7 +510,7 @@ export class TodosComponent implements OnDestroy {
     const recurrence = recurrenceDraft(todo.recurrence);
     this.editingTodoId.set(todo.id);
     this.todoDraft = {
-      title: todo.title, description: todo.description || '', priorityId: priorityId(todo.priorityId, this.priorities()), status: this.todoStatus(todo.status),
+      title: todo.title, description: todo.description || '', file: todo.file || null, priorityId: priorityId(todo.priorityId, this.priorities()), status: this.todoStatus(todo.status),
       estimatedTime: todo.estimatedTime ? String(todo.estimatedTime) : '', dueDate: todo.dueDate || '', reminderAt: todo.reminderAt || '', pinned: todo.pinned === true,
       projectId: todo.projectId || '', context: todo.context || '', attachedTo: todo.attachedTo || '', ...recurrence, dependencies: [...(todo.dependencies ?? [])], tags: (todo.tags ?? []).join(', '),
     };
@@ -527,7 +531,7 @@ export class TodosComponent implements OnDestroy {
     if (this.todoDraft.recurrenceType === 'weekly' && !recurrence) { this.feedback.showToast('Choisis au moins un jour de récurrence', 'error'); return; }
     const now = Date.now();
     const changes: Partial<Todo> = {
-      title, description: this.todoDraft.description.trim(), priorityId: this.todoDraft.priorityId || priorityId(undefined, this.priorities()), status: this.todoDraft.status,
+      title, description: this.todoDraft.description.trim(), file: this.todoDraft.file, priorityId: this.todoDraft.priorityId || priorityId(undefined, this.priorities()), status: this.todoDraft.status,
       estimatedTime: parsedTime.minutes, dueDate: this.todoDraft.dueDate, reminderAt: this.todoDraft.reminderAt, pinned: this.todoDraft.pinned,
       projectId, context, attachedTo: this.todoDraft.attachedTo.trim(), recurrence, dependencies: this.todoDraft.dependencies.filter((id) => id !== this.editingTodoId() && this.allTodos().some((todo) => todo.id === id)),
       tags: tagsValue(this.todoDraft.tags), updatedAt: now,
@@ -537,7 +541,7 @@ export class TodosComponent implements OnDestroy {
     const changed = this.mutate((data) => {
       if (!editingId) {
         return createTodo(data, {
-          id: createdId as string, title, description: this.todoDraft.description.trim(), status: this.todoDraft.status, priorityId: changes.priorityId,
+          id: createdId as string, title, description: this.todoDraft.description.trim(), file: this.todoDraft.file, status: this.todoDraft.status, priorityId: changes.priorityId,
           context, attachedTo: changes.attachedTo, estimatedTime: parsedTime.minutes, dependencies: changes.dependencies || [], tags: changes.tags || [],
           dueDate: this.todoDraft.dueDate, reminderAt: this.todoDraft.reminderAt, recurrence, pinned: this.todoDraft.pinned, projectId, createdAt: now,
         });
@@ -693,6 +697,12 @@ export class TodosComponent implements OnDestroy {
 
   protected toggleDraftWeekday(day: number): void { this.todoDraft.recurrenceWeekdays = this.todoDraft.recurrenceWeekdays.includes(day) ? this.todoDraft.recurrenceWeekdays.filter((value) => value !== day) : [...this.todoDraft.recurrenceWeekdays, day].sort((a, b) => a - b); }
   protected toggleDraftDependency(id: string): void { this.todoDraft.dependencies = this.todoDraft.dependencies.includes(id) ? this.todoDraft.dependencies.filter((value) => value !== id) : [...this.todoDraft.dependencies, id]; }
+  protected async selectAttachment(event: Event): Promise<void> {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    try { this.todoDraft.file = await this.files.readAttachment(file); }
+    catch { this.feedback.showToast('Pièce jointe invalide ou trop volumineuse (4 Mo maximum)', 'error'); }
+  }
 
   protected dragStart(event: DragEvent, todo: Todo): void { this.draggedId = todo.id; event.dataTransfer?.setData('text/plain', todo.id); if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move'; }
   protected dragEnd(): void { this.draggedId = null; this.clearDropPreview(); }
