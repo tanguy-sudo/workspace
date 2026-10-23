@@ -52,7 +52,7 @@ interface TodoDraft {
   projectId: string;
   context: string;
   attachedTo: string;
-  recurrenceType: 'none' | 'daily' | 'weekly' | 'monthly_nth_weekday';
+  recurrenceType: 'none' | 'daily' | 'weekly' | 'monthly_nth_weekday' | 'monthly_first_day';
   recurrenceWeekdays: number[];
   recurrenceNth: 1 | 2 | 3 | 4 | -1;
   recurrenceWeekday: number;
@@ -222,6 +222,7 @@ function interpolateTemplate(value: string | undefined): string {
 function recurrenceDraft(value: TodoRecurrence | null | undefined): Pick<TodoDraft, 'recurrenceType' | 'recurrenceWeekdays' | 'recurrenceNth' | 'recurrenceWeekday'> {
   if (!value) return { recurrenceType: 'none', recurrenceWeekdays: [], recurrenceNth: 2, recurrenceWeekday: 1 };
   if (value.type === 'daily') return { recurrenceType: 'daily', recurrenceWeekdays: [], recurrenceNth: 2, recurrenceWeekday: 1 };
+  if (value.type === 'monthly_first_day') return { recurrenceType: 'monthly_first_day', recurrenceWeekdays: [], recurrenceNth: 2, recurrenceWeekday: 1 };
   if (value.type === 'weekly') return { recurrenceType: 'weekly', recurrenceWeekdays: [...value.weeklyDays], recurrenceNth: 2, recurrenceWeekday: 1 };
   return { recurrenceType: 'monthly_nth_weekday', recurrenceWeekdays: [], recurrenceNth: value.nth, recurrenceWeekday: value.weekday };
 }
@@ -394,6 +395,7 @@ export class TodosComponent implements OnDestroy {
     if (!value) return '';
     if (value.type === 'daily') return 'Récurrence: quotidien';
     if (value.type === 'weekly') return `Récurrence: hebdo (${value.weeklyDays.map((day) => WEEK_DAYS.find((entry) => entry.id === day)?.label).filter(Boolean).join(', ')})`;
+    if (value.type === 'monthly_first_day') return 'Récurrence: le 1er de chaque mois';
     const nth = value.nth === -1 ? 'dernier' : `${value.nth}e`;
     return `Récurrence: ${nth} ${this.fullWeekDays.find((day) => day.id === value.weekday)?.label.toLowerCase() || 'jour'}`;
   }
@@ -775,6 +777,7 @@ export class TodosComponent implements OnDestroy {
     if (this.todoDraft.recurrenceType === 'daily') return { type: 'daily' };
     if (this.todoDraft.recurrenceType === 'weekly') return this.todoDraft.recurrenceWeekdays.length ? { type: 'weekly', weeklyDays: [...new Set(this.todoDraft.recurrenceWeekdays)].sort((a, b) => a - b) } : null;
     if (this.todoDraft.recurrenceType === 'monthly_nth_weekday') return { type: 'monthly_nth_weekday', nth: this.todoDraft.recurrenceNth, weekday: this.todoDraft.recurrenceWeekday };
+    if (this.todoDraft.recurrenceType === 'monthly_first_day') return { type: 'monthly_first_day' };
     return null;
   }
 
