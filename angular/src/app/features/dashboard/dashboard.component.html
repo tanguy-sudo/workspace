@@ -24,7 +24,7 @@
         <p class="status-message error-message" role="alert">Le dashboard ne peut pas être chargé.</p>
       } @else {
         <section class="dashboard-section" aria-labelledby="reminders-title">
-          <header class="section-header"><h2 id="reminders-title">Rappels <small>{{ activeReminderCount() ? '· ' + activeReminderCount() + ' actifs' : '' }}</small></h2><button class="primary-button" type="button" (click)="openReminder()">+ Nouveau rappel</button></header>
+          <header class="section-header"><h2 id="reminders-title">Rappels <small>{{ activeReminderCount() ? '· ' + activeReminderCount() + ' actifs' : '' }}</small></h2><button class="primary-button" type="button" data-shortcut-new (click)="openReminder()">+ Nouveau rappel</button></header>
           <div class="reminder-tabs" role="tablist" aria-label="Rappels">
             @for (tab of reminderTabs; track tab.id) { <button type="button" role="tab" [id]="'reminder-tab-' + tab.id" [attr.aria-controls]="'reminder-panel-' + tab.id" [attr.aria-selected]="reminderTab() === tab.id" [class.active]="reminderTab() === tab.id" (click)="setReminderTab(tab.id)">{{ tab.label }} <span>{{ reminderCount(tab.id) }}</span></button> }
           </div>

@@ -25,7 +25,7 @@
             <div class="header-actions">
               <button class="secondary-button" type="button" [class.active-button]="selectionMode()" (click)="toggleSelectionMode()">{{ selectionMode() ? 'Annuler' : 'Sélectionner' }}</button>
               <button class="secondary-button" type="button" (click)="openNewFolder()">+ Dossier</button>
-              <button class="primary-button" type="button" (click)="openNewItem()">+ Item</button>
+              <button class="primary-button" type="button" data-shortcut-new (click)="openNewItem()">+ Item</button>
               <button class="secondary-button" type="button" (click)="openProjectEditor()">Modifier</button>
               <button class="secondary-button" type="button" (click)="backToProjects()">Retour</button>
             </div>
