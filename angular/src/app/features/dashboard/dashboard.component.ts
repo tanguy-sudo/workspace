@@ -369,7 +369,7 @@ export class DashboardComponent {
   protected dateLabel(): string {
     const date = new Date(this.now());
     const day = date.toLocaleDateString('fr-FR', { weekday: 'long' });
-    return `c'est ${day} ${date.getHours()}h${String(date.getMinutes()).padStart(2, '0')}`;
+    return `nous sommes ${day} ${date.getHours()}h${String(date.getMinutes()).padStart(2, '0')}`;
   }
 
   protected reviewStatus(): string {

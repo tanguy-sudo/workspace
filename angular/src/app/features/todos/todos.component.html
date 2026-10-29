@@ -35,7 +35,7 @@
           </div>
         </div>
         @if (contexts().length) {
-          <div class="filter-section"><span class="filter-label">Contexte</span><div class="filter-group"><button type="button" [class.active-filter]="contextFilter() === 'all'" (click)="setFilter('context', 'all')">Tous</button>@for (context of contexts(); track context) { <button type="button" [class.active-filter]="contextFilter() === context" (click)="setFilter('context', context)">{{ context }}</button> }</div></div>
+          <div class="filter-section"><span class="filter-label">Contexte</span><div class="filter-group"><button type="button" [class.active-filter]="contextFilter() === 'all'" (click)="setFilter('context', 'all')">Tous</button>@for (context of contexts(); track context) { <button type="button" [class.active-filter]="contextFilter().toUpperCase() === context" (click)="setFilter('context', context)">{{ context }}</button> }</div></div>
         }
         @if (projects().length) {
           <div class="filter-section"><span class="filter-label">Projet</span><div class="filter-group"><button type="button" [class.active-filter]="projectFilter() === 'all'" (click)="setFilter('project', 'all')">Tous</button><button type="button" [class.active-filter]="projectFilter() === 'none'" (click)="setFilter('project', 'none')">Sans projet</button>@for (project of projects(); track project.id) { <button type="button" [class.active-filter]="projectFilter() === project.id" (click)="setFilter('project', project.id)">{{ project.name }}</button> }</div></div>
