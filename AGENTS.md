@@ -21,3 +21,6 @@ Static Angular app (no backend; data in IndexedDB via Dexie), published on GitHu
 - Workflow: pour tout développement, créer une branche dédiée (jamais de commit direct sur `main`), pousser puis ouvrir une pull request vers `main` (CI sur PR : `main` et `plan/angular-migration-windows`). Lancer `npm run verify` avant la PR.
 - Never use a personal browser profile or real credentials in tests or fixtures. Fixtures must stay anonymised.
 - CI fetches the `legacy-rollback-tan58` branch for compatibility tests, and the workflow has a legacy rollback mode.
+- npm : le registre local est le miroir interne CNP. Après un 
+pm install, vérifier que ngular/package-lock.json ne contient aucune URL intranet.cnp.fr dans esolved (sinon 
+pm ci plante en CI) ; les remplacer par https://registry.npmjs.org/.
