@@ -133,3 +133,5 @@ h1 { margin: 0; font-size: clamp(2rem, 6vw, 4.4rem); letter-spacing: -.06em; }
   .folder-card .node-actions { width: 100%; margin-left: 2.7rem; }
   .secret-block input { min-width: 9rem; }
 }
+.note-toggle { padding: 2px 0; border: 0; background: transparent; color: var(--accent); font: inherit; font-size: .8rem; cursor: pointer; }
+.note-toggle:hover { color: var(--accent-hi); text-decoration: underline; }

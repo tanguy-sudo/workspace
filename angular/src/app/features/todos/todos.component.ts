@@ -171,7 +171,7 @@ function emptyDraft(priorityId = 'normal'): TodoDraft {
 }
 
 function contextValues(value: unknown): string[] {
-  return [...new Set(String(value || '').split(',').map((item) => item.trim()).filter(Boolean))];
+  return [...new Set(String(value || '').split(',').map((item) => item.trim().toLocaleUpperCase('fr-FR')).filter(Boolean))];
 }
 
 function tagsValue(value: unknown): string[] {
@@ -769,7 +769,7 @@ export class TodosComponent implements OnDestroy {
   private matches(todo: Todo): boolean {
     if (this.statusFilter() !== 'all' && todo.status !== this.statusFilter()) return false;
     if (this.priorityFilter() !== 'all' && todo.priorityId !== this.priorityFilter()) return false;
-    if (this.contextFilter() !== 'all' && !contextValues(todo.context).includes(this.contextFilter())) return false;
+    if (this.contextFilter() !== 'all' && !contextValues(todo.context).includes(this.contextFilter().toLocaleUpperCase('fr-FR'))) return false;
     if (this.projectFilter() === 'none' && !!todo.projectId) return false;
     if (this.projectFilter() !== 'all' && this.projectFilter() !== 'none' && todo.projectId !== this.projectFilter()) return false;
     const today = localDate();
