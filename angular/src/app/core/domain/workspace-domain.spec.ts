@@ -148,6 +148,11 @@ describe('Workspace pure domain functions', () => {
     expect(completed.id).toBe('todo-daily');
   });
 
+  it('keeps the next occurrence of a late recurring task on today when it falls today', () => {
+    const late = { ...structuredClone(fixture.data.todos[0]), dueDate: '2026-01-30', reminderAt: undefined, recurrence: { type: 'daily' as const } } as WorkspaceData['todos'][number];
+    expect(buildNextRecurringTodo(late, '2026-02-02', 'next-id')?.dueDate).toBe('2026-02-02');
+  });
+
   it('keeps task CRUD, recurrence, order, views and priorities compatible', () => {
     const source = fixture.data as WorkspaceData;
     const todo = {
