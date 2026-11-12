@@ -29,6 +29,8 @@ const ACTIONS: SearchAction[] = [
   { title: 'Paramètres', subtitle: 'Préférences', path: '/settings' },
 ];
 
+const ICON_GLYPHS: Record<string, string> = { folder: '▸', document: '≡', check: '✓', code: '</>' };
+
 @Component({
   selector: 'app-global-search',
   standalone: true,
@@ -81,7 +83,7 @@ export class GlobalSearchComponent {
   }
 
   protected icon(item: SearchItem): string {
-    return 'icon' in item ? item.icon : '→';
+    return 'icon' in item ? (ICON_GLYPHS[item.icon] ?? '•') : '→';
   }
 
   private move(direction: number): void {

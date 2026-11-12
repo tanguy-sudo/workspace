@@ -14,7 +14,7 @@ kbd { flex-shrink: 0; padding: 2px 7px; border: 1px solid var(--border); border-
 .search-result { display: flex; width: 100%; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-5); border: 0; border-left: 3px solid transparent; border-radius: 0; background: none; color: var(--text); text-align: left; cursor: pointer; transition: background var(--t-fast); }
 .search-result:hover { background: var(--bg-3); }
 .search-result.selected { border-left-color: var(--accent); background: var(--bg-3); }
-.search-icon { display: grid; width: 30px; height: 30px; flex-shrink: 0; place-items: center; border-radius: var(--r-sm); background: var(--accent-dim); color: var(--accent); font-size: .8rem; }
+.search-icon { display: grid; width: 30px; height: 30px; flex-shrink: 0; place-items: center; overflow: hidden; border-radius: var(--r-sm); background: var(--accent-dim); color: var(--accent); font-size: .8rem; }
 .search-result-copy { display: grid; min-width: 0; flex: 1; gap: 2px; }
 .search-result-copy strong, .search-result-copy small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .search-result-copy strong { font-size: .88rem; font-weight: 500; }

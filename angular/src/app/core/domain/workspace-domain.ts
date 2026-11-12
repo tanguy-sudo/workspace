@@ -682,7 +682,7 @@ export function buildNextRecurringTodo(
   let nextDate = computeNextDateFromRecurrence(anchor, recurrence);
   if (!nextDate) return null;
   let guard = 0;
-  while (nextDate <= today && guard < 400) {
+  while (nextDate < today && guard < 400) {
     nextDate = computeNextDateFromRecurrence(nextDate, recurrence);
     if (!nextDate) return null;
     guard += 1;
