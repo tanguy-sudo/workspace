@@ -33,6 +33,7 @@ h2 { margin: 0; }
 
 /* ══ COLONNES & COULOIRS ══ */
 .todos-columns, .priority-board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-4); }
+.todos-columns { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .status-column, .priority-lane { min-width: 0; min-height: 12rem; padding: var(--sp-4); border: 1px solid var(--border); border-radius: var(--r-lg); background: color-mix(in srgb, var(--bg-2) 78%, transparent); transition: background var(--t-fast); }
 .column-header, .priority-header { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); margin-bottom: var(--sp-4); padding: var(--sp-2) var(--sp-1) var(--sp-3); border-bottom: 2px solid var(--border); color: var(--text-2); }
 .column-header h2, .priority-header h2 { font: .72rem var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }

@@ -23,7 +23,7 @@ const LEGACY_FULL_SECTIONS = [
 ] as const;
 
 const ITEM_TYPES = new Set(['link', 'memo', 'info', 'code', 'password']);
-const TODO_STATUSES = new Set(['todo', 'waitinginfo', 'inprogress', 'in-progress', 'blocked', 'done']);
+const TODO_STATUSES = new Set(['todo', 'waitinginfo', 'inprogress', 'in-progress', 'devdone', 'blocked', 'done']);
 const KNOWN_KEYS = new Set<string>(REQUIRED_WORKSPACE_SECTIONS);
 export const MAX_IMPORT_BYTES = 16 * 1024 * 1024;
 export const MAX_IMPORT_STRING_LENGTH = 1_000_000;

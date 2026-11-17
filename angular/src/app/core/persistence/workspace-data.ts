@@ -10,7 +10,7 @@ export interface UnknownFields {
 }
 
 export type KnownProjectItemType = 'link' | 'memo' | 'info' | 'code' | 'password';
-export type KnownTodoStatus = 'todo' | 'waitinginfo' | 'inprogress' | 'done';
+export type KnownTodoStatus = 'todo' | 'waitinginfo' | 'inprogress' | 'devdone' | 'done';
 
 export interface WorkspaceFile extends UnknownFields {
   name: string;

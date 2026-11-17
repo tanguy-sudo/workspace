@@ -49,13 +49,14 @@ const TODO_CSV_COLUMNS = [
   'estimatedTime', 'dependencies', 'tags', 'projectId', 'recurrence', 'updatedAt',
 ] as const;
 
-const TODO_STATUS_ORDER = ['todo', 'waitinginfo', 'inprogress', 'in-progress', 'blocked', 'done'];
+const TODO_STATUS_ORDER = ['todo', 'waitinginfo', 'inprogress', 'in-progress', 'devdone', 'blocked', 'done'];
 
 const TODO_STATUS_LABELS: Record<string, string> = {
   todo: 'À faire',
   waitinginfo: "En attente d'info",
   inprogress: 'En cours',
   'in-progress': 'En cours',
+  devdone: 'Dev fini',
   blocked: 'Bloqué',
   done: 'Terminées',
 };
