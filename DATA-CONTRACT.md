@@ -36,7 +36,7 @@ read/write semantics until a separate migration explicitly changes them.
 |---|---|---|
 | `projects` | project array with nested folders/items | Keep project IDs, `parentId`, child order and item fields. |
 | `rh` | RH folder/document tree | Keep node IDs, tree order, Markdown, tags and attachments. |
-| `todos` | task array | Keep IDs, status, priority, dates, recurrence, dependencies and optional fields. |
+| `todos` | task array | Keep IDs, status (	odo, waitinginfo, inprogress, devdone, done), priority, dates, recurrence, dependencies and optional fields. |
 | `snippets` | snippet array | Keep IDs, code, language, tags, favorite state and `folderId`. |
 | `snippetFolders` | folder tree | Keep folder IDs and hierarchy. |
 | `snippetMixedOrder` | `Record<string, string[]>` | Keep `f:<id>` and `s:<id>` tokens and their order. |

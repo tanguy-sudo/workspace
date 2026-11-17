@@ -130,6 +130,7 @@ const STATUSES: Array<{ id: TodoStatus; label: string }> = [
   { id: 'todo', label: 'À faire' },
   { id: 'waitinginfo', label: "En attente d'info" },
   { id: 'inprogress', label: 'En cours' },
+  { id: 'devdone', label: 'Dev fini' },
   { id: 'done', label: 'Terminées' },
 ];
 
